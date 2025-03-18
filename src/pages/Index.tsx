@@ -1,13 +1,62 @@
-// Update this page (the content is just a fallback if you fail to update the page)
 
-const Index = () => {
+import React from 'react';
+import { AppProvider, useAppContext } from '@/context/AppContext';
+import ProgressBar from '@/components/ProgressBar';
+import HabitSelector from '@/components/HabitSelector';
+import SavingsCalculator from '@/components/SavingsCalculator';
+import GrowthProjector from '@/components/GrowthProjector';
+import HabitSkipper from '@/components/HabitSkipper';
+import AutoInvest from '@/components/AutoInvest';
+import { Bitcoin } from 'lucide-react';
+
+const MainContent: React.FC = () => {
+  const { step } = useAppContext();
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return <HabitSelector />;
+      case 2:
+        return <SavingsCalculator />;
+      case 3:
+        return <GrowthProjector />;
+      case 4:
+        return <HabitSkipper />;
+      case 5:
+        return <AutoInvest />;
+      default:
+        return <HabitSelector />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="app-container">
+      <header className="flex justify-center md:justify-between items-center py-4 mb-4">
+        <div className="flex items-center gap-2">
+          <Bitcoin size={28} className="text-bitcoin" />
+          <h1 className="text-2xl font-bold">ssskipper</h1>
+        </div>
+        <p className="hidden md:block text-sm text-gray-500">Stack Sats Skipper</p>
+      </header>
+
+      <div className="flex flex-col md:flex-row gap-8">
+        <aside className="md:w-44 lg:w-64">
+          <ProgressBar />
+        </aside>
+        
+        <main className="flex-1">
+          {renderStep()}
+        </main>
       </div>
     </div>
+  );
+};
+
+const Index: React.FC = () => {
+  return (
+    <AppProvider>
+      <MainContent />
+    </AppProvider>
   );
 };
 
