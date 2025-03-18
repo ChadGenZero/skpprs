@@ -7,7 +7,7 @@ import SavingsCalculator from '@/components/SavingsCalculator';
 import GrowthProjector from '@/components/GrowthProjector';
 import HabitSkipper from '@/components/HabitSkipper';
 import AutoInvest from '@/components/AutoInvest';
-import { Bitcoin } from 'lucide-react';
+import { Sailboat } from 'lucide-react';
 
 const MainContent: React.FC = () => {
   const { step } = useAppContext();
@@ -33,7 +33,7 @@ const MainContent: React.FC = () => {
     <div className="app-container">
       <header className="flex justify-center md:justify-between items-center py-4 mb-4">
         <div className="flex items-center gap-2">
-          <Bitcoin size={28} className="text-bitcoin" />
+          <Sailboat size={28} className="text-bitcoin" />
           <h1 className="text-2xl font-bold">SS Skipper</h1>
         </div>
         <p className="hidden md:block text-sm text-gray-500">Stack Sats Skipper</p>

@@ -77,7 +77,7 @@ const HabitCard: React.FC<{
           e.stopPropagation();
           onEdit();
         }}
-        className="absolute top-4 right-12 p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
+        className="absolute top-4 right-4 p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
         aria-label="Edit habit"
       >
         <Pencil size={14} />
@@ -98,36 +98,48 @@ const HabitDialog: React.FC<{
   isEditing = false
 }) => {
   const { addHabit, updateHabit } = useAppContext();
-  const [name, setName] = useState(habit?.name || '');
-  const [expense, setExpense] = useState(habit?.expense ? habit.expense.toString() : '');
-  const [frequency, setFrequency] = useState(habit?.frequency ? habit.frequency.toString() : '1');
-  const [period, setPeriod] = useState<Frequency>(habit?.period || 'daily');
+  const [name, setName] = useState('');
+  const [expense, setExpense] = useState('');
+  const [frequency, setFrequency] = useState('1');
+  const [period, setPeriod] = useState<Frequency>('daily');
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name && expense && frequency) {
-      const habitData = {
-        name,
-        expense: parseFloat(expense),
-        frequency: parseInt(frequency),
-        period
-      };
-      
-      if (isEditing && habit) {
-        updateHabit(habit.id, habitData);
-        toast.success('Habit updated successfully!');
-      } else {
-        addHabit(habitData);
-        toast.success('Habit added successfully!');
-      }
-      
-      // Reset form
+  // Initialize form with habit data when editing and dialog opens
+  React.useEffect(() => {
+    if (isEditing && habit && open) {
+      setName(habit.name);
+      setExpense(habit.expense.toString());
+      setFrequency(habit.frequency.toString());
+      setPeriod(habit.period);
+    } else if (!isEditing && open) {
+      // Reset form for new habits
       setName('');
       setExpense('');
       setFrequency('1');
       setPeriod('daily');
-      onOpenChange(false);
     }
+  }, [habit, isEditing, open]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Use existing values or new input
+    const habitData = {
+      name,
+      expense: parseFloat(expense),
+      frequency: parseInt(frequency),
+      period
+    };
+    
+    if (isEditing && habit) {
+      updateHabit(habit.id, habitData);
+      toast.success('Habit updated successfully!');
+    } else {
+      addHabit(habitData);
+      toast.success('Habit added successfully!');
+    }
+    
+    // Close dialog
+    onOpenChange(false);
   };
 
   return (
@@ -142,9 +154,9 @@ const HabitDialog: React.FC<{
             id="name" 
             value={name} 
             onChange={(e) => setName(e.target.value)} 
-            placeholder={isEditing && habit ? habit.name : "e.g., Premium Coffee"} 
+            placeholder="e.g., Premium Coffee" 
             required 
-            className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
+            className="text-gray-900 placeholder:text-gray-400"
           />
         </div>
         <div className="space-y-2">
@@ -156,9 +168,9 @@ const HabitDialog: React.FC<{
             step="0.01" 
             value={expense} 
             onChange={(e) => setExpense(e.target.value)} 
-            placeholder={isEditing && habit ? habit.expense.toString() : "0.00"} 
+            placeholder="0.00" 
             required 
-            className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
+            className="text-gray-900 placeholder:text-gray-400"
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -170,15 +182,15 @@ const HabitDialog: React.FC<{
               min="1" 
               value={frequency} 
               onChange={(e) => setFrequency(e.target.value)} 
-              placeholder={isEditing && habit ? habit.frequency.toString() : "1"} 
+              placeholder="1" 
               required 
-              className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
+              className="text-gray-900 placeholder:text-gray-400"
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="period">Period</Label>
             <Select value={period} onValueChange={(value) => setPeriod(value as Frequency)}>
-              <SelectTrigger id="period" className={isEditing ? "text-gray-500" : ""}>
+              <SelectTrigger id="period" className="text-gray-900">
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent>
