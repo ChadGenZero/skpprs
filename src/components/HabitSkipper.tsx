@@ -34,7 +34,16 @@ const WeeklyTracker: React.FC<{
   // Get current day of week
   const now = new Date();
   const currentDayIndex = now.getDay(); // 0 is Sunday, 6 is Saturday
-  const currentDay: DayOfWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][currentDayIndex];
+  const currentDayMap: Record<number, DayOfWeek> = {
+    0: 'sun',
+    1: 'mon',
+    2: 'tue',
+    3: 'wed',
+    4: 'thu',
+    5: 'fri',
+    6: 'sat'
+  };
+  const currentDay: DayOfWeek = currentDayMap[currentDayIndex];
   
   // Calculate progress percentage
   const progressPercentage = (skippedDays.length / 7) * 100;

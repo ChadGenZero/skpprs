@@ -77,7 +77,7 @@ const HabitCard: React.FC<{
           e.stopPropagation();
           onEdit();
         }}
-        className="absolute top-2 right-2 p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
+        className="absolute top-4 right-4 p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
         aria-label="Edit habit"
       >
         <Pencil size={14} />
@@ -144,6 +144,7 @@ const HabitDialog: React.FC<{
             onChange={(e) => setName(e.target.value)} 
             placeholder="e.g., Premium Coffee" 
             required 
+            className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
           />
         </div>
         <div className="space-y-2">
@@ -157,6 +158,7 @@ const HabitDialog: React.FC<{
             onChange={(e) => setExpense(e.target.value)} 
             placeholder="0.00" 
             required 
+            className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -169,12 +171,13 @@ const HabitDialog: React.FC<{
               value={frequency} 
               onChange={(e) => setFrequency(e.target.value)} 
               required 
+              className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
             />
           </div>
           <div className="space-y-2">
             <Label htmlFor="period">Period</Label>
             <Select value={period} onValueChange={(value) => setPeriod(value as Frequency)}>
-              <SelectTrigger id="period">
+              <SelectTrigger id="period" className={isEditing ? "text-gray-500" : ""}>
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent>
@@ -216,6 +219,11 @@ const HabitSelector: React.FC = () => {
     }
   };
 
+  const handleAddHabit = () => {
+    setEditingHabit(undefined);
+    setDialogOpen(true);
+  };
+
   return (
     <div className="animate-scale-in">
       <div className="max-w-2xl mx-auto px-4">
@@ -243,12 +251,14 @@ const HabitSelector: React.FC = () => {
           ))}
           
           <Dialog open={dialogOpen} onOpenChange={handleCloseDialog}>
-            <DialogTrigger asChild>
-              <button className="flex items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-bitcoin hover:text-bitcoin transition-all">
-                <PlusIcon size={16} />
-                <span>Add Custom Habit</span>
-              </button>
-            </DialogTrigger>
+            <Button 
+              onClick={handleAddHabit}
+              className="flex items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-bitcoin hover:text-bitcoin transition-all"
+            >
+              <PlusIcon size={16} />
+              <span>Add Custom Habit</span>
+            </Button>
+            
             <HabitDialog 
               open={dialogOpen} 
               onOpenChange={handleCloseDialog} 
