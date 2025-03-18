@@ -30,7 +30,7 @@ const HabitCard: React.FC<{
 }) => {
   // Function to get readable frequency text
   const getFrequencyText = (habit: Habit) => {
-    return `${habit.frequency} time${habit.frequency > 1 ? 's' : ''} per ${habit.period.slice(0, -2)}`;
+    return `${habit.frequency} time${habit.frequency > 1 ? 's' : ''} per ${habit.period === 'daily' ? 'day' : habit.period.slice(0, -2)}`;
   };
 
   // Function to determine which icon to show based on habit name
@@ -77,7 +77,7 @@ const HabitCard: React.FC<{
           e.stopPropagation();
           onEdit();
         }}
-        className="absolute top-4 right-4 p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
+        className="absolute top-4 right-12 p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
         aria-label="Edit habit"
       >
         <Pencil size={14} />
@@ -142,7 +142,7 @@ const HabitDialog: React.FC<{
             id="name" 
             value={name} 
             onChange={(e) => setName(e.target.value)} 
-            placeholder="e.g., Premium Coffee" 
+            placeholder={isEditing && habit ? habit.name : "e.g., Premium Coffee"} 
             required 
             className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
           />
@@ -156,7 +156,7 @@ const HabitDialog: React.FC<{
             step="0.01" 
             value={expense} 
             onChange={(e) => setExpense(e.target.value)} 
-            placeholder="0.00" 
+            placeholder={isEditing && habit ? habit.expense.toString() : "0.00"} 
             required 
             className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
           />
@@ -170,6 +170,7 @@ const HabitDialog: React.FC<{
               min="1" 
               value={frequency} 
               onChange={(e) => setFrequency(e.target.value)} 
+              placeholder={isEditing && habit ? habit.frequency.toString() : "1"} 
               required 
               className={isEditing ? "text-gray-500 placeholder:text-gray-300" : ""}
             />

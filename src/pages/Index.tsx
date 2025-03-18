@@ -34,7 +34,7 @@ const MainContent: React.FC = () => {
       <header className="flex justify-center md:justify-between items-center py-4 mb-4">
         <div className="flex items-center gap-2">
           <Bitcoin size={28} className="text-bitcoin" />
-          <h1 className="text-2xl font-bold">ssskipper</h1>
+          <h1 className="text-2xl font-bold">SS Skipper</h1>
         </div>
         <p className="hidden md:block text-sm text-gray-500">Stack Sats Skipper</p>
       </header>
