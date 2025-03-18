@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import { useAppContext, type Habit, type Frequency } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { PlusIcon, ArrowRightIcon, Coffee, ShoppingBag, DollarSign } from 'lucide-react';
+import { PlusIcon, ArrowRightIcon, Coffee, ShoppingBag, DollarSign, Pencil } from 'lucide-react';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const frequencyOptions = [
   { value: 'daily', label: 'Daily' },
@@ -16,10 +17,16 @@ const frequencyOptions = [
   { value: 'yearly', label: 'Yearly' }
 ];
 
-const HabitCard: React.FC<{ habit: Habit; isSelected: boolean; onToggle: () => void }> = ({ 
+const HabitCard: React.FC<{ 
+  habit: Habit; 
+  isSelected: boolean; 
+  onToggle: () => void;
+  onEdit: () => void;
+}> = ({ 
   habit, 
   isSelected, 
-  onToggle 
+  onToggle,
+  onEdit
 }) => {
   // Function to get readable frequency text
   const getFrequencyText = (habit: Habit) => {
@@ -36,12 +43,11 @@ const HabitCard: React.FC<{ habit: Habit; isSelected: boolean; onToggle: () => v
   return (
     <div
       className={cn(
-        "habit-card p-4 rounded-xl border shadow-sm transition-all duration-300",
+        "habit-card p-4 rounded-xl border shadow-sm transition-all duration-300 relative",
         isSelected ? "bg-white border-bitcoin shadow-md" : "bg-white/60 hover:bg-white"
       )}
-      onClick={onToggle}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-start gap-3" onClick={onToggle}>
         <div className={cn(
           "flex items-center justify-center w-8 h-8 rounded-full", 
           isSelected ? "bg-bitcoin text-white" : "bg-gray-100 text-gray-500"
@@ -65,29 +71,56 @@ const HabitCard: React.FC<{ habit: Habit; isSelected: boolean; onToggle: () => v
           )}
         </div>
       </div>
+      
+      <button 
+        onClick={(e) => {
+          e.stopPropagation();
+          onEdit();
+        }}
+        className="absolute top-2 right-2 p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
+        aria-label="Edit habit"
+      >
+        <Pencil size={14} />
+      </button>
     </div>
   );
 };
 
-const AddHabitDialog: React.FC<{ open: boolean; onOpenChange: (open: boolean) => void }> = ({ 
+const HabitDialog: React.FC<{ 
+  open: boolean; 
+  onOpenChange: (open: boolean) => void;
+  habit?: Habit;
+  isEditing?: boolean;
+}> = ({ 
   open, 
-  onOpenChange 
+  onOpenChange,
+  habit,
+  isEditing = false
 }) => {
-  const { addHabit } = useAppContext();
-  const [name, setName] = useState('');
-  const [expense, setExpense] = useState('');
-  const [frequency, setFrequency] = useState('1');
-  const [period, setPeriod] = useState<Frequency>('daily');
+  const { addHabit, updateHabit } = useAppContext();
+  const [name, setName] = useState(habit?.name || '');
+  const [expense, setExpense] = useState(habit?.expense ? habit.expense.toString() : '');
+  const [frequency, setFrequency] = useState(habit?.frequency ? habit.frequency.toString() : '1');
+  const [period, setPeriod] = useState<Frequency>(habit?.period || 'daily');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name && expense && frequency) {
-      addHabit({
+      const habitData = {
         name,
         expense: parseFloat(expense),
         frequency: parseInt(frequency),
         period
-      });
+      };
+      
+      if (isEditing && habit) {
+        updateHabit(habit.id, habitData);
+        toast.success('Habit updated successfully!');
+      } else {
+        addHabit(habitData);
+        toast.success('Habit added successfully!');
+      }
+      
       // Reset form
       setName('');
       setExpense('');
@@ -100,7 +133,7 @@ const AddHabitDialog: React.FC<{ open: boolean; onOpenChange: (open: boolean) =>
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Add Custom Habit</DialogTitle>
+        <DialogTitle>{isEditing ? 'Edit Habit' : 'Add Custom Habit'}</DialogTitle>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="space-y-4 py-2">
         <div className="space-y-2">
@@ -154,7 +187,7 @@ const AddHabitDialog: React.FC<{ open: boolean; onOpenChange: (open: boolean) =>
         </div>
         <DialogFooter>
           <Button type="submit" className="w-full bg-bitcoin hover:bg-bitcoin/90">
-            Add Habit
+            {isEditing ? 'Update Habit' : 'Add Habit'}
           </Button>
         </DialogFooter>
       </form>
@@ -165,6 +198,17 @@ const AddHabitDialog: React.FC<{ open: boolean; onOpenChange: (open: boolean) =>
 const HabitSelector: React.FC = () => {
   const { habits, selectedHabits, toggleHabit, setStep } = useAppContext();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | undefined>(undefined);
+  
+  const handleEditHabit = (habit: Habit) => {
+    setEditingHabit(habit);
+    setDialogOpen(true);
+  };
+  
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setEditingHabit(undefined);
+  };
   
   const handleContinue = () => {
     if (selectedHabits.length > 0) {
@@ -182,6 +226,8 @@ const HabitSelector: React.FC = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Pick your habits to skip</h1>
           <p className="text-gray-600 max-w-md mx-auto">
             Select the habits you want to skip and start saving. Each skipped habit adds up to your Bitcoin savings.
+            <br />
+            <span className="text-sm italic mt-1 block">You can customize any habit by clicking the edit icon.</span>
           </p>
         </div>
         
@@ -192,17 +238,23 @@ const HabitSelector: React.FC = () => {
               habit={habit} 
               isSelected={selectedHabits.some(h => h.id === habit.id)}
               onToggle={() => toggleHabit(habit.id)}
+              onEdit={() => handleEditHabit(habit)}
             />
           ))}
           
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <Dialog open={dialogOpen} onOpenChange={handleCloseDialog}>
             <DialogTrigger asChild>
               <button className="flex items-center justify-center gap-2 p-4 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-bitcoin hover:text-bitcoin transition-all">
                 <PlusIcon size={16} />
                 <span>Add Custom Habit</span>
               </button>
             </DialogTrigger>
-            <AddHabitDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+            <HabitDialog 
+              open={dialogOpen} 
+              onOpenChange={handleCloseDialog} 
+              habit={editingHabit} 
+              isEditing={!!editingHabit} 
+            />
           </Dialog>
         </div>
         

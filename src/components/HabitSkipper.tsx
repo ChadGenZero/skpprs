@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useAppContext, type DayOfWeek } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon, TrendingUpIcon, Check, Coffee, ShoppingBag, DollarSign } from 'lucide-react';
+import { ArrowLeftIcon, ArrowRightIcon, TrendingUpIcon, Check, Coffee, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -15,11 +16,70 @@ const formatCurrency = (amount: number): string => {
   }).format(amount);
 };
 
+const WeeklyTracker: React.FC<{
+  habitId: string;
+  skippedDays: DayOfWeek[];
+  onSkipDay: (day: DayOfWeek) => void;
+}> = ({ habitId, skippedDays, onSkipDay }) => {
+  const days: { day: DayOfWeek; label: string }[] = [
+    { day: 'mon', label: 'M' },
+    { day: 'tue', label: 'T' },
+    { day: 'wed', label: 'W' },
+    { day: 'thu', label: 'T' },
+    { day: 'fri', label: 'F' },
+    { day: 'sat', label: 'S' },
+    { day: 'sun', label: 'S' }
+  ];
+  
+  // Get current day of week
+  const now = new Date();
+  const currentDayIndex = now.getDay(); // 0 is Sunday, 6 is Saturday
+  const currentDay: DayOfWeek = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][currentDayIndex];
+  
+  // Calculate progress percentage
+  const progressPercentage = (skippedDays.length / 7) * 100;
+
+  return (
+    <div className="mt-4">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-sm font-medium text-gray-600">Weekly progress</span>
+        <span className="text-xs text-gray-500">{skippedDays.length}/7 days</span>
+      </div>
+      
+      <Progress value={progressPercentage} className="h-2 mb-3" />
+      
+      <div className="flex justify-between gap-1">
+        {days.map(({ day, label }) => {
+          const isSkipped = skippedDays.includes(day);
+          const isToday = day === currentDay;
+          
+          return (
+            <button
+              key={day}
+              onClick={() => onSkipDay(day)}
+              disabled={isSkipped}
+              className={cn(
+                "w-8 h-8 flex items-center justify-center rounded-md text-xs font-medium transition-all",
+                isSkipped 
+                  ? "bg-green-500 text-white" 
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200",
+                isToday && !isSkipped && "ring-2 ring-bitcoin ring-offset-1"
+              )}
+            >
+              {isSkipped ? <Check size={14} /> : label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const SkipCard: React.FC<{ 
-  habit: any; 
-  onSkip: () => void; 
-  recentlySkipped: boolean;
-}> = ({ habit, onSkip, recentlySkipped }) => {
+  habit: any;
+  skippedDays: DayOfWeek[];
+  onSkipDay: (day: DayOfWeek) => void;
+}> = ({ habit, skippedDays, onSkipDay }) => {
   // Function to determine which icon to show based on habit name
   const getHabitIcon = (habitName: string) => {
     if (habitName.toLowerCase().includes('coffee')) return <Coffee size={24} />;
@@ -28,16 +88,7 @@ const SkipCard: React.FC<{
   };
 
   return (
-    <div className={cn(
-      "relative overflow-hidden p-5 rounded-xl border bg-white/90 shadow-sm transition-all duration-300",
-      recentlySkipped ? "border-green-500 animate-pulse" : "border-gray-200"
-    )}>
-      {recentlySkipped && (
-        <div className="absolute top-2 right-2 bg-green-500 text-white rounded-full p-1">
-          <Check size={14} />
-        </div>
-      )}
-      
+    <div className="relative overflow-hidden p-5 rounded-xl border bg-white/90 shadow-sm transition-all duration-300">
       <div className="flex items-center gap-4 mb-3">
         <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center text-gray-600">
           {getHabitIcon(habit.name)}
@@ -55,36 +106,34 @@ const SkipCard: React.FC<{
           <p className="text-sm text-gray-500">Skipped {habit.skipped} times</p>
           <p className="font-medium text-bitcoin">{formatCurrency(habit.skipped * habit.expense)} saved</p>
         </div>
-        
-        <Button 
-          variant="outline" 
-          className="border-bitcoin text-bitcoin hover:bg-bitcoin/10"
-          onClick={onSkip}
-        >
-          Skip Now
-        </Button>
       </div>
+      
+      <WeeklyTracker 
+        habitId={habit.id} 
+        skippedDays={skippedDays}
+        onSkipDay={onSkipDay}
+      />
     </div>
   );
 };
 
 const HabitSkipper: React.FC = () => {
-  const { selectedHabits, skipHabit, totalSavings, setStep } = useAppContext();
-  const [recentlySkipped, setRecentlySkipped] = useState<string[]>([]);
+  const { 
+    selectedHabits, 
+    skipHabitOnDay, 
+    totalSavings, 
+    weeklySkipSavings,
+    setStep,
+    getCurrentWeekSkips 
+  } = useAppContext();
   
-  const handleSkip = (habitId: string) => {
-    skipHabit(habitId);
-    setRecentlySkipped((prev) => [...prev, habitId]);
+  const handleSkipDay = (habitId: string, day: DayOfWeek) => {
+    skipHabitOnDay(habitId, day);
     
     // Show a success toast
     toast.success('Habit skipped!', {
       description: 'Great job! Your savings have been updated.',
     });
-    
-    // Remove the highlight after a short delay
-    setTimeout(() => {
-      setRecentlySkipped((prev) => prev.filter(id => id !== habitId));
-    }, 2000);
   };
 
   return (
@@ -96,11 +145,11 @@ const HabitSkipper: React.FC = () => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Skip & Save</h1>
           <p className="text-gray-600 max-w-md mx-auto">
-            Track your skipped habits and watch your savings grow. Each time you avoid a bad habit, click "Skip Now".
+            Track your skipped habits and watch your savings grow. Mark each day you successfully skip a habit.
           </p>
         </div>
         
-        <div className="glass-card p-6 mb-8 text-center">
+        <div className="glass-card p-6 mb-6 text-center">
           <h2 className="text-xl font-semibold mb-2">Total Savings</h2>
           <div className="text-4xl font-bold text-bitcoin animate-pulse-subtle">
             {formatCurrency(totalSavings)}
@@ -110,13 +159,28 @@ const HabitSkipper: React.FC = () => {
           </p>
         </div>
         
+        <div className="glass-card p-6 mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-full bg-bitcoin/10 text-bitcoin flex items-center justify-center">
+              <Calendar size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold">This Week's Savings</h2>
+              <p className="text-sm text-gray-500">Based on your skipped habits</p>
+            </div>
+          </div>
+          <div className="text-2xl font-bold">
+            {formatCurrency(weeklySkipSavings)}
+          </div>
+        </div>
+        
         <div className="grid gap-4 mb-8">
           {selectedHabits.map((habit) => (
             <SkipCard 
               key={habit.id}
               habit={habit}
-              onSkip={() => handleSkip(habit.id)}
-              recentlySkipped={recentlySkipped.includes(habit.id)}
+              skippedDays={getCurrentWeekSkips(habit.id)}
+              onSkipDay={(day) => handleSkipDay(habit.id, day)}
             />
           ))}
         </div>

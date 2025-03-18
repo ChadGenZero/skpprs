@@ -22,14 +22,14 @@ const formatCurrency = (amount: number): string => {
 };
 
 const AutoInvest: React.FC = () => {
-  const { selectedHabits, totalSavings, annualSavings, setStep } = useAppContext();
+  const { selectedHabits, totalSavings, annualSavings, weeklySkipSavings, setStep } = useAppContext();
   const [investFrequency, setInvestFrequency] = useState('weekly');
   const [autoInvestEnabled, setAutoInvestEnabled] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   
-  // Calculate weekly and monthly DCA amounts
-  const weeklyDCA = (annualSavings / 52).toFixed(2);
-  const monthlyDCA = (annualSavings / 12).toFixed(2);
+  // Calculate DCA amounts based on actual skip behavior
+  const weeklyDCA = weeklySkipSavings.toFixed(2);
+  const monthlyDCA = (weeklySkipSavings * 4).toFixed(2); // Approximate monthly based on weekly
 
   const handleSetupInvesting = () => {
     // In a real app, this would connect to a Bitcoin exchange API
@@ -61,9 +61,14 @@ const AutoInvest: React.FC = () => {
           
           <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-3 mb-6">
             <AlertTriangle className="text-yellow-500 mt-0.5" size={18} />
-            <p className="text-sm text-yellow-700">
-              This is a demonstration of the auto-invest feature. In a real app, this would connect to a Bitcoin exchange.
-            </p>
+            <div>
+              <p className="text-sm text-yellow-700 mb-1">
+                This is a demonstration of the auto-invest feature. In a real app, this would connect to a Bitcoin exchange.
+              </p>
+              <p className="text-xs text-yellow-600">
+                Your DCA amount is calculated based on your actual skipping behavior this week.
+              </p>
+            </div>
           </div>
           
           <div className="mb-6">
@@ -123,6 +128,10 @@ const AutoInvest: React.FC = () => {
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600">Annual savings potential</span>
               <span className="font-medium">{formatCurrency(annualSavings)}</span>
+            </div>
+            <div className="flex justify-between py-2 border-b">
+              <span className="text-gray-600">This week's skipped savings</span>
+              <span className="font-medium">{formatCurrency(weeklySkipSavings)}</span>
             </div>
             <div className="flex justify-between py-2">
               <span className="text-gray-600">DCA frequency</span>
