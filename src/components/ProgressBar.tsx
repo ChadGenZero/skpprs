@@ -12,70 +12,86 @@ const steps = [
   { step: 5, title: 'Auto-Invest' }
 ];
 
+// Path positions for the S-curve
+const stepPositions = [
+  { x: 50, y: 50 },   // First stage
+  { x: 0, y: 200 },   // Second stage
+  { x: 50, y: 350 },  // Third stage
+  { x: 100, y: 500 }, // Fourth stage
+  { x: 50, y: 650 }   // Final stage
+];
+
 const ProgressBar: React.FC = () => {
   const { step, setStep } = useAppContext();
 
   return (
-    <div className="py-6 px-4 md:px-0">
-      <div className="flex flex-col gap-1 items-center max-w-md mx-auto progress-s-path">
-        {steps.map((s, index) => {
-          // Determine position along the S-curve
-          const isEven = index % 2 === 0;
-          const shouldOffsetRight = index % 4 === 1 || index % 4 === 2;
-          
-          return (
-            <React.Fragment key={s.step}>
-              {/* Step Dot with S-path positioning */}
-              <div className={cn(
-                "flex items-center w-full",
-                shouldOffsetRight ? "justify-end" : "justify-start",
-                index === 0 && "justify-center" // First dot centered
-              )}>
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => s.step <= Math.max(step, 2) && setStep(s.step)}
-                    className={cn(
-                      "progress-dot group flex items-center justify-center",
-                      s.step === step && "active",
-                      s.step < step && "completed",
-                      s.step <= Math.max(step, 2) ? "cursor-pointer" : "cursor-not-allowed opacity-60"
-                    )}
-                    disabled={s.step > Math.max(step, 2)}
-                    aria-label={`Go to step ${s.step}: ${s.title}`}
-                  >
-                    {s.step < step ? (
-                      <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    ) : (
-                      <span className="text-white font-medium">{s.step}</span>
-                    )}
-                    
-                    {/* Life buoy ring effect */}
-                    <div className="absolute inset-0 ring-effect"></div>
-                  </button>
-                  
-                  {/* Step Title */}
-                  <div className={cn(
-                    "text-sm font-medium transition-all mt-1 whitespace-nowrap",
-                    s.step === step ? "text-royal-blue font-semibold scale-105" : "text-gray-500",
-                    s.step < step && "text-gray-400"
-                  )}>
-                    {s.title}
-                  </div>
-                </div>
-              </div>
+    <div className="py-6 px-4 md:px-0 progress-container">
+      <div className="relative mx-auto h-[650px] w-[150px]">
+        {/* SVG S-curve Path */}
+        <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 150 650" xmlns="http://www.w3.org/2000/svg">
+          <path 
+            d="M 50 50 C 150 150, -50 250, 50 350 S 150 550, 50 650" 
+            stroke="#ccc" 
+            strokeWidth="2" 
+            fill="none" 
+            strokeDasharray="5,5" 
+            className="progress-path"
+          />
+          {/* Active path segment that follows progress */}
+          <path 
+            d="M 50 50 C 150 150, -50 250, 50 350 S 150 550, 50 650" 
+            stroke="#1EAEDB" 
+            strokeWidth="3" 
+            fill="none" 
+            strokeDasharray="5,5"
+            strokeDashoffset="0"
+            className={`progress-path-active step-${step}`}
+          />
+        </svg>
 
-              {/* Dashed Connection Line (except after the last item) */}
-              {index < steps.length - 1 && (
-                <div className={cn(
-                  "progress-line",
-                  s.step < step && "active"
-                )} />
+        {/* Lifebuoy markers positioned along the path */}
+        {steps.map((s, index) => (
+          <div 
+            key={s.step}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2"
+            style={{ 
+              left: `${stepPositions[index].x}px`, 
+              top: `${stepPositions[index].y}px`,
+            }}
+          >
+            <button
+              onClick={() => s.step <= Math.max(step, 2) && setStep(s.step)}
+              className={cn(
+                "progress-dot group flex items-center justify-center",
+                s.step === step && "active",
+                s.step < step && "completed",
+                s.step <= Math.max(step, 2) ? "cursor-pointer" : "cursor-not-allowed opacity-60"
               )}
-            </React.Fragment>
-          );
-        })}
+              disabled={s.step > Math.max(step, 2)}
+              aria-label={`Go to step ${s.step}: ${s.title}`}
+            >
+              {s.step < step ? (
+                <svg className="w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                <span className="text-white font-medium">{s.step}</span>
+              )}
+              
+              {/* Life buoy ring effect */}
+              <div className="absolute inset-0 ring-effect"></div>
+            </button>
+            
+            {/* Step Title */}
+            <div className={cn(
+              "text-sm font-medium transition-all mt-2 whitespace-nowrap",
+              s.step === step ? "text-royal-blue font-semibold scale-105" : "text-gray-500",
+              s.step < step && "text-gray-400"
+            )}>
+              {s.title}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
