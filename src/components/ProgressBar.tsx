@@ -2,7 +2,6 @@
 import React from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { cn } from '@/lib/utils';
-import { LifeBuoy } from 'lucide-react';
 
 // Array of steps with their titles
 const steps = [
@@ -20,6 +19,7 @@ const ProgressBar: React.FC = () => {
     <div className="py-6 px-4 md:px-0">
       <div className="flex flex-col gap-1 items-center max-w-md mx-auto progress-s-path">
         {steps.map((s, index) => {
+          // Determine position along the S-curve
           const isEven = index % 2 === 0;
           const shouldOffsetRight = index % 4 === 1 || index % 4 === 2;
           
@@ -29,7 +29,7 @@ const ProgressBar: React.FC = () => {
               <div className={cn(
                 "flex items-center w-full",
                 shouldOffsetRight ? "justify-end" : "justify-start",
-                index === 0 && "justify-center"
+                index === 0 && "justify-center" // First dot centered
               )}>
                 <div className="flex flex-col items-center">
                   <button

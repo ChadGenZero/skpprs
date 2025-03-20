@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { AppProvider, useAppContext } from '@/context/AppContext';
 import ProgressBar from '@/components/ProgressBar';
@@ -7,15 +6,14 @@ import SavingsCalculator from '@/components/SavingsCalculator';
 import GrowthProjector from '@/components/GrowthProjector';
 import HabitSkipper from '@/components/HabitSkipper';
 import AutoInvest from '@/components/AutoInvest';
-import { Sailboat } from 'lucide-react';
 
-// Nautical Logo - Two S letters combined as rope
+// Nautical Logo - Two S letters intertwined as rope dollar sign
 const NauticalLogo = () => (
   <div className="text-royal-blue">
     <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14 2C10.5817 2 7.33312 3.31785 4.99975 5.65122C2.66637 7.98459 1.34853 11.2332 1.34853 14.6515C1.34853 18.0698 2.66637 21.3184 4.99975 23.6517C7.33312 25.9851 10.5817 27.3029 14 27.3029C17.4183 27.3029 20.6669 25.9851 23.0002 23.6517C25.3336 21.3184 26.6515 18.0698 26.6515 14.6515" stroke="#1EAEDB" strokeWidth="2.5" strokeLinecap="round"/>
-      <path d="M14 2C10.5817 2 7.33312 3.31785 4.99975 5.65122C2.66637 7.98459 1.34853 11.2332 1.34853 14.6515C1.34853 18.0698 2.66637 21.3184 4.99975 23.6517C7.33312 25.9851 10.5817 27.3029 14 27.3029" stroke="#F97316" strokeWidth="2.5" strokeLinecap="round"/>
-      <path d="M26.6515 7.32574C24.3181 4.99236 21.0695 3.67453 17.6512 3.67453C14.2329 3.67453 10.9843 4.99236 8.65091 7.32574C6.31754 9.65911 4.99969 12.9077 4.99969 16.326C4.99969 19.7443 6.31754 22.9929 8.65091 25.3262C10.9843 27.6596 14.2329 28.9775 17.6512 28.9775C21.0695 28.9775 24.3181 27.6596 26.6515 25.3262C28.9848 22.9929 30.3027 19.7443 30.3027 16.326C30.3027 12.9077 28.9848 9.65911 26.6515 7.32574Z" stroke="#1EAEDB" strokeWidth="2.5" strokeLinecap="round"/>
+      <path d="M14 5C11.5 5 9.5 6 8.5 7.5C7.5 9 7.5 11 9 12.5C10.5 14 13 14.5 15.5 15C18 15.5 20 16.5 20 18.5C20 20.5 18 22 15 22C12 22 10 20.5 10 18" stroke="#1EAEDB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M14 2V5M14 22V25" stroke="#1EAEDB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M18 4C20.5 4 22.5 5 23.5 6.5C24.5 8 24.5 10 23 11.5C21.5 13 19 13.5 16.5 14C14 14.5 12 15.5 12 17.5C12 19.5 14 21 17 21C20 21 22 19.5 22 17" stroke="#1EAEDB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   </div>
 );
