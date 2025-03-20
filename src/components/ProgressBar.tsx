@@ -50,6 +50,9 @@ const ProgressBar: React.FC = () => {
                     ) : (
                       <span className="text-white font-medium">{s.step}</span>
                     )}
+                    
+                    {/* Life buoy ring effect */}
+                    <div className="absolute inset-0 ring-effect"></div>
                   </button>
                   
                   {/* Step Title */}
@@ -63,7 +66,7 @@ const ProgressBar: React.FC = () => {
                 </div>
               </div>
 
-              {/* Connection Line (except after the last item) */}
+              {/* Dashed Connection Line (except after the last item) */}
               {index < steps.length - 1 && (
                 <div className={cn(
                   "progress-line",
