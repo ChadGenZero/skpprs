@@ -12,13 +12,13 @@ const steps = [
   { step: 5, title: 'Auto-Invest' }
 ];
 
-// Path positions for the S-curve
+// Path positions for a more natural S-curve
 const stepPositions = [
-  { x: 50, y: 50 },   // First stage
-  { x: 0, y: 200 },   // Second stage
-  { x: 50, y: 350 },  // Third stage
-  { x: 100, y: 500 }, // Fourth stage
-  { x: 50, y: 650 }   // Final stage
+  { x: 75, y: 50 },   // First stage
+  { x: 25, y: 200 },  // Second stage
+  { x: 75, y: 350 },  // Third stage
+  { x: 25, y: 500 },  // Fourth stage
+  { x: 75, y: 650 }   // Final stage
 ];
 
 const ProgressBar: React.FC = () => {
@@ -29,21 +29,22 @@ const ProgressBar: React.FC = () => {
       <div className="relative mx-auto h-[650px] w-[150px]">
         {/* SVG S-curve Path */}
         <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 150 650" xmlns="http://www.w3.org/2000/svg">
+          {/* Background dashed path */}
           <path 
-            d="M 50 50 C 150 150, -50 250, 50 350 S 150 550, 50 650" 
+            d="M 75 50 C 25 125, 125 275, 75 350 C 25 425, 125 575, 75 650" 
             stroke="#ccc" 
             strokeWidth="2" 
             fill="none" 
-            strokeDasharray="5,5" 
+            strokeDasharray="8,8" 
             className="progress-path"
           />
           {/* Active path segment that follows progress */}
           <path 
-            d="M 50 50 C 150 150, -50 250, 50 350 S 150 550, 50 650" 
+            d="M 75 50 C 25 125, 125 275, 75 350 C 25 425, 125 575, 75 650" 
             stroke="#1EAEDB" 
             strokeWidth="3" 
             fill="none" 
-            strokeDasharray="5,5"
+            strokeDasharray="8,8"
             strokeDashoffset="0"
             className={`progress-path-active step-${step}`}
           />
