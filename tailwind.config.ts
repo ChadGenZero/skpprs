@@ -29,6 +29,12 @@ export default {
 					DEFAULT: '#f7931a',
 					foreground: '#ffffff'
 				},
+				'royal-blue': {
+					DEFAULT: '#1EAEDB',
+					light: '#33C3F0',
+					dark: '#0FA0CE',
+					foreground: '#ffffff'
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'

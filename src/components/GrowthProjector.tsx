@@ -16,28 +16,31 @@ import {
 } from 'recharts';
 import { cn } from '@/lib/utils';
 
-// Simulated Bitcoin price data (historical and projected)
+// Generate projection data with 40% year-on-year return for 20 years
 const generateProjectionData = (monthlySavings: number) => {
-  // Assume the current Bitcoin price is $60,000
-  const btcPrice = 60000;
+  // Current Bitcoin price (not $80,000)
+  const btcPrice = 70000; // Using a more current price
+  const annualGrowthRate = 0.40; // 40% annual return
   const data = [];
   let cumulativeSats = 0;
   let cumulativeUSD = 0;
   
-  // Generate data for 5 years
-  for (let i = 0; i <= 60; i++) {
+  // Generate data for 20 years (240 months)
+  for (let i = 0; i <= 240; i++) {
     // Monthly DCA amount in BTC (sats)
-    const monthlyBtcAmount = monthlySavings / btcPrice;
+    const currentBtcPrice = btcPrice * Math.pow(1 + annualGrowthRate, i/12);
+    const monthlyBtcAmount = monthlySavings / currentBtcPrice;
     cumulativeSats += monthlyBtcAmount;
     cumulativeUSD += monthlySavings;
     
-    // Simple projection model with 15% annual increase
-    const projectedValue = cumulativeSats * btcPrice * Math.pow(1.15, i/12);
+    // Projected value based on 40% annual growth
+    const projectedValue = cumulativeSats * currentBtcPrice;
     
     data.push({
       month: i,
       savingsUSD: cumulativeUSD.toFixed(2),
       projectedValue: projectedValue.toFixed(2),
+      year: Math.floor(i / 12)
     });
   }
   
@@ -73,19 +76,6 @@ const GrowthProjector: React.FC = () => {
     return () => clearTimeout(timer);
   }, [monthlySavings]);
   
-  // Calculate final projected value
-  const finalProjectedValue = chartData.length > 0 
-    ? parseFloat(chartData[chartData.length - 1].projectedValue) 
-    : 0;
-  
-  // Calculate total savings amount (DCA)
-  const totalSavingsAmount = chartData.length > 0 
-    ? parseFloat(chartData[chartData.length - 1].savingsUSD) 
-    : 0;
-  
-  // Calculate potential profit
-  const potentialProfit = finalProjectedValue - totalSavingsAmount;
-  
   // Calculate data for the selected timeframe
   const timeframeData = () => {
     switch (selectedTimeframe) {
@@ -94,10 +84,31 @@ const GrowthProjector: React.FC = () => {
       case '3y':
         return chartData.slice(0, 37);
       case '5y':
-      default:
+        return chartData.slice(0, 61);
+      case '10y':
+        return chartData.slice(0, 121);
+      case '20y':
         return chartData;
+      default:
+        return chartData.slice(0, 61);
     }
   };
+  
+  // Get data for the selected timeframe
+  const currentTimeframeData = timeframeData();
+  
+  // Calculate final projected value based on selected timeframe
+  const finalProjectedValue = currentTimeframeData.length > 0 
+    ? parseFloat(currentTimeframeData[currentTimeframeData.length - 1].projectedValue) 
+    : 0;
+  
+  // Calculate total savings amount (DCA) based on selected timeframe
+  const totalSavingsAmount = currentTimeframeData.length > 0 
+    ? parseFloat(currentTimeframeData[currentTimeframeData.length - 1].savingsUSD) 
+    : 0;
+  
+  // Calculate potential profit
+  const potentialProfit = finalProjectedValue - totalSavingsAmount;
 
   return (
     <div className="animate-scale-in">
@@ -108,7 +119,7 @@ const GrowthProjector: React.FC = () => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Grow Your Savings</h1>
           <p className="text-gray-600 max-w-md mx-auto">
-            See what your savings could look like if invested in Bitcoin over time. 
+            See what your savings could look like if invested in Bitcoin over time with a 40% annual return. 
           </p>
         </div>
         
@@ -117,13 +128,13 @@ const GrowthProjector: React.FC = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold">Projected Growth</h2>
               <div className="flex gap-2">
-                {['1y', '3y', '5y'].map((period) => (
+                {['1y', '3y', '5y', '10y', '20y'].map((period) => (
                   <button
                     key={period}
                     className={cn(
                       "text-sm px-3 py-1 rounded-md transition-all",
                       selectedTimeframe === period 
-                        ? "bg-bitcoin text-white" 
+                        ? "bg-royal-blue text-white" 
                         : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                     )}
                     onClick={() => setSelectedTimeframe(period)}
@@ -137,20 +148,35 @@ const GrowthProjector: React.FC = () => {
             <div className="h-64 w-full">
               {isChartReady ? (
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={timeframeData()} margin={{ top: 5, right: 10, left: 0, bottom: 20 }}>
+                  <LineChart data={currentTimeframeData} margin={{ top: 5, right: 10, left: 0, bottom: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
                     <XAxis 
                       dataKey="month" 
-                      tickFormatter={(value) => `${value}m`}
+                      tickFormatter={(value) => {
+                        const year = Math.floor(value / 12);
+                        return `${year}y`;
+                      }}
                     >
-                      <Label value="Months" offset={-15} position="insideBottom" />
+                      <Label value="Time (years)" offset={-15} position="insideBottom" />
                     </XAxis>
                     <YAxis 
-                      tickFormatter={(value) => `$${(value/1000).toFixed(0)}k`}
+                      tickFormatter={(value) => {
+                        // Format based on the size of the value
+                        if (value >= 1000000) {
+                          return `$${(value/1000000).toFixed(1)}M`;
+                        } else if (value >= 1000) {
+                          return `$${(value/1000).toFixed(0)}k`;
+                        }
+                        return `$${value}`;
+                      }}
                     />
                     <Tooltip 
                       formatter={(value) => [`$${parseFloat(value as string).toLocaleString()}`, 'Value']}
-                      labelFormatter={(value) => `Month ${value}`}
+                      labelFormatter={(value) => {
+                        const years = Math.floor(value / 12);
+                        const months = value % 12;
+                        return `${years}y ${months}m`;
+                      }}
                     />
                     <Line 
                       type="monotone" 
@@ -164,7 +190,7 @@ const GrowthProjector: React.FC = () => {
                       type="monotone" 
                       dataKey="projectedValue" 
                       name="Projected BTC Value" 
-                      stroke="#f7931a" 
+                      stroke="#1EAEDB" 
                       strokeWidth={3}
                       dot={false}
                       activeDot={{ r: 6 }}
@@ -228,7 +254,7 @@ const GrowthProjector: React.FC = () => {
           </Button>
           
           <Button 
-            className="bg-bitcoin hover:bg-bitcoin/90 text-white px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+            className="bg-royal-blue hover:bg-royal-blue/90 text-white px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
             onClick={() => setStep(4)}
           >
             <span>Start Tracking Skips</span>

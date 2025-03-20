@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export type Frequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
@@ -31,6 +30,7 @@ export interface AppContextType {
   toggleHabit: (habitId: string) => void;
   skipHabit: (habitId: string) => void;
   skipHabitOnDay: (habitId: string, day: DayOfWeek) => void;
+  unskipHabitOnDay: (habitId: string, day: DayOfWeek) => void;
   resetSkips: () => void;
   totalSavings: number;
   annualSavings: number;
@@ -123,7 +123,6 @@ const defaultHabits: Habit[] = [
   }
 ];
 
-// Helper function to calculate annual cost of a habit
 const calculateAnnualCost = (habit: Habit): number => {
   switch (habit.period) {
     case 'daily':
@@ -139,7 +138,6 @@ const calculateAnnualCost = (habit: Habit): number => {
   }
 };
 
-// Helper to get start of current week (Monday)
 const getStartOfWeek = (): Date => {
   const now = new Date();
   const dayOfWeek = now.getDay(); // 0 is Sunday, 1 is Monday
@@ -147,13 +145,11 @@ const getStartOfWeek = (): Date => {
   return new Date(now.setDate(diff));
 };
 
-// Helper to convert JS day number to day string
 const getDayStringFromDate = (date: Date): DayOfWeek => {
   const days: DayOfWeek[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
   return days[date.getDay()];
 };
 
-// Create context with default values
 const AppContext = createContext<AppContextType>({
   step: 1,
   setStep: () => {},
@@ -165,6 +161,7 @@ const AppContext = createContext<AppContextType>({
   toggleHabit: () => {},
   skipHabit: () => {},
   skipHabitOnDay: () => {},
+  unskipHabitOnDay: () => {},
   resetSkips: () => {},
   totalSavings: 0,
   annualSavings: 0,
@@ -178,20 +175,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [habits, setHabits] = useState<Habit[]>(defaultHabits);
   const [selectedHabitIds, setSelectedHabitIds] = useState<string[]>([]);
 
-  // Get selected habits
   const selectedHabits = habits.filter(habit => selectedHabitIds.includes(habit.id));
   
-  // Calculate total savings from skips
   const totalSavings = selectedHabits.reduce((total, habit) => {
     return total + (habit.skipped * habit.expense);
   }, 0);
   
-  // Calculate annual savings
   const annualSavings = selectedHabits.reduce((total, habit) => {
     return total + calculateAnnualCost(habit);
   }, 0);
 
-  // Calculate weekly savings based on skips in the current week
   const weeklySkipSavings = selectedHabits.reduce((total, habit) => {
     const startOfWeek = getStartOfWeek();
     const weekSkips = habit.skippedDays.filter(skip => {
@@ -201,7 +194,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     return total + (weekSkips.length * habit.expense);
   }, 0);
 
-  // Get current week skips for a specific habit
   const getCurrentWeekSkips = (habitId: string): DayOfWeek[] => {
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return [];
@@ -215,7 +207,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       .map(skip => skip.day);
   };
 
-  // Add a new habit
   const addHabit = (habit: Omit<Habit, 'id' | 'skipped' | 'skippedDays'>) => {
     const newHabit: Habit = {
       ...habit,
@@ -224,18 +215,15 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       skippedDays: []
     };
     setHabits([...habits, newHabit]);
-    // Auto-select newly added habits
     setSelectedHabitIds([...selectedHabitIds, newHabit.id]);
   };
 
-  // Update existing habit
   const updateHabit = (habitId: string, updatedHabit: Partial<Omit<Habit, 'id'>>) => {
     setHabits(habits.map(habit => 
       habit.id === habitId ? { ...habit, ...updatedHabit } : habit
     ));
   };
 
-  // Toggle a habit selection
   const toggleHabit = (habitId: string) => {
     if (selectedHabitIds.includes(habitId)) {
       setSelectedHabitIds(selectedHabitIds.filter(id => id !== habitId));
@@ -244,14 +232,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  // Skip a habit (increment skip count)
   const skipHabit = (habitId: string) => {
     setHabits(habits.map(habit => 
       habit.id === habitId ? { ...habit, skipped: habit.skipped + 1 } : habit
     ));
   };
 
-  // Skip a habit on a specific day of the week
   const skipHabitOnDay = (habitId: string, day: DayOfWeek) => {
     const now = new Date();
     const skipLog: SkipLog = {
@@ -262,7 +248,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
     setHabits(habits.map(habit => {
       if (habit.id === habitId) {
-        // Check if already skipped today to avoid duplicates
         const today = now.toDateString();
         const alreadySkippedToday = habit.skippedDays.some(
           skip => new Date(skip.date).toDateString() === today && skip.day === day
@@ -280,7 +265,25 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }));
   };
 
-  // Reset all skip counts
+  const unskipHabitOnDay = (habitId: string, day: DayOfWeek) => {
+    setHabits(habits.map(habit => {
+      if (habit.id === habitId) {
+        const skipToRemove = habit.skippedDays.find(skip => skip.day === day);
+        
+        if (skipToRemove) {
+          return {
+            ...habit,
+            skipped: Math.max(0, habit.skipped - 1),
+            skippedDays: habit.skippedDays.filter(skip => 
+              !(skip.day === day && skip.date === skipToRemove.date)
+            )
+          };
+        }
+      }
+      return habit;
+    }));
+  };
+
   const resetSkips = () => {
     setHabits(habits.map(habit => ({ ...habit, skipped: 0, skippedDays: [] })));
   };
@@ -297,6 +300,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       toggleHabit,
       skipHabit,
       skipHabitOnDay,
+      unskipHabitOnDay,
       resetSkips,
       totalSavings,
       annualSavings,

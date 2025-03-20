@@ -19,8 +19,8 @@ const formatCurrency = (amount: number): string => {
 const WeeklyTracker: React.FC<{
   habitId: string;
   skippedDays: DayOfWeek[];
-  onSkipDay: (day: DayOfWeek) => void;
-}> = ({ habitId, skippedDays, onSkipDay }) => {
+  onToggleDay: (day: DayOfWeek) => void;
+}> = ({ habitId, skippedDays, onToggleDay }) => {
   const days: { day: DayOfWeek; label: string }[] = [
     { day: 'mon', label: 'M' },
     { day: 'tue', label: 'T' },
@@ -65,12 +65,11 @@ const WeeklyTracker: React.FC<{
           return (
             <button
               key={day}
-              onClick={() => onSkipDay(day)}
-              disabled={isSkipped}
+              onClick={() => onToggleDay(day)}
               className={cn(
                 "w-8 h-8 flex items-center justify-center rounded-md text-xs font-medium transition-all",
                 isSkipped 
-                  ? "bg-green-500 text-white" 
+                  ? "bg-green-500 text-white hover:bg-green-600" 
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200",
                 isToday && !isSkipped && "ring-2 ring-bitcoin ring-offset-1"
               )}
@@ -87,8 +86,8 @@ const WeeklyTracker: React.FC<{
 const SkipCard: React.FC<{ 
   habit: any;
   skippedDays: DayOfWeek[];
-  onSkipDay: (day: DayOfWeek) => void;
-}> = ({ habit, skippedDays, onSkipDay }) => {
+  onToggleDay: (day: DayOfWeek) => void;
+}> = ({ habit, skippedDays, onToggleDay }) => {
   // Function to determine which icon to show based on habit name
   const getHabitIcon = (habitName: string) => {
     if (habitName.toLowerCase().includes('coffee')) return <Coffee size={24} />;
@@ -113,14 +112,14 @@ const SkipCard: React.FC<{
       <div className="flex justify-between items-center">
         <div>
           <p className="text-sm text-gray-500">Skipped {habit.skipped} times</p>
-          <p className="font-medium text-bitcoin">{formatCurrency(habit.skipped * habit.expense)} saved</p>
+          <p className="font-medium text-royal-blue">{formatCurrency(habit.skipped * habit.expense)} saved</p>
         </div>
       </div>
       
       <WeeklyTracker 
         habitId={habit.id} 
         skippedDays={skippedDays}
-        onSkipDay={onSkipDay}
+        onToggleDay={onToggleDay}
       />
     </div>
   );
@@ -129,20 +128,31 @@ const SkipCard: React.FC<{
 const HabitSkipper: React.FC = () => {
   const { 
     selectedHabits, 
-    skipHabitOnDay, 
+    skipHabitOnDay,
+    unskipHabitOnDay,
     totalSavings, 
     weeklySkipSavings,
     setStep,
     getCurrentWeekSkips 
   } = useAppContext();
   
-  const handleSkipDay = (habitId: string, day: DayOfWeek) => {
-    skipHabitOnDay(habitId, day);
+  const handleToggleDay = (habitId: string, day: DayOfWeek) => {
+    const skippedDays = getCurrentWeekSkips(habitId);
+    const isAlreadySkipped = skippedDays.includes(day);
     
-    // Show a success toast
-    toast.success('Habit skipped!', {
-      description: 'Great job! Your savings have been updated.',
-    });
+    if (isAlreadySkipped) {
+      // Untick (remove) the skipped day
+      unskipHabitOnDay(habitId, day);
+      toast.success('Skipped day removed', {
+        description: 'Your habit tracking has been updated.',
+      });
+    } else {
+      // Add the skipped day
+      skipHabitOnDay(habitId, day);
+      toast.success('Habit skipped!', {
+        description: 'Great job! Your savings have been updated.',
+      });
+    }
   };
 
   return (
@@ -154,13 +164,13 @@ const HabitSkipper: React.FC = () => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Skip & Save</h1>
           <p className="text-gray-600 max-w-md mx-auto">
-            Track your skipped habits and watch your savings grow. Mark each day you successfully skip a habit.
+            Track your skipped habits and watch your savings grow. Mark or unmark days you skip a habit.
           </p>
         </div>
         
         <div className="glass-card p-6 mb-6 text-center">
           <h2 className="text-xl font-semibold mb-2">Total Savings</h2>
-          <div className="text-4xl font-bold text-bitcoin animate-pulse-subtle">
+          <div className="text-4xl font-bold text-royal-blue animate-pulse-subtle">
             {formatCurrency(totalSavings)}
           </div>
           <p className="text-gray-500 mt-2">
@@ -170,7 +180,7 @@ const HabitSkipper: React.FC = () => {
         
         <div className="glass-card p-6 mb-8">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-bitcoin/10 text-bitcoin flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-royal-blue/10 text-royal-blue flex items-center justify-center">
               <Calendar size={20} />
             </div>
             <div>
@@ -189,7 +199,7 @@ const HabitSkipper: React.FC = () => {
               key={habit.id}
               habit={habit}
               skippedDays={getCurrentWeekSkips(habit.id)}
-              onSkipDay={(day) => handleSkipDay(habit.id, day)}
+              onToggleDay={(day) => handleToggleDay(habit.id, day)}
             />
           ))}
         </div>
@@ -205,7 +215,7 @@ const HabitSkipper: React.FC = () => {
           </Button>
           
           <Button 
-            className="bg-bitcoin hover:bg-bitcoin/90 text-white px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
+            className="bg-royal-blue hover:bg-royal-blue/90 text-white px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
             onClick={() => setStep(5)}
           >
             <span>Setup Auto-Invest</span>
