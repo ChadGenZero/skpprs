@@ -12,13 +12,14 @@ const steps = [
   { step: 5, title: 'Auto-Invest' }
 ];
 
-// Path positions for a more natural S-curve
+// Path positions for a more natural S-curve 
+// Starting from right, curving left, then right again
 const stepPositions = [
-  { x: 75, y: 50 },   // First stage
-  { x: 25, y: 200 },  // Second stage
-  { x: 75, y: 350 },  // Third stage
-  { x: 25, y: 500 },  // Fourth stage
-  { x: 75, y: 650 }   // Final stage
+  { x: 100, y: 50 },  // First stage (top right)
+  { x: 25, y: 175 },  // Second stage (middle left)
+  { x: 100, y: 325 }, // Third stage (middle right)
+  { x: 25, y: 475 },  // Fourth stage (bottom left)
+  { x: 100, y: 600 }  // Final stage (bottom right)
 ];
 
 const ProgressBar: React.FC = () => {
@@ -29,22 +30,21 @@ const ProgressBar: React.FC = () => {
       <div className="relative mx-auto h-[650px] w-[150px]">
         {/* SVG S-curve Path */}
         <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 150 650" xmlns="http://www.w3.org/2000/svg">
-          {/* Background dashed path */}
+          {/* Background path */}
           <path 
-            d="M 75 50 C 25 125, 125 275, 75 350 C 25 425, 125 575, 75 650" 
-            stroke="#ccc" 
-            strokeWidth="2" 
+            d="M 100 50 C 150 100, 0 150, 25 175 C 50 200, 150 250, 100 325 C 50 400, 0 425, 25 475 C 50 525, 150 550, 100 600" 
+            stroke="#e5e7eb" 
+            strokeWidth="3" 
             fill="none" 
-            strokeDasharray="8,8" 
             className="progress-path"
           />
           {/* Active path segment that follows progress */}
           <path 
-            d="M 75 50 C 25 125, 125 275, 75 350 C 25 425, 125 575, 75 650" 
+            d="M 100 50 C 150 100, 0 150, 25 175 C 50 200, 150 250, 100 325 C 50 400, 0 425, 25 475 C 50 525, 150 550, 100 600" 
             stroke="#1EAEDB" 
             strokeWidth="3" 
             fill="none" 
-            strokeDasharray="8,8"
+            strokeDasharray="1000"
             strokeDashoffset="0"
             className={`progress-path-active step-${step}`}
           />
@@ -85,7 +85,7 @@ const ProgressBar: React.FC = () => {
             
             {/* Step Title */}
             <div className={cn(
-              "text-sm font-medium transition-all mt-2 whitespace-nowrap",
+              "text-sm font-medium mt-2 whitespace-nowrap transition-all",
               s.step === step ? "text-royal-blue font-semibold scale-105" : "text-gray-500",
               s.step < step && "text-gray-400"
             )}>

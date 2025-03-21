@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -18,8 +17,8 @@ import { cn } from '@/lib/utils';
 
 // Generate projection data with 40% year-on-year return for 20 years
 const generateProjectionData = (monthlySavings: number) => {
-  // Current Bitcoin price (not $80,000)
-  const btcPrice = 70000; // Using a more current price
+  // Current Bitcoin price
+  const btcPrice = 70000;
   const annualGrowthRate = 0.40; // 40% annual return
   const data = [];
   let cumulativeSats = 0;
@@ -109,6 +108,11 @@ const GrowthProjector: React.FC = () => {
   
   // Calculate potential profit
   const potentialProfit = finalProjectedValue - totalSavingsAmount;
+  
+  // Calculate the maximum value for the y-axis (add 15% buffer for better visualization)
+  const maxChartValue = currentTimeframeData.length > 0
+    ? Math.max(...currentTimeframeData.map(item => parseFloat(item.projectedValue))) * 1.15
+    : 100000;
 
   return (
     <div className="animate-scale-in">
@@ -160,6 +164,7 @@ const GrowthProjector: React.FC = () => {
                       <Label value="Time (years)" offset={-15} position="insideBottom" />
                     </XAxis>
                     <YAxis 
+                      domain={[0, maxChartValue]}
                       tickFormatter={(value) => {
                         // Format based on the size of the value
                         if (value >= 1000000) {

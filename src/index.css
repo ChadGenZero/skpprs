@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -115,14 +116,15 @@
 }
 
 .progress-dot {
-  @apply relative w-8 h-8 rounded-full transition-all duration-300 border-2 border-white overflow-hidden;
+  @apply relative w-10 h-10 rounded-full transition-all duration-300 border-2 border-white overflow-hidden;
   background: theme('colors.bitcoin.DEFAULT');
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+  z-index: 10;
 }
 
 .progress-dot::before {
   content: '';
-  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-white/80 transition-all duration-300;
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-white/80 transition-all duration-300;
 }
 
 .progress-dot::after {
@@ -142,12 +144,12 @@
 }
 
 .progress-dot.active {
-  @apply w-10 h-10;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.7), 0 0 10px rgba(249, 115, 22, 0.6);
+  @apply w-12 h-12;
+  box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.7), 0 0 10px rgba(249, 115, 22, 0.6);
 }
 
 .progress-dot.active::before {
-  @apply w-5 h-5;
+  @apply w-6 h-6;
 }
 
 .progress-dot.completed {
@@ -155,25 +157,25 @@
 }
 
 .progress-path-active {
-  stroke-dasharray: 800;
-  stroke-dashoffset: 800;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
   transition: stroke-dashoffset 1s ease;
 }
 
 .progress-path-active.step-1 {
-  stroke-dashoffset: 800; /* No progress */
+  stroke-dashoffset: 1000; /* No progress */
 }
 
 .progress-path-active.step-2 {
-  stroke-dashoffset: 600; /* 25% progress */
+  stroke-dashoffset: 750; /* 25% progress */
 }
 
 .progress-path-active.step-3 {
-  stroke-dashoffset: 400; /* 50% progress */
+  stroke-dashoffset: 500; /* 50% progress */
 }
 
 .progress-path-active.step-4 {
-  stroke-dashoffset: 200; /* 75% progress */
+  stroke-dashoffset: 250; /* 75% progress */
 }
 
 .progress-path-active.step-5 {
