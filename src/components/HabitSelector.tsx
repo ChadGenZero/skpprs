@@ -1,12 +1,14 @@
 
 import React, { useState } from 'react';
-import { useAppContext, type Habit, type Frequency } from '@/context/AppContext';
+import { useAppContext, type Habit, type Frequency, type SavingsModel } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { PlusIcon, ArrowRightIcon, Coffee, ShoppingBag, DollarSign, Pencil } from 'lucide-react';
+import { PlusIcon, ArrowRightIcon, Coffee, ShoppingBag, DollarSign, Pencil, Info } from 'lucide-react';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -16,6 +18,25 @@ const frequencyOptions = [
   { value: 'monthly', label: 'Monthly' },
   { value: 'yearly', label: 'Yearly' }
 ];
+
+const SavingsModelTooltip: React.FC<{ model: SavingsModel }> = ({ model }) => {
+  const content = model === 'fractional' 
+    ? "This goal allows you to save a fraction of your target amount each day you skip the habit. Example: Skip your $5 coffee each day to save $20 this week. If you skip 6 days, you save $17.16."
+    : "This goal requires you to skip all days of the week to meet your target. Example: Skip all 7 days of online shopping to save $70. If you miss a day, your savings reset to $0 for the week.";
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Info size={16} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+          <p>{content}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 const HabitCard: React.FC<{ 
   habit: Habit; 
@@ -58,7 +79,19 @@ const HabitCard: React.FC<{
           <div className="mt-1 text-sm text-gray-500">
             ${habit.expense.toFixed(2)} • {getFrequencyText(habit)}
           </div>
+          <div className="mt-1 text-xs flex items-center">
+            <span className={cn(
+              "px-2 py-0.5 rounded-full",
+              habit.savingsModel === 'fractional' 
+                ? "bg-blue-100 text-blue-700" 
+                : "bg-purple-100 text-purple-700"
+            )}>
+              {habit.savingsModel === 'fractional' ? 'Fractional' : 'All-or-Nothing'}
+            </span>
+            <SavingsModelTooltip model={habit.savingsModel} />
+          </div>
         </div>
+        
         <button 
           onClick={(e) => {
             e.stopPropagation(); // Prevent the card click from triggering
@@ -69,6 +102,7 @@ const HabitCard: React.FC<{
         >
           <Pencil size={14} />
         </button>
+        
         <div 
           onClick={(e) => {
             e.stopPropagation(); // This prevents double toggling when clicking directly on the circle
@@ -106,6 +140,7 @@ const HabitDialog: React.FC<{
   const [expense, setExpense] = useState('');
   const [frequency, setFrequency] = useState('1');
   const [period, setPeriod] = useState<Frequency>('daily');
+  const [savingsModel, setSavingsModel] = useState<SavingsModel>('fractional');
 
   React.useEffect(() => {
     if (isEditing && habit && open) {
@@ -113,11 +148,13 @@ const HabitDialog: React.FC<{
       setExpense(habit.expense.toString());
       setFrequency(habit.frequency.toString());
       setPeriod(habit.period);
+      setSavingsModel(habit.savingsModel);
     } else if (!isEditing && open) {
       setName('');
       setExpense('');
       setFrequency('1');
       setPeriod('daily');
+      setSavingsModel('fractional');
     }
   }, [habit, isEditing, open]);
 
@@ -128,7 +165,8 @@ const HabitDialog: React.FC<{
       name,
       expense: parseFloat(expense),
       frequency: parseInt(frequency),
-      period
+      period,
+      savingsModel
     };
     
     if (isEditing && habit) {
@@ -201,6 +239,29 @@ const HabitDialog: React.FC<{
             </Select>
           </div>
         </div>
+        
+        <div className="space-y-2">
+          <Label className="flex items-center">
+            Savings Model
+          </Label>
+          <RadioGroup value={savingsModel} onValueChange={(value) => setSavingsModel(value as SavingsModel)} className="flex flex-col gap-3">
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="fractional" id="fractional" />
+              <Label htmlFor="fractional" className="font-normal flex items-center cursor-pointer">
+                Fractional Savings
+                <SavingsModelTooltip model="fractional" />
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="all-or-nothing" id="all-or-nothing" />
+              <Label htmlFor="all-or-nothing" className="font-normal flex items-center cursor-pointer">
+                All-or-Nothing
+                <SavingsModelTooltip model="all-or-nothing" />
+              </Label>
+            </div>
+          </RadioGroup>
+        </div>
+        
         <DialogFooter>
           <Button type="submit" className="w-full bg-bitcoin hover:bg-bitcoin/90">
             {isEditing ? 'Update Habit' : 'Add Habit'}

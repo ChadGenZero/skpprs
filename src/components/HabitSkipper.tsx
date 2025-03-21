@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { useAppContext, type DayOfWeek } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon, TrendingUpIcon, Check, Coffee, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
+import { ArrowLeftIcon, ArrowRightIcon, TrendingUpIcon, Check, Coffee, ShoppingBag, DollarSign, Calendar, Info, AlertTriangle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -17,10 +18,10 @@ const formatCurrency = (amount: number): string => {
 };
 
 const WeeklyTracker: React.FC<{
-  habitId: string;
+  habit: any;
   skippedDays: DayOfWeek[];
   onToggleDay: (day: DayOfWeek) => void;
-}> = ({ habitId, skippedDays, onToggleDay }) => {
+}> = ({ habit, skippedDays, onToggleDay }) => {
   const days: { day: DayOfWeek; label: string }[] = [
     { day: 'mon', label: 'M' },
     { day: 'tue', label: 'T' },
@@ -48,14 +49,41 @@ const WeeklyTracker: React.FC<{
   // Calculate progress percentage
   const progressPercentage = (skippedDays.length / 7) * 100;
 
+  const { calculateHabitSavings } = useAppContext();
+  const habitSavings = calculateHabitSavings(habit);
+  
+  // For all-or-nothing model - need 7/7 days to get savings
+  const isAllOrNothing = habit.savingsModel === 'all-or-nothing';
+  const missedAnyDay = skippedDays.length < 7 && isAllOrNothing;
+  
   return (
     <div className="mt-4">
       <div className="flex justify-between items-center mb-2">
-        <span className="text-sm font-medium text-gray-600">Weekly progress</span>
+        <div className="flex items-center">
+          <span className="text-sm font-medium text-gray-600">Weekly progress</span>
+          {isAllOrNothing && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>All-or-Nothing goal: You must skip all 7 days to save the full amount.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
         <span className="text-xs text-gray-500">{skippedDays.length}/7 days</span>
       </div>
       
-      <Progress value={progressPercentage} className="h-2 mb-3" />
+      <Progress 
+        value={progressPercentage} 
+        className={cn(
+          "h-2 mb-3",
+          isAllOrNothing && skippedDays.length < 7 ? "bg-gray-200" : undefined
+        )} 
+      />
       
       <div className="flex justify-between gap-1">
         {days.map(({ day, label }) => {
@@ -78,6 +106,34 @@ const WeeklyTracker: React.FC<{
             </button>
           );
         })}
+      </div>
+      
+      {isAllOrNothing && (
+        <div className={cn(
+          "text-sm mt-2 flex items-center",
+          missedAnyDay ? "text-orange-500" : "text-green-600"
+        )}>
+          {missedAnyDay ? (
+            <>
+              <AlertTriangle size={14} className="mr-1" />
+              <span>Must complete all 7 days to save {formatCurrency(habit.expense * habit.frequency)}</span>
+            </>
+          ) : (
+            <>
+              <Check size={14} className="mr-1" />
+              <span>Saved {formatCurrency(habit.expense * habit.frequency)} this week!</span>
+            </>
+          )}
+        </div>
+      )}
+
+      <div className="text-sm mt-2 font-medium">
+        <span>Current savings: </span>
+        <span className={cn(
+          isAllOrNothing && missedAnyDay ? "text-orange-500" : "text-green-600"
+        )}>
+          {formatCurrency(habitSavings)}
+        </span>
       </div>
     </div>
   );
@@ -102,7 +158,17 @@ const SkipCard: React.FC<{
           {getHabitIcon(habit.name)}
         </div>
         <div>
-          <h3 className="font-medium text-gray-900">{habit.name}</h3>
+          <div className="flex items-center">
+            <h3 className="font-medium text-gray-900">{habit.name}</h3>
+            <span className={cn(
+              "ml-2 px-2 py-0.5 rounded-full text-xs",
+              habit.savingsModel === 'fractional' 
+                ? "bg-blue-100 text-blue-700" 
+                : "bg-purple-100 text-purple-700"
+            )}>
+              {habit.savingsModel === 'fractional' ? 'Fractional' : 'All-or-Nothing'}
+            </span>
+          </div>
           <p className="text-sm text-gray-500">
             Save {formatCurrency(habit.expense)} each time
           </p>
@@ -112,12 +178,12 @@ const SkipCard: React.FC<{
       <div className="flex justify-between items-center">
         <div>
           <p className="text-sm text-gray-500">Skipped {habit.skipped} times</p>
-          <p className="font-medium text-royal-blue">{formatCurrency(habit.skipped * habit.expense)} saved</p>
+          <p className="font-medium text-royal-blue">{formatCurrency(habit.skipped * habit.expense)} total saved</p>
         </div>
       </div>
       
       <WeeklyTracker 
-        habitId={habit.id} 
+        habit={habit} 
         skippedDays={skippedDays}
         onToggleDay={onToggleDay}
       />

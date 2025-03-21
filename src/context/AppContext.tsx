@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, ReactNode, useEffect } from
 
 export type Frequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 export type DayOfWeek = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+export type SavingsModel = 'fractional' | 'all-or-nothing';
 
 export interface SkipLog {
   habitId: string;
@@ -17,6 +18,7 @@ export interface Habit {
   period: Frequency;
   skipped: number;
   skippedDays: SkipLog[];
+  savingsModel: SavingsModel;
 }
 
 export interface AppContextType {
@@ -37,6 +39,7 @@ export interface AppContextType {
   weeklySkipSavings: number;
   getCurrentWeekSkips: (habitId: string) => DayOfWeek[];
   getStartOfWeek: () => Date;
+  calculateHabitSavings: (habit: Habit) => number;
 }
 
 const defaultHabits: Habit[] = [
@@ -47,7 +50,8 @@ const defaultHabits: Habit[] = [
     frequency: 1,
     period: 'daily',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'fractional'
   },
   {
     id: '2',
@@ -56,7 +60,8 @@ const defaultHabits: Habit[] = [
     frequency: 3,
     period: 'weekly',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'fractional'
   },
   {
     id: '3',
@@ -65,7 +70,8 @@ const defaultHabits: Habit[] = [
     frequency: 1,
     period: 'weekly',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'all-or-nothing'
   },
   {
     id: '4',
@@ -74,7 +80,8 @@ const defaultHabits: Habit[] = [
     frequency: 3,
     period: 'weekly',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'fractional'
   },
   {
     id: '5',
@@ -83,7 +90,8 @@ const defaultHabits: Habit[] = [
     frequency: 3,
     period: 'monthly',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'fractional'
   },
   {
     id: '6',
@@ -92,7 +100,8 @@ const defaultHabits: Habit[] = [
     frequency: 1,
     period: 'monthly',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'fractional'
   },
   {
     id: '7',
@@ -101,7 +110,8 @@ const defaultHabits: Habit[] = [
     frequency: 1,
     period: 'weekly',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'all-or-nothing'
   },
   {
     id: '8',
@@ -110,7 +120,8 @@ const defaultHabits: Habit[] = [
     frequency: 2,
     period: 'monthly',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'fractional'
   },
   {
     id: '9',
@@ -119,7 +130,8 @@ const defaultHabits: Habit[] = [
     frequency: 1,
     period: 'monthly',
     skipped: 0,
-    skippedDays: []
+    skippedDays: [],
+    savingsModel: 'all-or-nothing'
   }
 ];
 
@@ -168,6 +180,7 @@ const AppContext = createContext<AppContextType>({
   weeklySkipSavings: 0,
   getCurrentWeekSkips: () => [],
   getStartOfWeek: () => new Date(),
+  calculateHabitSavings: () => 0,
 });
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -177,8 +190,34 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   const selectedHabits = habits.filter(habit => selectedHabitIds.includes(habit.id));
   
+  const calculateHabitSavings = (habit: Habit): number => {
+    const startOfWeek = getStartOfWeek();
+    const weekSkips = habit.skippedDays.filter(skip => {
+      const skipDate = new Date(skip.date);
+      return skipDate >= startOfWeek;
+    });
+    
+    if (habit.savingsModel === 'fractional') {
+      return weekSkips.length * (habit.expense * habit.frequency / 7);
+    } else {
+      const completedWeeks = Math.floor(habit.skipped / 7);
+      return completedWeeks * habit.expense * habit.frequency;
+    }
+  };
+  
   const totalSavings = selectedHabits.reduce((total, habit) => {
-    return total + (habit.skipped * habit.expense);
+    if (habit.savingsModel === 'fractional') {
+      return total + (habit.skipped * habit.expense);
+    } else {
+      const startOfWeek = getStartOfWeek();
+      const weekSkips = habit.skippedDays.filter(skip => {
+        const skipDate = new Date(skip.date);
+        return skipDate >= startOfWeek;
+      });
+      
+      const completedWeeks = Math.floor(habit.skipped / 7);
+      return total + (completedWeeks * habit.expense * habit.frequency);
+    }
   }, 0);
   
   const annualSavings = selectedHabits.reduce((total, habit) => {
@@ -186,12 +225,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   }, 0);
 
   const weeklySkipSavings = selectedHabits.reduce((total, habit) => {
-    const startOfWeek = getStartOfWeek();
-    const weekSkips = habit.skippedDays.filter(skip => {
-      const skipDate = new Date(skip.date);
-      return skipDate >= startOfWeek;
-    });
-    return total + (weekSkips.length * habit.expense);
+    return total + calculateHabitSavings(habit);
   }, 0);
 
   const getCurrentWeekSkips = (habitId: string): DayOfWeek[] => {
@@ -306,7 +340,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       annualSavings,
       weeklySkipSavings,
       getCurrentWeekSkips,
-      getStartOfWeek
+      getStartOfWeek,
+      calculateHabitSavings
     }}>
       {children}
     </AppContext.Provider>
