@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAppContext, type Habit, type Frequency } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -40,9 +41,10 @@ const HabitCard: React.FC<{
   return (
     <div
       className={cn(
-        "habit-card p-4 rounded-xl border shadow-sm transition-all duration-300 relative",
+        "habit-card p-4 rounded-xl border shadow-sm transition-all duration-300 relative cursor-pointer",
         isSelected ? "bg-white border-bitcoin shadow-md" : "bg-white/60 hover:bg-white"
       )}
+      onClick={onToggle}
     >
       <div className="flex items-start gap-3">
         <div className={cn(
@@ -59,16 +61,19 @@ const HabitCard: React.FC<{
         </div>
         <button 
           onClick={(e) => {
-            e.stopPropagation();
+            e.stopPropagation(); // Prevent the card click from triggering
             onEdit();
           }}
-          className="p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors mr-2"
+          className="p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
           aria-label="Edit habit"
         >
           <Pencil size={14} />
         </button>
         <div 
-          onClick={onToggle}
+          onClick={(e) => {
+            e.stopPropagation(); // This prevents double toggling when clicking directly on the circle
+            onToggle();
+          }}
           className={cn(
             "w-5 h-5 rounded-full border transition-all flex items-center justify-center cursor-pointer",
             isSelected ? "border-bitcoin bg-bitcoin" : "border-gray-300"

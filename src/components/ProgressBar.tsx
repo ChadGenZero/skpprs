@@ -14,7 +14,27 @@ const steps = [
 ];
 
 const ProgressBar: React.FC = () => {
-  const { step, setStep } = useAppContext();
+  const { step, setStep, selectedHabits } = useAppContext();
+
+  // Function to handle step click, ensuring proper navigation rules
+  const handleStepClick = (clickedStep: number) => {
+    // Always allow clicking on step 1
+    if (clickedStep === 1) {
+      setStep(1);
+      return;
+    }
+    
+    // For step 2 and beyond, only allow if user has selected habits or already reached a later step
+    if (clickedStep === 2 && (selectedHabits.length > 0 || step > 2)) {
+      setStep(2);
+      return;
+    }
+    
+    // For other steps, only allow navigation to steps we've already reached
+    if (clickedStep <= Math.max(step, 2)) {
+      setStep(clickedStep);
+    }
+  };
 
   return (
     <div className="py-6 px-4 md:px-0 progress-container">
@@ -33,6 +53,11 @@ const ProgressBar: React.FC = () => {
         {/* Step markers */}
         {steps.map((s, index) => {
           const verticalPosition = index * (100 / (steps.length - 1));
+          const isStepCompleted = s.step < step;
+          const isStepCurrent = s.step === step;
+          const canNavigate = s.step === 1 || 
+                             (s.step === 2 && selectedHabits.length > 0) || 
+                             (s.step <= Math.max(step, 2));
           
           return (
             <div 
@@ -43,20 +68,23 @@ const ProgressBar: React.FC = () => {
               }}
             >
               <button
-                onClick={() => s.step <= Math.max(step, 2) && setStep(s.step)}
+                onClick={() => handleStepClick(s.step)}
                 className={cn(
                   "progress-dot group flex items-center justify-center",
-                  s.step === step && "active",
-                  s.step < step && "completed",
-                  s.step <= Math.max(step, 2) ? "cursor-pointer" : "cursor-not-allowed opacity-60"
+                  isStepCurrent && "active",
+                  isStepCompleted && "completed",
+                  canNavigate ? "cursor-pointer" : "cursor-not-allowed opacity-60"
                 )}
-                disabled={s.step > Math.max(step, 2)}
+                disabled={!canNavigate}
                 aria-label={`Go to step ${s.step}: ${s.title}`}
               >
-                {s.step < step ? (
+                {isStepCompleted ? (
                   <Check className="w-4 h-4 text-white" />
                 ) : (
-                  <span className="text-white font-medium">{s.step}</span>
+                  <span className={cn(
+                    "font-medium",
+                    isStepCurrent ? "text-white" : "text-white"
+                  )}>{s.step}</span>
                 )}
                 
                 {/* Life buoy ring effect */}
@@ -66,8 +94,8 @@ const ProgressBar: React.FC = () => {
               {/* Step Title */}
               <div className={cn(
                 "text-sm font-medium mt-2 whitespace-nowrap transition-all absolute left-10",
-                s.step === step ? "text-royal-blue font-semibold scale-105" : "text-gray-500",
-                s.step < step && "text-gray-400"
+                isStepCurrent ? "text-royal-blue font-semibold scale-105" : "text-gray-500",
+                isStepCompleted && "text-gray-400"
               )}>
                 {s.title}
               </div>
