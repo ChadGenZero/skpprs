@@ -12,13 +12,14 @@ const steps = [
   { step: 5, title: 'Auto-Invest' }
 ];
 
-// Path positions for the S-shaped progress bar as shown in the reference image
+// Path positions for a more natural S-curve 
+// Starting from right, curving left, then right again
 const stepPositions = [
-  { x: 80, y: 50 },    // First stage (top right)
-  { x: 30, y: 180 },   // Second stage (middle left)
-  { x: 80, y: 300 },   // Third stage (middle right)
-  { x: 30, y: 420 },   // Fourth stage (bottom left)
-  { x: 80, y: 550 }    // Final stage (bottom right)
+  { x: 100, y: 50 },  // First stage (top right)
+  { x: 25, y: 175 },  // Second stage (middle left)
+  { x: 100, y: 325 }, // Third stage (middle right)
+  { x: 25, y: 475 },  // Fourth stage (bottom left)
+  { x: 100, y: 600 }  // Final stage (bottom right)
 ];
 
 const ProgressBar: React.FC = () => {
@@ -27,21 +28,21 @@ const ProgressBar: React.FC = () => {
   return (
     <div className="py-6 px-4 md:px-0 progress-container">
       <div className="relative mx-auto h-[650px] w-[150px]">
-        {/* SVG S-curve Path that matches the reference image */}
+        {/* SVG S-curve Path */}
         <svg className="absolute top-0 left-0 w-full h-full" viewBox="0 0 150 650" xmlns="http://www.w3.org/2000/svg">
           {/* Background path */}
           <path 
-            d="M80 50 C120 50, 0 100, 30 180 C60 260, 120 220, 80 300 C40 380, 0 360, 30 420 C60 480, 120 450, 80 550" 
+            d="M 100 50 C 150 100, 0 150, 25 175 C 50 200, 150 250, 100 325 C 50 400, 0 425, 25 475 C 50 525, 150 550, 100 600" 
             stroke="#e5e7eb" 
-            strokeWidth="4" 
+            strokeWidth="3" 
             fill="none" 
             className="progress-path"
           />
           {/* Active path segment that follows progress */}
           <path 
-            d="M80 50 C120 50, 0 100, 30 180 C60 260, 120 220, 80 300 C40 380, 0 360, 30 420 C60 480, 120 450, 80 550" 
+            d="M 100 50 C 150 100, 0 150, 25 175 C 50 200, 150 250, 100 325 C 50 400, 0 425, 25 475 C 50 525, 150 550, 100 600" 
             stroke="#1EAEDB" 
-            strokeWidth="4" 
+            strokeWidth="3" 
             fill="none" 
             strokeDasharray="1000"
             strokeDashoffset="0"
@@ -49,7 +50,7 @@ const ProgressBar: React.FC = () => {
           />
         </svg>
 
-        {/* Step markers positioned along the path */}
+        {/* Lifebuoy markers positioned along the path */}
         {steps.map((s, index) => (
           <div 
             key={s.step}
