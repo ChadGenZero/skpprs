@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext, type Habit, type Frequency } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -28,12 +27,10 @@ const HabitCard: React.FC<{
   onToggle,
   onEdit
 }) => {
-  // Function to get readable frequency text
   const getFrequencyText = (habit: Habit) => {
     return `${habit.frequency} time${habit.frequency > 1 ? 's' : ''} per ${habit.period === 'daily' ? 'day' : habit.period.slice(0, -2)}`;
   };
 
-  // Function to determine which icon to show based on habit name
   const getHabitIcon = (habitName: string) => {
     if (habitName.toLowerCase().includes('coffee')) return <Coffee size={20} />;
     if (habitName.toLowerCase().includes('shopping')) return <ShoppingBag size={20} />;
@@ -47,7 +44,7 @@ const HabitCard: React.FC<{
         isSelected ? "bg-white border-bitcoin shadow-md" : "bg-white/60 hover:bg-white"
       )}
     >
-      <div className="flex items-start gap-3" onClick={onToggle}>
+      <div className="flex items-start gap-3">
         <div className={cn(
           "flex items-center justify-center w-8 h-8 rounded-full", 
           isSelected ? "bg-bitcoin text-white" : "bg-gray-100 text-gray-500"
@@ -60,10 +57,23 @@ const HabitCard: React.FC<{
             ${habit.expense.toFixed(2)} • {getFrequencyText(habit)}
           </div>
         </div>
-        <div className={cn(
-          "w-5 h-5 rounded-full border transition-all flex items-center justify-center",
-          isSelected ? "border-bitcoin bg-bitcoin" : "border-gray-300"
-        )}>
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          className="p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors mr-2"
+          aria-label="Edit habit"
+        >
+          <Pencil size={14} />
+        </button>
+        <div 
+          onClick={onToggle}
+          className={cn(
+            "w-5 h-5 rounded-full border transition-all flex items-center justify-center cursor-pointer",
+            isSelected ? "border-bitcoin bg-bitcoin" : "border-gray-300"
+          )}
+        >
           {isSelected && (
             <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none">
               <path d="M5 13L9 17L19 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -71,17 +81,6 @@ const HabitCard: React.FC<{
           )}
         </div>
       </div>
-      
-      <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          onEdit();
-        }}
-        className="absolute top-4 right-4 p-1 text-gray-400 hover:text-bitcoin rounded-full hover:bg-gray-100 transition-colors"
-        aria-label="Edit habit"
-      >
-        <Pencil size={14} />
-      </button>
     </div>
   );
 };
@@ -103,7 +102,6 @@ const HabitDialog: React.FC<{
   const [frequency, setFrequency] = useState('1');
   const [period, setPeriod] = useState<Frequency>('daily');
 
-  // Initialize form with habit data when editing and dialog opens
   React.useEffect(() => {
     if (isEditing && habit && open) {
       setName(habit.name);
@@ -111,7 +109,6 @@ const HabitDialog: React.FC<{
       setFrequency(habit.frequency.toString());
       setPeriod(habit.period);
     } else if (!isEditing && open) {
-      // Reset form for new habits
       setName('');
       setExpense('');
       setFrequency('1');
@@ -122,7 +119,6 @@ const HabitDialog: React.FC<{
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Use existing values or new input
     const habitData = {
       name,
       expense: parseFloat(expense),
@@ -138,7 +134,6 @@ const HabitDialog: React.FC<{
       toast.success('Habit added successfully!');
     }
     
-    // Close dialog
     onOpenChange(false);
   };
 
