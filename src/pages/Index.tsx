@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { AppProvider, useAppContext } from '@/context/AppContext';
 import ProgressBar from '@/components/ProgressBar';
@@ -7,19 +8,18 @@ import GrowthProjector from '@/components/GrowthProjector';
 import HabitSkipper from '@/components/HabitSkipper';
 import AutoInvest from '@/components/AutoInvest';
 
-// Nautical Logo - Simple S letter stylized as rope
+// Smooth block "S" logo
 const NauticalLogo = () => (
   <div className="text-royal-blue">
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Simple S shape with rope styling */}
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      {/* Solid block S shape */}
       <path 
-        d="M14 5C10 5 8 7 8 9C8 11 10 13 14 13C18 13 20 15 20 19C20 21 18 23 14 23" 
-        stroke="#1EAEDB" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
-      />
-      {/* Vertical line to create $ sign */}
-      <path 
-        d="M14 2V5M14 23V26" 
-        stroke="#1EAEDB" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+        d="M22 8C22 5.79086 20.2091 4 18 4H12C9.79086 4 8 5.79086 8 8V8C8 10.2091 9.79086 12 12 12H18C20.2091 12 22 13.7909 22 16V16C22 18.2091 20.2091 20 18 20H12C9.79086 20 8 21.7909 8 24V24C8 26.2091 9.79086 28 12 28H18C20.2091 28 22 26.2091 22 24" 
+        stroke="#1EAEDB" 
+        strokeWidth="4" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+        fill="none"
       />
     </svg>
   </div>
