@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext, type DayOfWeek, type SkipLog } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon, TrendingUpIcon, Check, Coffee, ShoppingBag, DollarSign, Calendar, Info, AlertTriangle } from 'lucide-react';
+import { ArrowLeftIcon, ArrowRightIcon, Check, Coffee, ShoppingBag, DollarSign, Calendar, Info } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -52,11 +52,11 @@ const WeeklyTracker: React.FC<{
   // Calculate progress percentage - using let instead of const to allow reassignment
   let progressPercentage = (skippedDays.length / 7) * 100;
   
-  // For both fractional-skip and full-skip, calculate progress towards weekly goal
+  // Calculate progress towards weekly goal
   let progressText = `${skippedDays.length}/7 days`;
   let savingsProgressText = '';
   
-  if ((habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') && habit.weeklySavingsGoal) {
+  if (habit.weeklySavingsGoal) {
     const totalSaved = skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0);
     const goalPercentage = (totalSaved / habit.weeklySavingsGoal) * 100;
     progressPercentage = Math.min(100, goalPercentage);
@@ -72,32 +72,18 @@ const WeeklyTracker: React.FC<{
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center">
           <span className="text-sm font-medium text-gray-600">
-            {(habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') ? 'Weekly savings progress' : 'Weekly progress'}
+            Weekly savings progress
           </span>
-          {habit.savingsModel === 'fractional-skip' && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info size={14} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>Fractional Skip: Track partial savings when you reduce your spending on this habit.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          {habit.savingsModel === 'full-skip' && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info size={14} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>Full Skip: You save the full amount each time you completely skip this habit.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info size={14} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Track your savings by logging how much you spend on this habit.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <span className="text-xs text-gray-500">{progressText}</span>
       </div>
@@ -121,11 +107,7 @@ const WeeklyTracker: React.FC<{
             <button
               key={day}
               onClick={() => {
-                if (habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') {
-                  onFractionalSkip(day);
-                } else {
-                  onToggleDay(day);
-                }
+                onFractionalSkip(day);
               }}
               className={cn(
                 "w-8 h-8 flex items-center justify-center rounded-md text-xs font-medium transition-all",
@@ -141,17 +123,15 @@ const WeeklyTracker: React.FC<{
         })}
       </div>
       
-      {(habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') && (
-        <div className="text-sm mt-3 text-gray-600">
-          <div className="flex flex-wrap gap-1 mt-1">
-            {skippedDays.map((skip, index) => (
-              <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
-                {skip.day.toUpperCase()}: {formatCurrency(skip.amountSaved || 0)}
-              </span>
-            ))}
-          </div>
+      <div className="text-sm mt-3 text-gray-600">
+        <div className="flex flex-wrap gap-1 mt-1">
+          {skippedDays.map((skip, index) => (
+            <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+              {skip.day.toUpperCase()}: {formatCurrency(skip.amountSaved || 0)}
+            </span>
+          ))}
         </div>
-      )}
+      </div>
 
       <div className="text-sm mt-2 font-medium">
         <span>Current savings: </span>
@@ -172,30 +152,18 @@ const FractionalSkipDialog: React.FC<{
 }> = ({ open, onOpenChange, habit, day, onSubmit }) => {
   const [spentAmount, setSpentAmount] = useState('');
   const typicalSpend = habit.expense;
-  const isFullSkip = habit.savingsModel === 'full-skip';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     let amountSaved = 0;
     
-    if (isFullSkip) {
-      // For full skip, if they spent nothing, they saved the full amount
-      // If they spent something, calculate the savings
-      const spent = parseFloat(spentAmount);
-      if (isNaN(spent)) {
-        // Treat as complete skip (spent nothing)
-        amountSaved = typicalSpend;
-      } else {
-        // Saved the difference between typical spend and actual spend
-        amountSaved = Math.max(0, typicalSpend - spent);
-      }
+    // Calculate savings based on what they spent
+    const spent = parseFloat(spentAmount);
+    if (isNaN(spent)) {
+      // Treat as complete skip (spent nothing)
+      amountSaved = typicalSpend;
     } else {
-      // For fractional skip, calculate how much was saved based on what they spent
-      const spent = parseFloat(spentAmount);
-      if (isNaN(spent) || spent < 0) {
-        toast.error('Please enter a valid amount');
-        return;
-      }
+      // Saved the difference between typical spend and actual spend
       amountSaved = Math.max(0, typicalSpend - spent);
     }
     
@@ -207,14 +175,13 @@ const FractionalSkipDialog: React.FC<{
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Log {isFullSkip ? 'Full' : 'Partial'} Skip</DialogTitle>
+        <DialogTitle>Log Skip</DialogTitle>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="space-y-4 py-2">
         <div className="space-y-2">
           <Label htmlFor="spent-amount">How much did you spend?</Label>
           <p className="text-sm text-gray-500 mb-2">
-            Enter how much you spent on {habit.name} today
-            {isFullSkip ? ' (leave empty if you skipped completely)' : ''}
+            Enter how much you spent on {habit.name} today (leave empty if you skipped completely)
           </p>
           <Input
             id="spent-amount"
