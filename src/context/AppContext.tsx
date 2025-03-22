@@ -227,17 +227,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
   
   const totalSavings = selectedHabits.reduce((total, habit) => {
-    if (habit.savingsModel === 'fractional-skip') {
+    if (habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') {
       return total + habit.skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0);
-    } else if (habit.savingsModel === 'full-skip') {
-      return total + habit.skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0);
-    } else if (habit.savingsModel === 'fractional') {
-      return total + (habit.skipped * habit.expense);
-    } else {
-      // all-or-nothing
-      const completedWeeks = Math.floor(habit.skipped / 7);
-      return total + (completedWeeks * habit.expense * habit.frequency);
     }
+    return total;
   }, 0);
   
   const annualSavings = selectedHabits.reduce((total, habit) => {

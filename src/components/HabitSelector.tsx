@@ -69,8 +69,6 @@ const HabitCard: React.FC<{
 
   const getSavingsModelLabel = (model: SavingsModel) => {
     switch(model) {
-      case 'fractional': return 'Fractional';
-      case 'all-or-nothing': return 'All-or-Nothing';
       case 'full-skip': return 'Full Skip';
       case 'fractional-skip': return 'Fractional Skip';
       default: return model;
@@ -79,8 +77,6 @@ const HabitCard: React.FC<{
 
   const getSavingsModelColor = (model: SavingsModel) => {
     switch(model) {
-      case 'fractional': return "bg-blue-100 text-blue-700";
-      case 'all-or-nothing': return "bg-purple-100 text-purple-700";
       case 'full-skip': return "bg-green-100 text-green-700";
       case 'fractional-skip': return "bg-amber-100 text-amber-700";
       default: return "bg-gray-100 text-gray-700";
