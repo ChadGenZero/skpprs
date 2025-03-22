@@ -1,15 +1,14 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export type Frequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
 export type DayOfWeek = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
-export type SavingsModel = 'fractional' | 'all-or-nothing' | 'full-skip' | 'fractional-skip';
+export type SavingsModel = 'fractional-skip' | 'full-skip';
 
 export interface SkipLog {
   habitId: string;
   date: string; // ISO date string
   day: DayOfWeek;
-  amountSaved?: number; // For fractional-skip model
+  amountSaved?: number; // For both fractional-skip and full-skip models
 }
 
 export interface Habit {
@@ -21,8 +20,8 @@ export interface Habit {
   skipped: number;
   skippedDays: SkipLog[];
   savingsModel: SavingsModel;
-  typicalWeeklySpend?: number; // For fractional-skip model
-  weeklySavingsGoal?: number; // For fractional-skip model
+  typicalWeeklySpend?: number; // For both fractional-skip and full-skip models
+  weeklySavingsGoal?: number; // For both fractional-skip and full-skip models
 }
 
 export interface AppContextType {
@@ -55,7 +54,9 @@ const defaultHabits: Habit[] = [
     period: 'daily',
     skipped: 0,
     skippedDays: [],
-    savingsModel: 'full-skip'
+    savingsModel: 'full-skip',
+    typicalWeeklySpend: 35.00,
+    weeklySavingsGoal: 25.00
   },
   {
     id: '2',
@@ -77,7 +78,9 @@ const defaultHabits: Habit[] = [
     period: 'weekly',
     skipped: 0,
     skippedDays: [],
-    savingsModel: 'all-or-nothing'
+    savingsModel: 'full-skip',
+    typicalWeeklySpend: 50.00,
+    weeklySavingsGoal: 30.00
   },
   {
     id: '4',
@@ -87,7 +90,9 @@ const defaultHabits: Habit[] = [
     period: 'weekly',
     skipped: 0,
     skippedDays: [],
-    savingsModel: 'fractional'
+    savingsModel: 'fractional-skip',
+    typicalWeeklySpend: 15.00,
+    weeklySavingsGoal: 10.00
   },
   {
     id: '5',
@@ -97,7 +102,9 @@ const defaultHabits: Habit[] = [
     period: 'monthly',
     skipped: 0,
     skippedDays: [],
-    savingsModel: 'fractional'
+    savingsModel: 'full-skip',
+    typicalWeeklySpend: 45.00,
+    weeklySavingsGoal: 15.00
   },
   {
     id: '6',
@@ -119,7 +126,9 @@ const defaultHabits: Habit[] = [
     period: 'weekly',
     skipped: 0,
     skippedDays: [],
-    savingsModel: 'all-or-nothing'
+    savingsModel: 'full-skip',
+    typicalWeeklySpend: 50.00,
+    weeklySavingsGoal: 25.00
   },
   {
     id: '8',
@@ -141,7 +150,9 @@ const defaultHabits: Habit[] = [
     period: 'monthly',
     skipped: 0,
     skippedDays: [],
-    savingsModel: 'full-skip'
+    savingsModel: 'full-skip',
+    typicalWeeklySpend: 100.00,
+    weeklySavingsGoal: 50.00
   }
 ];
 
@@ -207,26 +218,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       return skipDate >= startOfWeek;
     });
     
-    switch(habit.savingsModel) {
-      case 'fractional':
-        return weekSkips.length * (habit.expense * habit.frequency / 7);
-      case 'all-or-nothing':
-        const completedWeeks = Math.floor(habit.skipped / 7);
-        return completedWeeks * habit.expense * habit.frequency;
-      case 'full-skip':
-        return weekSkips.length * habit.expense;
-      case 'fractional-skip':
-        return weekSkips.reduce((total, skip) => total + (skip.amountSaved || 0), 0);
-      default:
-        return 0;
+    // Both fractional-skip and full-skip now use the same logic
+    if (habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') {
+      return weekSkips.reduce((total, skip) => total + (skip.amountSaved || 0), 0);
     }
+    
+    return 0;
   };
   
   const totalSavings = selectedHabits.reduce((total, habit) => {
     if (habit.savingsModel === 'fractional-skip') {
       return total + habit.skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0);
     } else if (habit.savingsModel === 'full-skip') {
-      return total + (habit.skipped * habit.expense);
+      return total + habit.skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0);
     } else if (habit.savingsModel === 'fractional') {
       return total + (habit.skipped * habit.expense);
     } else {

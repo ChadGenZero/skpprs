@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext, type Habit, type Frequency, type SavingsModel } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -23,17 +22,11 @@ const SavingsModelTooltip: React.FC<{ model: SavingsModel }> = ({ model }) => {
   let content = '';
   
   switch(model) {
-    case 'fractional':
-      content = "This goal allows you to save a fraction of your target amount each day you skip the habit. Example: Skip your $5 coffee each day to save $20 this week. If you skip 6 days, you save $17.16.";
-      break;
-    case 'all-or-nothing':
-      content = "This goal requires you to skip all days of the week to meet your target. Example: Skip all 7 days of online shopping to save $70. If you miss a day, your savings reset to $0 for the week.";
-      break;
     case 'full-skip':
-      content = "Full Skip allows you to completely eliminate a small daily habit (e.g., coffee, snacks). Perfect for habits you can fully avoid to reach your savings goal faster.";
+      content = "Full Skip allows you to completely eliminate a habit and track the full amount saved, while setting a weekly savings goal.";
       break;
     case 'fractional-skip':
-      content = "Fractional Skip is for larger ticket items (e.g., fast food, subscriptions) where you may not be able to fully eliminate the habit but can reduce the spending each time to build up over several weeks.";
+      content = "Fractional Skip is perfect for habits you want to reduce but not eliminate completely. Log how much you actually spent to track your partial savings.";
       break;
     default:
       content = "Choose a savings model that best fits your habit.";
@@ -208,9 +201,9 @@ const HabitDialog: React.FC<{
       savingsModel
     };
     
-    if (savingsModel === 'fractional-skip') {
+    if (savingsModel === 'fractional-skip' || savingsModel === 'full-skip') {
       if (!typicalWeeklySpend || !weeklySavingsGoal) {
-        toast.error('Please provide weekly spend and savings goal for Fractional Skip');
+        toast.error('Please provide weekly spend and savings goal');
         return;
       }
       habitData.typicalWeeklySpend = parseFloat(typicalWeeklySpend);
@@ -307,24 +300,10 @@ const HabitDialog: React.FC<{
                 <SavingsModelTooltip model="fractional-skip" />
               </Label>
             </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="fractional" id="fractional" />
-              <Label htmlFor="fractional" className="font-normal flex items-center cursor-pointer">
-                Fractional Savings (Legacy)
-                <SavingsModelTooltip model="fractional" />
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="all-or-nothing" id="all-or-nothing" />
-              <Label htmlFor="all-or-nothing" className="font-normal flex items-center cursor-pointer">
-                All-or-Nothing (Legacy)
-                <SavingsModelTooltip model="all-or-nothing" />
-              </Label>
-            </div>
           </RadioGroup>
         </div>
         
-        {savingsModel === 'fractional-skip' && (
+        {(savingsModel === 'fractional-skip' || savingsModel === 'full-skip') && (
           <>
             <div className="space-y-2">
               <Label htmlFor="typicalWeeklySpend">Typical Weekly Spend ($)</Label>

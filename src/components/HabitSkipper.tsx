@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext, type DayOfWeek, type SkipLog } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -53,11 +52,11 @@ const WeeklyTracker: React.FC<{
   // Calculate progress percentage - using let instead of const to allow reassignment
   let progressPercentage = (skippedDays.length / 7) * 100;
   
-  // For fractional-skip, calculate progress towards weekly goal
+  // For both fractional-skip and full-skip, calculate progress towards weekly goal
   let progressText = `${skippedDays.length}/7 days`;
   let savingsProgressText = '';
   
-  if (habit.savingsModel === 'fractional-skip' && habit.weeklySavingsGoal) {
+  if ((habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') && habit.weeklySavingsGoal) {
     const totalSaved = skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0);
     const goalPercentage = (totalSaved / habit.weeklySavingsGoal) * 100;
     progressPercentage = Math.min(100, goalPercentage);
@@ -67,30 +66,14 @@ const WeeklyTracker: React.FC<{
 
   const { calculateHabitSavings } = useAppContext();
   const habitSavings = calculateHabitSavings(habit);
-  
-  // For all-or-nothing model - need 7/7 days to get savings
-  const isAllOrNothing = habit.savingsModel === 'all-or-nothing';
-  const missedAnyDay = skippedDays.length < 7 && isAllOrNothing;
-  
+
   return (
     <div className="mt-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center">
           <span className="text-sm font-medium text-gray-600">
-            {habit.savingsModel === 'fractional-skip' ? 'Weekly savings progress' : 'Weekly progress'}
+            {(habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') ? 'Weekly savings progress' : 'Weekly progress'}
           </span>
-          {isAllOrNothing && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info size={14} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
-                </TooltipTrigger>
-                <TooltipContent className="max-w-xs">
-                  <p>All-or-Nothing goal: You must skip all 7 days to save the full amount.</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
           {habit.savingsModel === 'fractional-skip' && (
             <TooltipProvider>
               <Tooltip>
@@ -121,10 +104,7 @@ const WeeklyTracker: React.FC<{
       
       <Progress 
         value={progressPercentage} 
-        className={cn(
-          "h-2 mb-3",
-          isAllOrNothing && skippedDays.length < 7 ? "bg-gray-200" : undefined
-        )} 
+        className="h-2 mb-3"
       />
       
       {savingsProgressText && (
@@ -141,7 +121,7 @@ const WeeklyTracker: React.FC<{
             <button
               key={day}
               onClick={() => {
-                if (habit.savingsModel === 'fractional-skip') {
+                if (habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') {
                   onFractionalSkip(day);
                 } else {
                   onToggleDay(day);
@@ -161,7 +141,7 @@ const WeeklyTracker: React.FC<{
         })}
       </div>
       
-      {habit.savingsModel === 'fractional-skip' && (
+      {(habit.savingsModel === 'fractional-skip' || habit.savingsModel === 'full-skip') && (
         <div className="text-sm mt-3 text-gray-600">
           <div className="flex flex-wrap gap-1 mt-1">
             {skippedDays.map((skip, index) => (
@@ -172,31 +152,10 @@ const WeeklyTracker: React.FC<{
           </div>
         </div>
       )}
-      
-      {isAllOrNothing && (
-        <div className={cn(
-          "text-sm mt-2 flex items-center",
-          missedAnyDay ? "text-orange-500" : "text-green-600"
-        )}>
-          {missedAnyDay ? (
-            <>
-              <AlertTriangle size={14} className="mr-1" />
-              <span>Must complete all 7 days to save {formatCurrency(habit.expense * habit.frequency)}</span>
-            </>
-          ) : (
-            <>
-              <Check size={14} className="mr-1" />
-              <span>Saved {formatCurrency(habit.expense * habit.frequency)} this week!</span>
-            </>
-          )}
-        </div>
-      )}
 
       <div className="text-sm mt-2 font-medium">
         <span>Current savings: </span>
-        <span className={cn(
-          isAllOrNothing && missedAnyDay ? "text-orange-500" : "text-green-600"
-        )}>
+        <span className="text-green-600">
           {formatCurrency(habitSavings)}
         </span>
       </div>
@@ -211,43 +170,60 @@ const FractionalSkipDialog: React.FC<{
   day: DayOfWeek;
   onSubmit: (amount: number) => void;
 }> = ({ open, onOpenChange, habit, day, onSubmit }) => {
-  const [amount, setAmount] = useState('');
-  const maxAmount = habit.expense;
+  const [spentAmount, setSpentAmount] = useState('');
+  const typicalSpend = habit.expense;
+  const isFullSkip = habit.savingsModel === 'full-skip';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const amountSaved = parseFloat(amount);
-    if (isNaN(amountSaved) || amountSaved <= 0) {
-      toast.error('Please enter a valid amount');
-      return;
+    let amountSaved = 0;
+    
+    if (isFullSkip) {
+      // For full skip, if they spent nothing, they saved the full amount
+      // If they spent something, calculate the savings
+      const spent = parseFloat(spentAmount);
+      if (isNaN(spent)) {
+        // Treat as complete skip (spent nothing)
+        amountSaved = typicalSpend;
+      } else {
+        // Saved the difference between typical spend and actual spend
+        amountSaved = Math.max(0, typicalSpend - spent);
+      }
+    } else {
+      // For fractional skip, calculate how much was saved based on what they spent
+      const spent = parseFloat(spentAmount);
+      if (isNaN(spent) || spent < 0) {
+        toast.error('Please enter a valid amount');
+        return;
+      }
+      amountSaved = Math.max(0, typicalSpend - spent);
     }
     
     onSubmit(amountSaved);
     onOpenChange(false);
-    setAmount('');
+    setSpentAmount('');
   };
 
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Log Partial Skip</DialogTitle>
+        <DialogTitle>Log {isFullSkip ? 'Full' : 'Partial'} Skip</DialogTitle>
       </DialogHeader>
       <form onSubmit={handleSubmit} className="space-y-4 py-2">
         <div className="space-y-2">
-          <Label htmlFor="saved-amount">Amount Saved</Label>
+          <Label htmlFor="spent-amount">How much did you spend?</Label>
           <p className="text-sm text-gray-500 mb-2">
-            How much did you save by reducing your {habit.name} expense today?
+            Enter how much you spent on {habit.name} today
+            {isFullSkip ? ' (leave empty if you skipped completely)' : ''}
           </p>
           <Input
-            id="saved-amount"
+            id="spent-amount"
             type="number"
-            min="0.01"
+            min="0"
             step="0.01"
-            max={maxAmount.toString()}
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
+            value={spentAmount}
+            onChange={(e) => setSpentAmount(e.target.value)}
             placeholder={`0.00`}
-            required
             className="text-gray-900 placeholder:text-gray-400"
           />
           <p className="text-xs text-gray-500 mt-1">
@@ -257,7 +233,7 @@ const FractionalSkipDialog: React.FC<{
         
         <DialogFooter>
           <Button type="submit" className="w-full bg-bitcoin hover:bg-bitcoin/90">
-            Save Amount
+            Save
           </Button>
         </DialogFooter>
       </form>
@@ -297,21 +273,17 @@ const SkipCard: React.FC<{
             <h3 className="font-medium text-gray-900">{habit.name}</h3>
             <span className={cn(
               "ml-2 px-2 py-0.5 rounded-full text-xs",
-              habit.savingsModel === 'fractional' || habit.savingsModel === 'fractional-skip'
+              habit.savingsModel === 'fractional-skip'
                 ? "bg-blue-100 text-blue-700" 
-                : habit.savingsModel === 'all-or-nothing'
-                  ? "bg-purple-100 text-purple-700"
-                  : "bg-green-100 text-green-700"
+                : "bg-green-100 text-green-700"
             )}>
-              {habit.savingsModel === 'fractional' ? 'Fractional' : 
-               habit.savingsModel === 'fractional-skip' ? 'Fractional Skip' :
-               habit.savingsModel === 'full-skip' ? 'Full Skip' : 'All-or-Nothing'}
+              {habit.savingsModel === 'fractional-skip' ? 'Fractional Skip' : 'Full Skip'}
             </span>
           </div>
           <p className="text-sm text-gray-500">
             {habit.savingsModel === 'fractional-skip' 
               ? `Goal: Save ${formatCurrency(habit.weeklySavingsGoal || 0)} weekly`
-              : `Save ${formatCurrency(habit.expense)} each time`}
+              : `Goal: Save ${formatCurrency(habit.weeklySavingsGoal || 0)} weekly`}
           </p>
         </div>
       </div>
@@ -322,7 +294,7 @@ const SkipCard: React.FC<{
           <p className="font-medium text-royal-blue">
             {habit.savingsModel === 'fractional-skip'
               ? `${formatCurrency(habit.skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0))} total saved`
-              : `${formatCurrency(habit.skipped * habit.expense)} total saved`}
+              : `${formatCurrency(habit.skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0))} total saved`}
           </p>
         </div>
       </div>
