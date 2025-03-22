@@ -1,12 +1,15 @@
 
 import React, { useState } from 'react';
-import { useAppContext, type DayOfWeek } from '@/context/AppContext';
+import { useAppContext, type DayOfWeek, type SkipLog } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, TrendingUpIcon, Check, Coffee, ShoppingBag, DollarSign, Calendar, Info, AlertTriangle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
@@ -19,9 +22,10 @@ const formatCurrency = (amount: number): string => {
 
 const WeeklyTracker: React.FC<{
   habit: any;
-  skippedDays: DayOfWeek[];
+  skippedDays: SkipLog[];
   onToggleDay: (day: DayOfWeek) => void;
-}> = ({ habit, skippedDays, onToggleDay }) => {
+  onFractionalSkip: (day: DayOfWeek) => void;
+}> = ({ habit, skippedDays, onToggleDay, onFractionalSkip }) => {
   const days: { day: DayOfWeek; label: string }[] = [
     { day: 'mon', label: 'M' },
     { day: 'tue', label: 'T' },
@@ -48,6 +52,18 @@ const WeeklyTracker: React.FC<{
   
   // Calculate progress percentage
   const progressPercentage = (skippedDays.length / 7) * 100;
+  
+  // For fractional-skip, calculate progress towards weekly goal
+  let progressText = `${skippedDays.length}/7 days`;
+  let savingsProgressText = '';
+  
+  if (habit.savingsModel === 'fractional-skip' && habit.weeklySavingsGoal) {
+    const totalSaved = skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0);
+    const goalPercentage = (totalSaved / habit.weeklySavingsGoal) * 100;
+    progressPercentage = Math.min(100, goalPercentage);
+    progressText = `${formatCurrency(totalSaved)} of ${formatCurrency(habit.weeklySavingsGoal)}`;
+    savingsProgressText = `${Math.round(goalPercentage)}% of weekly goal`;
+  }
 
   const { calculateHabitSavings } = useAppContext();
   const habitSavings = calculateHabitSavings(habit);
@@ -60,7 +76,9 @@ const WeeklyTracker: React.FC<{
     <div className="mt-4">
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center">
-          <span className="text-sm font-medium text-gray-600">Weekly progress</span>
+          <span className="text-sm font-medium text-gray-600">
+            {habit.savingsModel === 'fractional-skip' ? 'Weekly savings progress' : 'Weekly progress'}
+          </span>
           {isAllOrNothing && (
             <TooltipProvider>
               <Tooltip>
@@ -73,8 +91,32 @@ const WeeklyTracker: React.FC<{
               </Tooltip>
             </TooltipProvider>
           )}
+          {habit.savingsModel === 'fractional-skip' && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Fractional Skip: Track partial savings when you reduce your spending on this habit.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+          {habit.savingsModel === 'full-skip' && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info size={14} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <p>Full Skip: You save the full amount each time you completely skip this habit.</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
-        <span className="text-xs text-gray-500">{skippedDays.length}/7 days</span>
+        <span className="text-xs text-gray-500">{progressText}</span>
       </div>
       
       <Progress 
@@ -85,15 +127,26 @@ const WeeklyTracker: React.FC<{
         )} 
       />
       
+      {savingsProgressText && (
+        <div className="text-xs text-gray-500 mb-2 text-right">{savingsProgressText}</div>
+      )}
+      
       <div className="flex justify-between gap-1">
         {days.map(({ day, label }) => {
-          const isSkipped = skippedDays.includes(day);
+          const skippedLog = skippedDays.find(skip => skip.day === day);
+          const isSkipped = !!skippedLog;
           const isToday = day === currentDay;
           
           return (
             <button
               key={day}
-              onClick={() => onToggleDay(day)}
+              onClick={() => {
+                if (habit.savingsModel === 'fractional-skip') {
+                  onFractionalSkip(day);
+                } else {
+                  onToggleDay(day);
+                }
+              }}
               className={cn(
                 "w-8 h-8 flex items-center justify-center rounded-md text-xs font-medium transition-all",
                 isSkipped 
@@ -107,6 +160,18 @@ const WeeklyTracker: React.FC<{
           );
         })}
       </div>
+      
+      {habit.savingsModel === 'fractional-skip' && (
+        <div className="text-sm mt-3 text-gray-600">
+          <div className="flex flex-wrap gap-1 mt-1">
+            {skippedDays.map((skip, index) => (
+              <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                {skip.day.toUpperCase()}: {formatCurrency(skip.amountSaved || 0)}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
       
       {isAllOrNothing && (
         <div className={cn(
@@ -139,16 +204,86 @@ const WeeklyTracker: React.FC<{
   );
 };
 
+const FractionalSkipDialog: React.FC<{
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  habit: any;
+  day: DayOfWeek;
+  onSubmit: (amount: number) => void;
+}> = ({ open, onOpenChange, habit, day, onSubmit }) => {
+  const [amount, setAmount] = useState('');
+  const maxAmount = habit.expense;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const amountSaved = parseFloat(amount);
+    if (isNaN(amountSaved) || amountSaved <= 0) {
+      toast.error('Please enter a valid amount');
+      return;
+    }
+    
+    onSubmit(amountSaved);
+    onOpenChange(false);
+    setAmount('');
+  };
+
+  return (
+    <DialogContent className="sm:max-w-md">
+      <DialogHeader>
+        <DialogTitle>Log Partial Skip</DialogTitle>
+      </DialogHeader>
+      <form onSubmit={handleSubmit} className="space-y-4 py-2">
+        <div className="space-y-2">
+          <Label htmlFor="saved-amount">Amount Saved</Label>
+          <p className="text-sm text-gray-500 mb-2">
+            How much did you save by reducing your {habit.name} expense today?
+          </p>
+          <Input
+            id="saved-amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            max={maxAmount.toString()}
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder={`0.00`}
+            required
+            className="text-gray-900 placeholder:text-gray-400"
+          />
+          <p className="text-xs text-gray-500 mt-1">
+            Your typical spend: {formatCurrency(habit.expense)}
+          </p>
+        </div>
+        
+        <DialogFooter>
+          <Button type="submit" className="w-full bg-bitcoin hover:bg-bitcoin/90">
+            Save Amount
+          </Button>
+        </DialogFooter>
+      </form>
+    </DialogContent>
+  );
+};
+
 const SkipCard: React.FC<{ 
   habit: any;
-  skippedDays: DayOfWeek[];
+  skippedDays: SkipLog[];
   onToggleDay: (day: DayOfWeek) => void;
-}> = ({ habit, skippedDays, onToggleDay }) => {
+  onFractionalSkip: (day: DayOfWeek, amount: number) => void;
+}> = ({ habit, skippedDays, onToggleDay, onFractionalSkip }) => {
+  const [fractionalSkipDialogOpen, setFractionalSkipDialogOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<DayOfWeek>('mon');
+
   // Function to determine which icon to show based on habit name
   const getHabitIcon = (habitName: string) => {
     if (habitName.toLowerCase().includes('coffee')) return <Coffee size={24} />;
     if (habitName.toLowerCase().includes('shopping')) return <ShoppingBag size={24} />;
     return <DollarSign size={24} />;
+  };
+
+  const handleFractionalSkipDay = (day: DayOfWeek) => {
+    setSelectedDay(day);
+    setFractionalSkipDialogOpen(true);
   };
 
   return (
@@ -162,15 +297,21 @@ const SkipCard: React.FC<{
             <h3 className="font-medium text-gray-900">{habit.name}</h3>
             <span className={cn(
               "ml-2 px-2 py-0.5 rounded-full text-xs",
-              habit.savingsModel === 'fractional' 
+              habit.savingsModel === 'fractional' || habit.savingsModel === 'fractional-skip'
                 ? "bg-blue-100 text-blue-700" 
-                : "bg-purple-100 text-purple-700"
+                : habit.savingsModel === 'all-or-nothing'
+                  ? "bg-purple-100 text-purple-700"
+                  : "bg-green-100 text-green-700"
             )}>
-              {habit.savingsModel === 'fractional' ? 'Fractional' : 'All-or-Nothing'}
+              {habit.savingsModel === 'fractional' ? 'Fractional' : 
+               habit.savingsModel === 'fractional-skip' ? 'Fractional Skip' :
+               habit.savingsModel === 'full-skip' ? 'Full Skip' : 'All-or-Nothing'}
             </span>
           </div>
           <p className="text-sm text-gray-500">
-            Save {formatCurrency(habit.expense)} each time
+            {habit.savingsModel === 'fractional-skip' 
+              ? `Goal: Save ${formatCurrency(habit.weeklySavingsGoal || 0)} weekly`
+              : `Save ${formatCurrency(habit.expense)} each time`}
           </p>
         </div>
       </div>
@@ -178,7 +319,11 @@ const SkipCard: React.FC<{
       <div className="flex justify-between items-center">
         <div>
           <p className="text-sm text-gray-500">Skipped {habit.skipped} times</p>
-          <p className="font-medium text-royal-blue">{formatCurrency(habit.skipped * habit.expense)} total saved</p>
+          <p className="font-medium text-royal-blue">
+            {habit.savingsModel === 'fractional-skip'
+              ? `${formatCurrency(habit.skippedDays.reduce((sum, skip) => sum + (skip.amountSaved || 0), 0))} total saved`
+              : `${formatCurrency(habit.skipped * habit.expense)} total saved`}
+          </p>
         </div>
       </div>
       
@@ -186,7 +331,18 @@ const SkipCard: React.FC<{
         habit={habit} 
         skippedDays={skippedDays}
         onToggleDay={onToggleDay}
+        onFractionalSkip={handleFractionalSkipDay}
       />
+
+      <Dialog open={fractionalSkipDialogOpen} onOpenChange={setFractionalSkipDialogOpen}>
+        <FractionalSkipDialog
+          open={fractionalSkipDialogOpen}
+          onOpenChange={setFractionalSkipDialogOpen}
+          habit={habit}
+          day={selectedDay}
+          onSubmit={(amount) => onFractionalSkip(selectedDay, amount)}
+        />
+      </Dialog>
     </div>
   );
 };
@@ -204,7 +360,7 @@ const HabitSkipper: React.FC = () => {
   
   const handleToggleDay = (habitId: string, day: DayOfWeek) => {
     const skippedDays = getCurrentWeekSkips(habitId);
-    const isAlreadySkipped = skippedDays.includes(day);
+    const isAlreadySkipped = skippedDays.some(skip => skip.day === day);
     
     if (isAlreadySkipped) {
       // Untick (remove) the skipped day
@@ -221,6 +377,13 @@ const HabitSkipper: React.FC = () => {
     }
   };
 
+  const handleFractionalSkip = (habitId: string, day: DayOfWeek, amount: number) => {
+    skipHabitOnDay(habitId, day, amount);
+    toast.success('Partial savings logged!', {
+      description: `You saved ${formatCurrency(amount)} by reducing this expense.`,
+    });
+  };
+
   return (
     <div className="animate-scale-in">
       <div className="max-w-2xl mx-auto px-4">
@@ -230,7 +393,7 @@ const HabitSkipper: React.FC = () => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Skip & Save</h1>
           <p className="text-gray-600 max-w-md mx-auto">
-            Track your skipped habits and watch your savings grow. Mark or unmark days you skip a habit.
+            Track your skipped habits and watch your savings grow. Mark when you skip a habit or log partial savings.
           </p>
         </div>
         
@@ -266,6 +429,7 @@ const HabitSkipper: React.FC = () => {
               habit={habit}
               skippedDays={getCurrentWeekSkips(habit.id)}
               onToggleDay={(day) => handleToggleDay(habit.id, day)}
+              onFractionalSkip={(day, amount) => handleFractionalSkip(habit.id, day, amount)}
             />
           ))}
         </div>

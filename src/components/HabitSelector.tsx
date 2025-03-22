@@ -20,9 +20,24 @@ const frequencyOptions = [
 ];
 
 const SavingsModelTooltip: React.FC<{ model: SavingsModel }> = ({ model }) => {
-  const content = model === 'fractional' 
-    ? "This goal allows you to save a fraction of your target amount each day you skip the habit. Example: Skip your $5 coffee each day to save $20 this week. If you skip 6 days, you save $17.16."
-    : "This goal requires you to skip all days of the week to meet your target. Example: Skip all 7 days of online shopping to save $70. If you miss a day, your savings reset to $0 for the week.";
+  let content = '';
+  
+  switch(model) {
+    case 'fractional':
+      content = "This goal allows you to save a fraction of your target amount each day you skip the habit. Example: Skip your $5 coffee each day to save $20 this week. If you skip 6 days, you save $17.16.";
+      break;
+    case 'all-or-nothing':
+      content = "This goal requires you to skip all days of the week to meet your target. Example: Skip all 7 days of online shopping to save $70. If you miss a day, your savings reset to $0 for the week.";
+      break;
+    case 'full-skip':
+      content = "Full Skip allows you to completely eliminate a small daily habit (e.g., coffee, snacks). Perfect for habits you can fully avoid to reach your savings goal faster.";
+      break;
+    case 'fractional-skip':
+      content = "Fractional Skip is for larger ticket items (e.g., fast food, subscriptions) where you may not be able to fully eliminate the habit but can reduce the spending each time to build up over several weeks.";
+      break;
+    default:
+      content = "Choose a savings model that best fits your habit.";
+  }
   
   return (
     <TooltipProvider>
@@ -59,6 +74,26 @@ const HabitCard: React.FC<{
     return <DollarSign size={20} />;
   };
 
+  const getSavingsModelLabel = (model: SavingsModel) => {
+    switch(model) {
+      case 'fractional': return 'Fractional';
+      case 'all-or-nothing': return 'All-or-Nothing';
+      case 'full-skip': return 'Full Skip';
+      case 'fractional-skip': return 'Fractional Skip';
+      default: return model;
+    }
+  };
+
+  const getSavingsModelColor = (model: SavingsModel) => {
+    switch(model) {
+      case 'fractional': return "bg-blue-100 text-blue-700";
+      case 'all-or-nothing': return "bg-purple-100 text-purple-700";
+      case 'full-skip': return "bg-green-100 text-green-700";
+      case 'fractional-skip': return "bg-amber-100 text-amber-700";
+      default: return "bg-gray-100 text-gray-700";
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -82,11 +117,9 @@ const HabitCard: React.FC<{
           <div className="mt-1 text-xs flex items-center">
             <span className={cn(
               "px-2 py-0.5 rounded-full",
-              habit.savingsModel === 'fractional' 
-                ? "bg-blue-100 text-blue-700" 
-                : "bg-purple-100 text-purple-700"
+              getSavingsModelColor(habit.savingsModel)
             )}>
-              {habit.savingsModel === 'fractional' ? 'Fractional' : 'All-or-Nothing'}
+              {getSavingsModelLabel(habit.savingsModel)}
             </span>
             <SavingsModelTooltip model={habit.savingsModel} />
           </div>
@@ -140,7 +173,9 @@ const HabitDialog: React.FC<{
   const [expense, setExpense] = useState('');
   const [frequency, setFrequency] = useState('1');
   const [period, setPeriod] = useState<Frequency>('daily');
-  const [savingsModel, setSavingsModel] = useState<SavingsModel>('fractional');
+  const [savingsModel, setSavingsModel] = useState<SavingsModel>('full-skip');
+  const [typicalWeeklySpend, setTypicalWeeklySpend] = useState('');
+  const [weeklySavingsGoal, setWeeklySavingsGoal] = useState('');
 
   React.useEffect(() => {
     if (isEditing && habit && open) {
@@ -149,19 +184,23 @@ const HabitDialog: React.FC<{
       setFrequency(habit.frequency.toString());
       setPeriod(habit.period);
       setSavingsModel(habit.savingsModel);
+      setTypicalWeeklySpend(habit.typicalWeeklySpend?.toString() || '');
+      setWeeklySavingsGoal(habit.weeklySavingsGoal?.toString() || '');
     } else if (!isEditing && open) {
       setName('');
       setExpense('');
       setFrequency('1');
       setPeriod('daily');
-      setSavingsModel('fractional');
+      setSavingsModel('full-skip');
+      setTypicalWeeklySpend('');
+      setWeeklySavingsGoal('');
     }
   }, [habit, isEditing, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const habitData = {
+    const habitData: Partial<Habit> = {
       name,
       expense: parseFloat(expense),
       frequency: parseInt(frequency),
@@ -169,11 +208,20 @@ const HabitDialog: React.FC<{
       savingsModel
     };
     
+    if (savingsModel === 'fractional-skip') {
+      if (!typicalWeeklySpend || !weeklySavingsGoal) {
+        toast.error('Please provide weekly spend and savings goal for Fractional Skip');
+        return;
+      }
+      habitData.typicalWeeklySpend = parseFloat(typicalWeeklySpend);
+      habitData.weeklySavingsGoal = parseFloat(weeklySavingsGoal);
+    }
+    
     if (isEditing && habit) {
       updateHabit(habit.id, habitData);
       toast.success('Habit updated successfully!');
     } else {
-      addHabit(habitData);
+      addHabit(habitData as Omit<Habit, 'id' | 'skipped' | 'skippedDays'>);
       toast.success('Habit added successfully!');
     }
     
@@ -242,25 +290,72 @@ const HabitDialog: React.FC<{
         
         <div className="space-y-2">
           <Label className="flex items-center">
-            Savings Model
+            Skip Method
           </Label>
           <RadioGroup value={savingsModel} onValueChange={(value) => setSavingsModel(value as SavingsModel)} className="flex flex-col gap-3">
             <div className="flex items-center space-x-2">
+              <RadioGroupItem value="full-skip" id="full-skip" />
+              <Label htmlFor="full-skip" className="font-normal flex items-center cursor-pointer">
+                Full Skip
+                <SavingsModelTooltip model="full-skip" />
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="fractional-skip" id="fractional-skip" />
+              <Label htmlFor="fractional-skip" className="font-normal flex items-center cursor-pointer">
+                Fractional Skip
+                <SavingsModelTooltip model="fractional-skip" />
+              </Label>
+            </div>
+            <div className="flex items-center space-x-2">
               <RadioGroupItem value="fractional" id="fractional" />
               <Label htmlFor="fractional" className="font-normal flex items-center cursor-pointer">
-                Fractional Savings
+                Fractional Savings (Legacy)
                 <SavingsModelTooltip model="fractional" />
               </Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="all-or-nothing" id="all-or-nothing" />
               <Label htmlFor="all-or-nothing" className="font-normal flex items-center cursor-pointer">
-                All-or-Nothing
+                All-or-Nothing (Legacy)
                 <SavingsModelTooltip model="all-or-nothing" />
               </Label>
             </div>
           </RadioGroup>
         </div>
+        
+        {savingsModel === 'fractional-skip' && (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="typicalWeeklySpend">Typical Weekly Spend ($)</Label>
+              <Input 
+                id="typicalWeeklySpend" 
+                type="number" 
+                min="0.01" 
+                step="0.01" 
+                value={typicalWeeklySpend} 
+                onChange={(e) => setTypicalWeeklySpend(e.target.value)} 
+                placeholder="0.00" 
+                required 
+                className="text-gray-900 placeholder:text-gray-400"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="weeklySavingsGoal">Weekly Savings Goal ($)</Label>
+              <Input 
+                id="weeklySavingsGoal" 
+                type="number" 
+                min="0.01" 
+                step="0.01" 
+                value={weeklySavingsGoal} 
+                onChange={(e) => setWeeklySavingsGoal(e.target.value)} 
+                placeholder="0.00" 
+                required 
+                className="text-gray-900 placeholder:text-gray-400"
+              />
+            </div>
+          </>
+        )}
         
         <DialogFooter>
           <Button type="submit" className="w-full bg-bitcoin hover:bg-bitcoin/90">
