@@ -50,8 +50,8 @@ const WeeklyTracker: React.FC<{
   };
   const currentDay: DayOfWeek = currentDayMap[currentDayIndex];
   
-  // Calculate progress percentage
-  const progressPercentage = (skippedDays.length / 7) * 100;
+  // Calculate progress percentage - using let instead of const to allow reassignment
+  let progressPercentage = (skippedDays.length / 7) * 100;
   
   // For fractional-skip, calculate progress towards weekly goal
   let progressText = `${skippedDays.length}/7 days`;
