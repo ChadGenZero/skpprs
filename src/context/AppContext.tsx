@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export type Frequency = 'daily' | 'weekly' | 'fortnightly' | 'monthly' | 'quarterly' | 'yearly';
@@ -7,11 +6,8 @@ export type DayOfWeek = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
 export interface SkipLog {
   habitId: string;
   date: string; // ISO date string
-  day: DayOfWeek;
   amountSaved: number;
   isForfeited?: boolean;
-  isPartial?: boolean;
-  partialAmount?: 0.25 | 0.5 | 0.75; // quarter, half, three-quarter progress
 }
 
 export interface Habit {
@@ -25,7 +21,7 @@ export interface Habit {
   skippedDays: SkipLog[];
   skipGoal: number; // Weekly skip goal
   weeklyTotalPotential: number; // Calculated total possible weekly spend
-  isForfeited?: boolean; // Whether the weekly habit has been forfeited
+  isForfeited?: boolean; // Whether the weekly/monthly habit has been forfeited
 }
 
 export interface AppContextType {
@@ -37,21 +33,24 @@ export interface AppContextType {
   addHabit: (habit: Omit<Habit, 'id' | 'skipped' | 'skippedDays' | 'weeklyTotalPotential'>) => void;
   updateHabit: (habitId: string, updatedHabit: Partial<Omit<Habit, 'id'>>) => void;
   toggleHabit: (habitId: string) => void;
-  skipHabit: (habitId: string, amount?: number, isPartial?: boolean, partialAmount?: 0.25 | 0.5 | 0.75) => void;
+  skipHabit: (habitId: string, amount?: number) => void;
   forfeitHabit: (habitId: string) => void;
-  skipHabitOnDay: (habitId: string, day: DayOfWeek, amountSaved?: number, isPartial?: boolean, partialAmount?: 0.25 | 0.5 | 0.75) => void;
-  unskipHabitOnDay: (habitId: string, day: DayOfWeek) => void;
+  unskipLog: (habitId: string, skipLogIndex: number) => void;
   resetSkips: () => void;
-  superSkip: () => void; // New function for super skip
+  superSkip: () => void; // One-tap skip all eligible habits
   totalSavings: number;
   annualSavings: number;
   weeklySkipSavings: number;
   getCurrentWeekSkips: (habitId: string) => SkipLog[];
+  getTodaySkips: (habitId: string) => SkipLog[];
   getStartOfWeek: () => Date;
   calculateHabitSavings: (habit: Habit) => number;
   getRemainingSkips: (habit: Habit) => number;
   getBonusSkipPotential: (habit: Habit) => number;
+  getMaxBonusSkips: (habit: Habit) => number;
   getSkipGoalProgress: (habit: Habit) => { completed: number; total: number };
+  canSkipToday: (habit: Habit) => boolean;
+  isToday: (date: string) => boolean;
 }
 
 const defaultHabits: Habit[] = [
@@ -117,7 +116,6 @@ const defaultHabits: Habit[] = [
   }
 ];
 
-// Helper function to calculate weekly equivalent based on period
 const calculateWeeklyEquivalent = (amount: number, frequency: number, period: Frequency): number => {
   switch (period) {
     case 'daily':
@@ -168,6 +166,14 @@ const getDayStringFromDate = (date: Date): DayOfWeek => {
   return days[date.getDay()];
 };
 
+const isToday = (dateString: string): boolean => {
+  const date = new Date(dateString);
+  const today = new Date();
+  return date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear();
+};
+
 const AppContext = createContext<AppContextType>({
   step: 1,
   setStep: () => {},
@@ -179,19 +185,22 @@ const AppContext = createContext<AppContextType>({
   toggleHabit: () => {},
   skipHabit: () => {},
   forfeitHabit: () => {},
-  skipHabitOnDay: () => {},
-  unskipHabitOnDay: () => {},
+  unskipLog: () => {},
   resetSkips: () => {},
   superSkip: () => {},
   totalSavings: 0,
   annualSavings: 0,
   weeklySkipSavings: 0,
   getCurrentWeekSkips: () => [],
+  getTodaySkips: () => [],
   getStartOfWeek: () => new Date(),
   calculateHabitSavings: () => 0,
   getRemainingSkips: () => 0,
   getBonusSkipPotential: () => 0,
+  getMaxBonusSkips: () => 0,
   getSkipGoalProgress: () => ({ completed: 0, total: 0 }),
+  canSkipToday: () => false,
+  isToday: () => false,
 });
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -234,10 +243,18 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         return skipDate >= startOfWeek;
       });
   };
+  
+  const getTodaySkips = (habitId: string): SkipLog[] => {
+    const habit = habits.find(h => h.id === habitId);
+    if (!habit) return [];
+    
+    return habit.skippedDays.filter(skip => isToday(skip.date));
+  };
 
   const getRemainingSkips = (habit: Habit): number => {
     const currentWeekSkips = getCurrentWeekSkips(habit.id);
-    return Math.max(0, habit.skipGoal - currentWeekSkips.length);
+    const completedSkips = currentWeekSkips.filter(skip => !skip.isForfeited).length;
+    return Math.max(0, habit.skipGoal - completedSkips);
   };
 
   const getBonusSkipPotential = (habit: Habit): number => {
@@ -245,13 +262,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const skipGoalValue = habit.skipGoal * habit.expense;
     return Math.max(0, weeklyPotential - skipGoalValue);
   };
+  
+  const getMaxBonusSkips = (habit: Habit): number => {
+    const bonusPotential = getBonusSkipPotential(habit);
+    return Math.floor(bonusPotential / habit.expense);
+  };
 
   const getSkipGoalProgress = (habit: Habit): { completed: number; total: number } => {
     const currentWeekSkips = getCurrentWeekSkips(habit.id);
+    const completedSkips = currentWeekSkips.filter(skip => !skip.isForfeited).length;
     return {
-      completed: currentWeekSkips.length,
+      completed: completedSkips,
       total: habit.skipGoal
     };
+  };
+  
+  const canSkipToday = (habit: Habit): boolean => {
+    if (habit.isForfeited) return false;
+    
+    const currentWeekSkips = getCurrentWeekSkips(habit.id);
+    const completedSkips = currentWeekSkips.filter(skip => !skip.isForfeited).length;
+    const todaySkips = getTodaySkips(habit.id);
+    
+    // Calculate maximum possible skips (base goal + bonus skips)
+    const maxPossibleSkips = habit.skipGoal + getMaxBonusSkips(habit);
+    
+    // Can skip if haven't reached maximum possible skips and haven't skipped today
+    return completedSkips < maxPossibleSkips && todaySkips.length === 0;
   };
 
   const addHabit = (habit: Omit<Habit, 'id' | 'skipped' | 'skippedDays' | 'weeklyTotalPotential'>) => {
@@ -301,10 +338,17 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  const skipHabit = (habitId: string, amount?: number, isPartial?: boolean, partialAmount?: 0.25 | 0.5 | 0.75) => {
+  const skipHabit = (habitId: string, amount?: number) => {
     setHabits(habits.map(habit => {
       if (habit.id === habitId) {
         if (habit.isForfeited) return habit; // Skip if habit is forfeited
+        
+        // Get current week skips
+        const currentSkips = getCurrentWeekSkips(habit.id).filter(skip => !skip.isForfeited).length;
+        const maxSkips = habit.skipGoal + getMaxBonusSkips(habit);
+        
+        // Don't allow more skips than the maximum (goal + bonus)
+        if (currentSkips >= maxSkips) return habit;
         
         const skipAmount = amount || habit.expense;
         
@@ -316,10 +360,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             {
               habitId,
               date: new Date().toISOString(),
-              day: getDayStringFromDate(new Date()),
-              amountSaved: skipAmount,
-              isPartial,
-              partialAmount
+              amountSaved: skipAmount
             }
           ]
         };
@@ -350,57 +391,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }));
   };
 
-  const skipHabitOnDay = (
-    habitId: string, 
-    day: DayOfWeek, 
-    amountSaved?: number, 
-    isPartial?: boolean, 
-    partialAmount?: 0.25 | 0.5 | 0.75
-  ) => {
-    const now = new Date();
-    
+  const unskipLog = (habitId: string, skipLogIndex: number) => {
     setHabits(habits.map(habit => {
       if (habit.id === habitId) {
-        if (habit.isForfeited) return habit; // Skip if habit is forfeited
+        // Get the skip log to check if it's from today
+        const skipLog = habit.skippedDays[skipLogIndex];
         
-        const today = now.toDateString();
-        const alreadySkippedToday = habit.skippedDays.some(
-          skip => new Date(skip.date).toDateString() === today && skip.day === day
-        );
-
-        if (!alreadySkippedToday) {
-          const skipLog: SkipLog = {
-            habitId,
-            date: now.toISOString(),
-            day,
-            amountSaved: amountSaved || habit.expense,
-            isPartial,
-            partialAmount
-          };
-
-          return {
-            ...habit,
-            skipped: habit.skipped + 1,
-            skippedDays: [...habit.skippedDays, skipLog]
-          };
-        }
-      }
-      return habit;
-    }));
-  };
-
-  const unskipHabitOnDay = (habitId: string, day: DayOfWeek) => {
-    setHabits(habits.map(habit => {
-      if (habit.id === habitId) {
-        const skipToRemove = habit.skippedDays.find(skip => skip.day === day);
-        
-        if (skipToRemove) {
+        // Only allow unskipping if the skip was logged today
+        if (skipLog && isToday(skipLog.date)) {
+          const updatedSkippedDays = [...habit.skippedDays];
+          updatedSkippedDays.splice(skipLogIndex, 1);
+          
           return {
             ...habit,
             skipped: Math.max(0, habit.skipped - 1),
-            skippedDays: habit.skippedDays.filter(skip => 
-              !(skip.day === day && skip.date === skipToRemove.date)
-            )
+            skippedDays: updatedSkippedDays
           };
         }
       }
@@ -418,14 +423,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const superSkip = () => {
-    // Get today's day of week
-    const today = new Date();
-    const dayOfWeek = getDayStringFromDate(today);
-    
-    // Skip all non-forfeited habits at once
+    // Skip all non-forfeited habits that haven't been skipped today
     selectedHabits.forEach(habit => {
-      if (!habit.isForfeited) {
-        skipHabitOnDay(habit.id, dayOfWeek);
+      if (canSkipToday(habit)) {
+        skipHabit(habit.id);
       }
     });
   };
@@ -442,19 +443,22 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       toggleHabit,
       skipHabit,
       forfeitHabit,
-      skipHabitOnDay,
-      unskipHabitOnDay,
+      unskipLog,
       resetSkips,
       superSkip,
       totalSavings,
       annualSavings,
       weeklySkipSavings,
       getCurrentWeekSkips,
+      getTodaySkips,
       getStartOfWeek,
       calculateHabitSavings,
       getRemainingSkips,
       getBonusSkipPotential,
-      getSkipGoalProgress
+      getMaxBonusSkips,
+      getSkipGoalProgress,
+      canSkipToday,
+      isToday
     }}>
       {children}
     </AppContext.Provider>

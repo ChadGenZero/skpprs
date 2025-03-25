@@ -1,15 +1,13 @@
 
 import React, { useState } from 'react';
-import { useAppContext, type DayOfWeek, type SkipLog, type Habit } from '@/context/AppContext';
+import { useAppContext, type SkipLog, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon, Check, Calendar, Info, CheckCircle, AlertCircle, BadgeCheck, Gift } from 'lucide-react';
+import { ArrowLeftIcon, ArrowRightIcon, Check, Calendar, Info, AlertCircle, BadgeCheck, Gift, Clock, XCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 
 const formatCurrency = (amount: number): string => {
@@ -36,36 +34,21 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => {
   );
 };
 
-const WeeklyTracker: React.FC<{
+const SkipBoxes: React.FC<{
   habit: Habit;
-  skippedDays: SkipLog[];
   progress: { completed: number; total: number };
-  bonusSkipPotential: number;
-  onLogSkip: (day: DayOfWeek) => void;
-}> = ({ habit, skippedDays, progress, bonusSkipPotential, onLogSkip }) => {
-  const days: { day: DayOfWeek; label: string }[] = [
-    { day: 'mon', label: 'M' },
-    { day: 'tue', label: 'T' },
-    { day: 'wed', label: 'W' },
-    { day: 'thu', label: 'T' },
-    { day: 'fri', label: 'F' },
-    { day: 'sat', label: 'S' },
-    { day: 'sun', label: 'S' }
-  ];
+  maxBonusSkips: number;
+  onSkip: () => void;
+  onUnskip: (index: number) => void;
+  skips: SkipLog[];
+}> = ({ habit, progress, maxBonusSkips, onSkip, onUnskip, skips }) => {
+  const { isToday } = useAppContext();
   
-  // Get current day of week
-  const now = new Date();
-  const currentDayIndex = now.getDay(); // 0 is Sunday, 6 is Saturday
-  const currentDayMap: Record<number, DayOfWeek> = {
-    0: 'sun',
-    1: 'mon',
-    2: 'tue',
-    3: 'wed',
-    4: 'thu',
-    5: 'fri',
-    6: 'sat'
-  };
-  const currentDay: DayOfWeek = currentDayMap[currentDayIndex];
+  // Calculate total possible skips (base goal + bonus)
+  const totalPossibleSkips = progress.total + maxBonusSkips;
+  
+  // Create an array representing all possible skip boxes
+  const skipBoxes = Array(totalPossibleSkips).fill(null);
   
   // Calculate progress percentage
   const progressPercentage = (progress.completed / progress.total) * 100;
@@ -74,8 +57,8 @@ const WeeklyTracker: React.FC<{
   const progressText = `${progress.completed}/${progress.total} skips`;
   
   // Calculate savings from skips
-  const savedAmount = skippedDays.reduce((sum, skip) => sum + skip.amountSaved, 0);
-  
+  const savedAmount = skips.reduce((sum, skip) => sum + skip.amountSaved, 0);
+
   return (
     <div className="mt-3">
       <div className="flex justify-between items-center mb-2">
@@ -98,7 +81,7 @@ const WeeklyTracker: React.FC<{
           Saved: {formatCurrency(savedAmount)}
         </span>
         
-        {progress.completed >= progress.total && bonusSkipPotential > 0 && (
+        {progress.completed >= progress.total && maxBonusSkips > 0 && (
           <div className="flex items-center">
             <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full flex items-center gap-1">
               <Gift size={12} /> Bonus skips available!
@@ -107,47 +90,56 @@ const WeeklyTracker: React.FC<{
         )}
       </div>
       
-      <div className="flex justify-between gap-1 mb-2">
-        {days.map(({ day, label }) => {
-          const skippedLog = skippedDays.find(skip => skip.day === day);
-          const isSkipped = !!skippedLog;
-          const isToday = day === currentDay;
-          const isForfeited = skippedLog?.isForfeited;
-          const isPartial = skippedLog?.isPartial;
+      <div className="flex flex-wrap gap-2 mb-3">
+        {skipBoxes.map((_, index) => {
+          const isCompleted = index < skips.length;
+          const isBaseGoal = index < progress.total;
+          const isBonusSkip = index >= progress.total;
+          const currentSkip = isCompleted ? skips[index] : null;
+          const isEditable = isCompleted && isToday(currentSkip!.date);
           
           return (
-            <button
-              key={day}
+            <div
+              key={index}
+              className={cn(
+                "relative w-10 h-10 flex items-center justify-center rounded-md text-xs font-medium transition-all",
+                isCompleted 
+                  ? isBaseGoal 
+                    ? "bg-green-500 text-white" 
+                    : "bg-amber-500 text-white"
+                  : isBaseGoal
+                    ? "bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer"
+                    : progress.completed >= progress.total
+                      ? "bg-amber-100 text-amber-700 hover:bg-amber-200 cursor-pointer"
+                      : "bg-gray-50 text-gray-400 cursor-not-allowed",
+                habit.isForfeited && "opacity-50 cursor-not-allowed"
+              )}
               onClick={() => {
-                if (!isSkipped && !habit.isForfeited) {
-                  onLogSkip(day);
+                if (!isCompleted && !habit.isForfeited) {
+                  // Can only click bonus skips if base goal is completed
+                  if (isBonusSkip && progress.completed < progress.total) return;
+                  onSkip();
                 }
               }}
-              disabled={isSkipped || habit.isForfeited}
-              className={cn(
-                "w-9 h-9 flex items-center justify-center rounded-md text-xs font-medium transition-all",
-                isSkipped && isForfeited 
-                  ? "bg-red-100 text-red-500 cursor-not-allowed" 
-                  : isSkipped 
-                    ? "bg-green-500 text-white cursor-not-allowed" 
-                    : habit.isForfeited
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-gray-100 text-gray-600 hover:bg-gray-200",
-                isToday && !isSkipped && !habit.isForfeited && "ring-2 ring-bitcoin ring-offset-1"
-              )}
             >
-              {isSkipped ? (
-                isForfeited ? (
-                  <AlertCircle size={14} />
-                ) : isPartial ? (
-                  <div className="text-xs">{skippedLog.partialAmount && skippedLog.partialAmount * 100}%</div>
-                ) : (
-                  <Check size={14} />
-                )
+              {isCompleted ? (
+                <Check size={16} />
               ) : (
-                label
+                index + 1
               )}
-            </button>
+              
+              {isEditable && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUnskip(index);
+                  }}
+                  className="absolute -top-1 -right-1 bg-white rounded-full shadow-sm p-0.5"
+                >
+                  <XCircle size={14} className="text-red-500" />
+                </button>
+              )}
+            </div>
           );
         })}
       </div>
@@ -161,6 +153,11 @@ const WeeklyTracker: React.FC<{
         <div className="text-xs px-3 py-2 bg-blue-50 text-blue-500 rounded-md mb-2">
           <span>{progress.total - progress.completed} more skips needed to reach your goal</span>
         </div>
+      ) : maxBonusSkips > 0 ? (
+        <div className="text-xs px-3 py-2 bg-amber-50 text-amber-700 rounded-md flex items-center mb-2">
+          <Gift size={14} className="mr-1" />
+          <span>You can save up to {formatCurrency(habit.expense * maxBonusSkips)} more with bonus skips!</span>
+        </div>
       ) : (
         <div className="text-xs px-3 py-2 bg-green-50 text-green-600 rounded-md flex items-center mb-2">
           <BadgeCheck size={14} className="mr-1" />
@@ -171,145 +168,58 @@ const WeeklyTracker: React.FC<{
   );
 };
 
-const FractionalSkipDialog: React.FC<{
+const ConfirmSkipDialog: React.FC<{
   open: boolean;
   onOpenChange: (open: boolean) => void;
   habit: Habit;
-  day: DayOfWeek;
-  onSubmit: (amount: number, isPartial: boolean, partialAmount?: 0.25 | 0.5 | 0.75) => void;
-}> = ({ open, onOpenChange, habit, day, onSubmit }) => {
-  const [spentAmount, setSpentAmount] = useState('');
-  const [skipType, setSkipType] = useState<'full' | 'partial'>('full');
-  const [partialAmount, setPartialAmount] = useState<'0.25' | '0.5' | '0.75'>('0.5');
-  
-  const typicalSpend = habit.expense;
-  const dayNames = {
-    'mon': 'Monday',
-    'tue': 'Tuesday',
-    'wed': 'Wednesday',
-    'thu': 'Thursday',
-    'fri': 'Friday',
-    'sat': 'Saturday',
-    'sun': 'Sunday'
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
+  isBonus: boolean;
+  onConfirm: () => void;
+}> = ({ open, onOpenChange, habit, isBonus, onConfirm }) => {
+  const handleConfirm = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    let amountSaved = 0;
-    let isPartial = skipType === 'partial';
-    let partialAmountValue: 0.25 | 0.5 | 0.75 | undefined = undefined;
-    
-    if (skipType === 'full') {
-      // Full skip (spent nothing)
-      amountSaved = typicalSpend;
-    } else {
-      // Partial skip
-      partialAmountValue = parseFloat(partialAmount) as 0.25 | 0.5 | 0.75;
-      amountSaved = typicalSpend * partialAmountValue;
-    }
-    
-    onSubmit(amountSaved, isPartial, partialAmountValue);
+    onConfirm();
     onOpenChange(false);
-    setSpentAmount('');
-    setSkipType('full');
-    setPartialAmount('0.5');
   };
 
   return (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
-        <DialogTitle>Log Skip for {dayNames[day]}</DialogTitle>
+        <DialogTitle>
+          {isBonus ? "Log Bonus Skip" : "Log Skip"}
+        </DialogTitle>
       </DialogHeader>
-      <form onSubmit={handleSubmit} className="space-y-4 py-2">
-        <div className="flex flex-col gap-2">
-          <Label>Skip Type</Label>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              type="button"
-              variant={skipType === 'full' ? 'default' : 'outline'}
-              onClick={() => setSkipType('full')}
-              className={cn(
-                skipType === 'full' && "bg-green-500 hover:bg-green-600 text-white"
-              )}
-            >
-              <CheckCircle size={16} className="mr-2" />
-              Full Skip
-            </Button>
-            <Button
-              type="button"
-              variant={skipType === 'partial' ? 'default' : 'outline'}
-              onClick={() => setSkipType('partial')}
-              className={cn(
-                skipType === 'partial' && "bg-blue-500 hover:bg-blue-600 text-white"
-              )}
-            >
-              <div className="mr-2">½</div>
-              Partial Skip
-            </Button>
+      
+      <form onSubmit={handleConfirm} className="space-y-4 py-2">
+        <div className="p-4 rounded-md bg-green-50 flex items-center gap-3">
+          <div className="text-3xl">{habit.emoji}</div>
+          <div>
+            <div className="font-medium">{habit.name}</div>
+            <div className="text-sm text-gray-600">
+              Expense: {formatCurrency(habit.expense)} per occurrence
+            </div>
           </div>
         </div>
-        
-        {skipType === 'partial' && (
-          <div className="space-y-2">
-            <Label>How much did you save?</Label>
-            <div className="grid grid-cols-3 gap-2">
-              <Button
-                type="button"
-                variant={partialAmount === '0.25' ? 'default' : 'outline'}
-                onClick={() => setPartialAmount('0.25')}
-                className={cn(
-                  partialAmount === '0.25' && "bg-blue-500 hover:bg-blue-600 text-white"
-                )}
-              >
-                25%
-              </Button>
-              <Button
-                type="button"
-                variant={partialAmount === '0.5' ? 'default' : 'outline'}
-                onClick={() => setPartialAmount('0.5')}
-                className={cn(
-                  partialAmount === '0.5' && "bg-blue-500 hover:bg-blue-600 text-white"
-                )}
-              >
-                50%
-              </Button>
-              <Button
-                type="button"
-                variant={partialAmount === '0.75' ? 'default' : 'outline'}
-                onClick={() => setPartialAmount('0.75')}
-                className={cn(
-                  partialAmount === '0.75' && "bg-blue-500 hover:bg-blue-600 text-white"
-                )}
-              >
-                75%
-              </Button>
-            </div>
-            <p className="text-xs text-gray-500">
-              You'll save {formatCurrency(typicalSpend * parseFloat(partialAmount))}
-            </p>
-          </div>
-        )}
         
         <div className="p-3 bg-gray-50 rounded-md">
           <div className="flex justify-between text-sm">
-            <span>Typical spend:</span>
-            <span className="font-medium">{formatCurrency(habit.expense)}</span>
-          </div>
-          
-          <div className="flex justify-between text-sm mt-1">
-            <span>You'll save:</span>
-            <span className="font-medium text-green-600">
-              {skipType === 'full' 
-                ? formatCurrency(habit.expense) 
-                : formatCurrency(habit.expense * parseFloat(partialAmount))}
-            </span>
+            <span>Amount you'll save:</span>
+            <span className="font-medium text-green-600">{formatCurrency(habit.expense)}</span>
           </div>
         </div>
         
-        <DialogFooter>
-          <Button type="submit" className="w-full bg-bitcoin hover:bg-bitcoin/90">
-            Log Skip
+        {isBonus && (
+          <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-md text-amber-700">
+            <Gift size={16} />
+            <div className="text-sm font-medium">This is a bonus skip - great job!</div>
+          </div>
+        )}
+        
+        <DialogFooter className="gap-2">
+          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            Cancel
+          </Button>
+          <Button type="submit" className="bg-bitcoin hover:bg-bitcoin/90">
+            Confirm Skip
           </Button>
         </DialogFooter>
       </form>
@@ -321,28 +231,30 @@ const SkipCard: React.FC<{
   habit: Habit;
   skippedDays: SkipLog[];
   progress: { completed: number; total: number };
-  bonusSkipPotential: number;
-  onLogSkip: (day: DayOfWeek, amount: number, isPartial: boolean, partialAmount?: 0.25 | 0.5 | 0.75) => void;
+  maxBonusSkips: number;
+  onLogSkip: () => void;
+  onUnskipLog: (index: number) => void;
   onForfeit: () => void;
 }> = ({ 
   habit, 
   skippedDays, 
   progress,
-  bonusSkipPotential,
+  maxBonusSkips,
   onLogSkip,
+  onUnskipLog,
   onForfeit
 }) => {
   const [skipDialogOpen, setSkipDialogOpen] = useState(false);
-  const [selectedDay, setSelectedDay] = useState<DayOfWeek>('mon');
-  const { getRemainingSkips } = useAppContext();
+  const { canSkipToday } = useAppContext();
 
-  const remainingSkips = getRemainingSkips(habit);
   const weeklyPotential = habit.weeklyTotalPotential;
   const currentSavings = skippedDays.reduce((sum, skip) => sum + skip.amountSaved, 0);
+  const isBonus = progress.completed >= progress.total;
 
-  const handleLogSkipDay = (day: DayOfWeek) => {
-    setSelectedDay(day);
-    setSkipDialogOpen(true);
+  const handleSkip = () => {
+    if (canSkipToday(habit)) {
+      setSkipDialogOpen(true);
+    }
   };
 
   const handleForfeit = () => {
@@ -374,12 +286,13 @@ const SkipCard: React.FC<{
       </CardHeader>
       
       <CardContent>
-        <WeeklyTracker 
+        <SkipBoxes 
           habit={habit} 
-          skippedDays={skippedDays}
           progress={progress}
-          bonusSkipPotential={bonusSkipPotential}
-          onLogSkip={handleLogSkipDay}
+          maxBonusSkips={maxBonusSkips}
+          onSkip={handleSkip}
+          onUnskip={onUnskipLog}
+          skips={skippedDays}
         />
         
         <div className="grid grid-cols-2 gap-3 mt-4">
@@ -393,18 +306,6 @@ const SkipCard: React.FC<{
             <div className="font-medium text-green-600">{formatCurrency(currentSavings)}</div>
           </div>
         </div>
-        
-        {bonusSkipPotential > 0 && progress.completed >= progress.total && (
-          <div className="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-md">
-            <div className="flex items-center gap-2">
-              <Gift size={18} className="text-amber-500" />
-              <div className="font-medium text-amber-700">Bonus Skip Potential</div>
-            </div>
-            <div className="text-sm text-amber-600 mt-1">
-              You can save an additional {formatCurrency(bonusSkipPotential)} this week!
-            </div>
-          </div>
-        )}
       </CardContent>
       
       <CardFooter className="flex justify-between pt-2">
@@ -423,8 +324,8 @@ const SkipCard: React.FC<{
               variant="outline"
               size="sm"
               className="border-green-500 text-green-600 hover:bg-green-50"
-              onClick={() => handleLogSkipDay(getDayStringFromDate(new Date()))}
-              disabled={habit.isForfeited}
+              onClick={handleSkip}
+              disabled={!canSkipToday(habit)}
             >
               Log Skip
             </Button>
@@ -433,58 +334,50 @@ const SkipCard: React.FC<{
       </CardFooter>
       
       <Dialog open={skipDialogOpen} onOpenChange={setSkipDialogOpen}>
-        <FractionalSkipDialog
+        <ConfirmSkipDialog
           open={skipDialogOpen}
           onOpenChange={setSkipDialogOpen}
           habit={habit}
-          day={selectedDay}
-          onSubmit={(amount, isPartial, partialAmount) => 
-            onLogSkip(selectedDay, amount, isPartial, partialAmount)
-          }
+          isBonus={isBonus}
+          onConfirm={onLogSkip}
         />
       </Dialog>
     </Card>
   );
 };
 
-// Helper function to get day string from date
-const getDayStringFromDate = (date: Date): DayOfWeek => {
-  const days: DayOfWeek[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-  return days[date.getDay()];
-};
-
 const HabitSkipper: React.FC = () => {
   const { 
     selectedHabits, 
-    skipHabitOnDay,
+    skipHabit,
+    unskipLog,
     forfeitHabit,
     totalSavings, 
     weeklySkipSavings,
     setStep,
     getCurrentWeekSkips,
     getSkipGoalProgress,
-    getBonusSkipPotential,
-    superSkip
+    getMaxBonusSkips,
+    superSkip,
+    isToday
   } = useAppContext();
   
-  const handleLogSkip = (
-    habitId: string, 
-    day: DayOfWeek, 
-    amount: number, 
-    isPartial: boolean, 
-    partialAmount?: 0.25 | 0.5 | 0.75
-  ) => {
-    skipHabitOnDay(habitId, day, amount, isPartial, partialAmount);
+  const handleLogSkip = (habitId: string) => {
+    skipHabit(habitId);
     
-    if (isPartial) {
-      toast.success('Partial skip logged!', {
-        description: `You saved ${formatCurrency(amount)} by reducing this expense.`,
-      });
-    } else {
+    const habit = selectedHabits.find(h => h.id === habitId);
+    if (habit) {
       toast.success('Habit skipped!', {
-        description: `Great job! You saved ${formatCurrency(amount)}.`,
+        description: `Great job! You saved ${formatCurrency(habit.expense)}.`,
       });
     }
+  };
+
+  const handleUnskipLog = (habitId: string, index: number) => {
+    unskipLog(habitId, index);
+    toast.info('Skip removed', {
+      description: 'You can still log this skip again today if you change your mind.',
+    });
   };
 
   const handleForfeitHabit = (habitId: string) => {
@@ -498,11 +391,9 @@ const HabitSkipper: React.FC = () => {
     });
   };
 
-  // Check if any habits are eligible for super skip (not forfeited and not already skipped today)
-  const today = getDayStringFromDate(new Date());
-  const eligibleForSuperSkip = selectedHabits.some(habit => {
-    const skippedToday = getCurrentWeekSkips(habit.id).some(skip => skip.day === today);
-    return !habit.isForfeited && !skippedToday;
+  // Check if any habits are eligible for super skip
+  const canSuperSkip = selectedHabits.some(habit => {
+    return !habit.isForfeited && getCurrentWeekSkips(habit.id).filter(skip => isToday(skip.date)).length === 0;
   });
 
   return (
@@ -514,7 +405,7 @@ const HabitSkipper: React.FC = () => {
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Skip & Save</h1>
           <p className="text-gray-600 max-w-md mx-auto">
-            Track your skipped habits and watch your savings grow. Record full or partial skips each day.
+            Track your skipped habits and watch your savings grow. Each box represents one skip opportunity.
           </p>
         </div>
         
@@ -544,10 +435,10 @@ const HabitSkipper: React.FC = () => {
           <Button 
             className={cn(
               "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white p-4 h-auto",
-              !eligibleForSuperSkip && "opacity-50 cursor-not-allowed"
+              !canSuperSkip && "opacity-50 cursor-not-allowed"
             )}
             onClick={handleSuperSkip}
-            disabled={!eligibleForSuperSkip}
+            disabled={!canSuperSkip}
           >
             <Gift size={18} className="mr-2" />
             <div className="flex flex-col items-start">
@@ -557,6 +448,13 @@ const HabitSkipper: React.FC = () => {
           </Button>
         </div>
         
+        <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-blue-50 text-blue-600 rounded-md">
+          <Clock size={16} />
+          <div className="text-sm">
+            <span className="font-medium">Note:</span> Skips can only be edited on the same day they're logged
+          </div>
+        </div>
+        
         <div className="grid gap-4 mb-8">
           {selectedHabits.map((habit) => (
             <SkipCard 
@@ -564,10 +462,9 @@ const HabitSkipper: React.FC = () => {
               habit={habit}
               skippedDays={getCurrentWeekSkips(habit.id)}
               progress={getSkipGoalProgress(habit)}
-              bonusSkipPotential={getBonusSkipPotential(habit)}
-              onLogSkip={(day, amount, isPartial, partialAmount) => 
-                handleLogSkip(habit.id, day, amount, isPartial, partialAmount)
-              }
+              maxBonusSkips={getMaxBonusSkips(habit)}
+              onLogSkip={() => handleLogSkip(habit.id)}
+              onUnskipLog={(index) => handleUnskipLog(habit.id, index)}
               onForfeit={() => handleForfeitHabit(habit.id)}
             />
           ))}
