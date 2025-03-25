@@ -280,6 +280,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const canSkipToday = (habit: Habit): boolean => {
     if (habit.isForfeited) return false;
     
+    // Check if habit has a period longer than weekly
+    const isLongerThanWeeklyPeriod = ['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period);
+    if (isLongerThanWeeklyPeriod) return false;
+    
     const currentWeekSkips = getCurrentWeekSkips(habit.id);
     const completedSkips = currentWeekSkips.filter(skip => !skip.isForfeited).length;
     const todaySkips = getTodaySkips(habit.id);
@@ -447,6 +451,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const superSkip = () => {
     // Skip all non-forfeited DAILY habits that haven't been skipped today
     selectedHabits.forEach(habit => {
+      // Make sure to only super skip daily habits
       if (canSkipToday(habit) && habit.period === 'daily') {
         skipHabit(habit.id);
       }

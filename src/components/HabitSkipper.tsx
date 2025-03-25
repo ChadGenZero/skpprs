@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext, type SkipLog, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -59,8 +58,8 @@ const SkipBoxes: React.FC<{
   // Calculate savings from skips
   const savedAmount = skips.reduce((sum, skip) => sum + skip.amountSaved, 0);
 
-  // Determine if habit is weekly or needs weekly tracking
-  const isWeeklyOrLargerPeriod = habit.period !== 'daily';
+  // Determine if habit has a period longer than weekly
+  const isLongerThanWeeklyPeriod = ['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period);
 
   return (
     <div className="mt-3">
@@ -94,10 +93,10 @@ const SkipBoxes: React.FC<{
         )}
       </div>
 
-      {isWeeklyOrLargerPeriod && (
+      {isLongerThanWeeklyPeriod && (
         <div className="px-3 py-2 bg-blue-50 text-blue-600 rounded-md text-xs mb-3 flex items-center">
           <Info size={14} className="mr-1" />
-          <span>Weekly habits can only be completed at the end of the week</span>
+          <span>Habits with periods longer than a week can only be skipped at the end of the week</span>
         </div>
       )}
       
@@ -124,16 +123,16 @@ const SkipBoxes: React.FC<{
                       ? "bg-amber-100 text-amber-700 hover:bg-amber-200 cursor-pointer"
                       : "bg-gray-50 text-gray-400 cursor-not-allowed",
                 habit.isForfeited && "opacity-50 cursor-not-allowed",
-                isWeeklyOrLargerPeriod && !isCompleted && "cursor-not-allowed opacity-60"
+                isLongerThanWeeklyPeriod && !isCompleted && "cursor-not-allowed opacity-60"
               )}
               onClick={() => {
                 if (!isCompleted && !habit.isForfeited) {
                   // Can only click bonus skips if base goal is completed
                   if (isBonusSkip && progress.completed < progress.total) return;
                   
-                  // Weekly habits can only be skipped at end of week
-                  if (isWeeklyOrLargerPeriod) {
-                    toast.info("Weekly habits can only be completed at the end of the week");
+                  // Longer than weekly period habits can only be skipped at end of week
+                  if (isLongerThanWeeklyPeriod) {
+                    toast.info("Habits with periods longer than a week can only be skipped at the end of the week");
                     return;
                   }
                   
@@ -270,8 +269,15 @@ const SkipCard: React.FC<{
   const currentSavings = skippedDays.reduce((sum, skip) => sum + skip.amountSaved, 0);
   const isBonus = progress.completed >= progress.total;
 
+  // Determine if habit has a period longer than weekly
+  const isLongerThanWeeklyPeriod = ['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period);
+
   const handleSkip = () => {
     if (canSkipToday(habit)) {
+      if (isLongerThanWeeklyPeriod) {
+        toast.info("Habits with periods longer than a week can only be skipped at the end of the week");
+        return;
+      }
       setSkipDialogOpen(true);
     }
   };
@@ -360,7 +366,7 @@ const SkipCard: React.FC<{
               size="sm"
               className="border-green-500 text-green-600 hover:bg-green-50"
               onClick={handleSkip}
-              disabled={!canSkipToday(habit)}
+              disabled={!canSkipToday(habit) || isLongerThanWeeklyPeriod}
             >
               Log Skip
             </Button>
