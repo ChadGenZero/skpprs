@@ -3,7 +3,7 @@ import { useAppContext, type SkipLog, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, Check, Calendar, Info, AlertCircle, BadgeCheck, Gift, Clock, XCircle, Lock, X } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -21,16 +21,14 @@ const formatCurrency = (amount: number): string => {
 
 const InfoTooltip: React.FC<{ content: string }> = ({ content }) => {
   return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Info size={16} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
-        </TooltipTrigger>
-        <TooltipContent className="max-w-xs">
-          <p>{content}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Info size={16} className="text-gray-400 hover:text-royal-blue cursor-help ml-1" />
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs">
+        <p>{content}</p>
+      </TooltipContent>
+    </Tooltip>
   );
 };
 
