@@ -355,7 +355,7 @@ const SkipCard: React.FC<{
   onForfeit
 }) => {
   const [skipDialogOpen, setSkipDialogOpen] = useState(false);
-  const { canSkipToday, isToday, markHabitAsSpent } = useAppContext();
+  const { canSkipToday, isToday, markHabitAsSpent, getCurrentWeekSkips } = useAppContext();
 
   const weeklyPotential = habit.weeklyTotalPotential;
   const currentSavings = skippedDays.reduce((sum, skip) => sum + skip.amountSaved, 0);
@@ -627,4 +627,3 @@ const HabitSkipper: React.FC = () => {
 };
 
 export default HabitSkipper;
-

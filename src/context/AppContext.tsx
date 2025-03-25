@@ -281,7 +281,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       if (todaySkips.length >= habit.frequency) return false;
     }
     
-    // For weekly habits, only allow 1 skip per day
     if (habit.period === 'weekly') {
       const todaySkips = getTodaySkips(habit.id).filter(skip => !skip.isSpent);
       if (todaySkips.length >= 1) return false;
@@ -466,7 +465,36 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     });
   };
 
-  // New function to mark habit as spent
+  const getDaysTillNextSkip = (habit: Habit): number => {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
+    
+    if (['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period)) {
+      // For longer period habits, skips are available at the end of the week (Sunday)
+      return dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
+    }
+    
+    // Daily habits can skip any day, so 0 days
+    if (habit.period === 'daily') {
+      const todaySkips = getTodaySkips(habit.id);
+      if (todaySkips.length >= habit.frequency) {
+        return 1; // Need to wait until tomorrow
+      }
+      return 0;
+    }
+    
+    // Weekly habits are limited to one skip per day
+    if (habit.period === 'weekly') {
+      const todaySkips = getTodaySkips(habit.id).filter(skip => !skip.isSpent);
+      if (todaySkips.length >= 1) {
+        return 1; // Need to wait until tomorrow
+      }
+      return 0;
+    }
+    
+    return 0;
+  };
+
   const markHabitAsSpent = (habitId: string) => {
     setHabits(habits.map(habit => {
       if (habit.id === habitId) {
@@ -487,7 +515,6 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }));
   };
 
-  // Update getSkipGoalProgress to exclude spent habits
   const getSkipGoalProgress = (habit: Habit): { completed: number; total: number } => {
     const currentWeekSkips = getCurrentWeekSkips(habit.id);
     const completedSkips = currentWeekSkips.filter(skip => !skip.isForfeited && !skip.isSpent).length;
