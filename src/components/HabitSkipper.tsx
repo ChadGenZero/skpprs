@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
@@ -458,6 +459,58 @@ const SkipCard: React.FC<{
   );
 };
 
+const SuperSkipDialog: React.FC<{
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  eligibleHabits: Habit[];
+  onConfirm: () => void;
+}> = ({ open, onOpenChange, eligibleHabits, onConfirm }) => {
+  const totalSavings = eligibleHabits.reduce((sum, habit) => sum + habit.expense, 0);
+  
+  return (
+    <AlertDialogContent className="sm:max-w-md">
+      <AlertDialogHeader>
+        <AlertDialogTitle>
+          Super Skip All Eligible Habits
+        </AlertDialogTitle>
+        <AlertDialogDescription>
+          You're about to skip {eligibleHabits.length} eligible habit{eligibleHabits.length !== 1 ? 's' : ''} for today and save {formatCurrency(totalSavings)}.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      
+      <div className="max-h-48 overflow-y-auto my-4">
+        {eligibleHabits.map((habit) => (
+          <div key={habit.id} className="p-3 mb-2 rounded-md bg-green-50 flex items-center gap-3">
+            <div className="text-xl">{habit.emoji}</div>
+            <div>
+              <div className="font-medium">{habit.name}</div>
+              <div className="text-sm text-gray-600">
+                Save: {formatCurrency(habit.expense)}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      <AlertDialogFooter>
+        <AlertDialogCancel className="border border-gray-300">
+          Cancel
+        </AlertDialogCancel>
+        <AlertDialogAction 
+          className="bg-orange-500 hover:bg-orange-600 text-white"
+          onClick={(e) => {
+            e.preventDefault();
+            onConfirm();
+            onOpenChange(false);
+          }}
+        >
+          Confirm Super Skip
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  );
+};
+
 const HabitSkipper: React.FC = () => {
   const { 
     selectedHabits, 
@@ -474,6 +527,8 @@ const HabitSkipper: React.FC = () => {
     superSkip,
     isToday
   } = useAppContext();
+  
+  const [superSkipDialogOpen, setSuperSkipDialogOpen] = useState(false);
   
   const handleLogSkip = (habitId: string, shouldSkip: boolean) => {
     if (shouldSkip) {
@@ -515,19 +570,29 @@ const HabitSkipper: React.FC = () => {
   };
 
   const handleSuperSkip = () => {
+    setSuperSkipDialogOpen(true);
+  };
+
+  const confirmSuperSkip = () => {
     superSkip();
     toast.success('Super Skip activated!', {
       description: 'All eligible daily habits have been skipped for today.',
     });
   };
 
-  const canSuperSkip = selectedHabits.some(habit => {
+  const eligibleHabitsForSuperSkip = selectedHabits.filter(habit => {
     if (habit.period === 'daily') {
       const todaySkips = getCurrentWeekSkips(habit.id).filter(skip => isToday(skip.date) && !skip.isSpent).length;
       return !habit.isForfeited && todaySkips < habit.frequency;
     }
+    if (habit.period === 'weekly') {
+      const todaySkips = getCurrentWeekSkips(habit.id).filter(skip => isToday(skip.date) && !skip.isSpent).length;
+      return !habit.isForfeited && todaySkips < 1;
+    }
     return false;
   });
+
+  const canSuperSkip = eligibleHabitsForSuperSkip.length > 0;
 
   return (
     <div className="animate-scale-in">
@@ -622,6 +687,15 @@ const HabitSkipper: React.FC = () => {
           </Button>
         </div>
       </div>
+      
+      <AlertDialog open={superSkipDialogOpen} onOpenChange={setSuperSkipDialogOpen}>
+        <SuperSkipDialog 
+          open={superSkipDialogOpen}
+          onOpenChange={setSuperSkipDialogOpen}
+          eligibleHabits={eligibleHabitsForSuperSkip}
+          onConfirm={confirmSuperSkip}
+        />
+      </AlertDialog>
     </div>
   );
 };
