@@ -573,6 +573,7 @@ const HabitSkipper: React.FC = () => {
 
   const confirmSuperSkip = () => {
     superSkip();
+    
     toast.success('Super Skip activated!', {
       description: 'All eligible daily habits have been skipped for today.',
     });
@@ -628,20 +629,24 @@ const HabitSkipper: React.FC = () => {
             </div>
           </div>
           
-          <Button 
-            className={cn(
-              "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white p-4 h-auto",
-              !canSuperSkip && "opacity-50 cursor-not-allowed"
-            )}
-            onClick={handleSuperSkip}
-            disabled={!canSuperSkip}
-          >
-            <Gift size={18} className="mr-2" />
-            <div className="flex flex-col items-start">
-              <span className="text-xs font-normal">One-tap</span>
-              <span className="font-semibold">Super Skip</span>
-            </div>
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button 
+                className={cn(
+                  "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white p-4 h-auto",
+                  !canSuperSkip && "opacity-50 cursor-not-allowed"
+                )}
+                onClick={handleSuperSkip}
+                disabled={!canSuperSkip}
+              >
+                <Gift size={18} className="mr-2" />
+                <span className="font-semibold">Super Skip</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              <p className="max-w-xs">Skip all eligible habits for today with one click!</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
         
         <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-blue-50 text-blue-600 rounded-md">
