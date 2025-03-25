@@ -34,7 +34,7 @@ export interface AppContextType {
   updateHabit: (habitId: string, updatedHabit: Partial<Omit<Habit, 'id'>>) => void;
   toggleHabit: (habitId: string) => void;
   skipHabit: (habitId: string, amount?: number) => void;
-  forfeitHabit: (habitId: string) => void;
+  forfeitHabit: (habitId: string, undo?: boolean) => void;
   unskipLog: (habitId: string, skipLogIndex: number) => void;
   resetSkips: () => void;
   superSkip: () => void; // One-tap skip all eligible habits
@@ -369,23 +369,45 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }));
   };
 
-  const forfeitHabit = (habitId: string) => {
+  const forfeitHabit = (habitId: string, undo: boolean = false) => {
     setHabits(habits.map(habit => {
       if (habit.id === habitId) {
-        return {
-          ...habit,
-          isForfeited: true,
-          // Mark all existing skips this week as forfeited
-          skippedDays: habit.skippedDays.map(skip => {
-            const skipDate = new Date(skip.date);
-            const startOfWeek = getStartOfWeek();
-            
-            if (skipDate >= startOfWeek) {
-              return { ...skip, isForfeited: true };
-            }
-            return skip;
-          })
-        };
+        if (undo) {
+          // Undo forfeit (only if it was forfeited today)
+          const todayForfeits = habit.skippedDays.some(skip => 
+            isToday(skip.date) && skip.isForfeited
+          );
+          
+          if (!todayForfeits) return habit; // If not forfeited today, don't allow undo
+          
+          return {
+            ...habit,
+            isForfeited: false,
+            // Restore any skips that were forfeited today
+            skippedDays: habit.skippedDays.map(skip => {
+              if (isToday(skip.date) && skip.isForfeited) {
+                return { ...skip, isForfeited: false };
+              }
+              return skip;
+            })
+          };
+        } else {
+          // Forfeit the habit
+          return {
+            ...habit,
+            isForfeited: true,
+            // Mark all existing skips this week as forfeited
+            skippedDays: habit.skippedDays.map(skip => {
+              const skipDate = new Date(skip.date);
+              const startOfWeek = getStartOfWeek();
+              
+              if (skipDate >= startOfWeek) {
+                return { ...skip, isForfeited: true };
+              }
+              return skip;
+            })
+          };
+        }
       }
       return habit;
     }));
@@ -423,9 +445,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const superSkip = () => {
-    // Skip all non-forfeited habits that haven't been skipped today
+    // Skip all non-forfeited DAILY habits that haven't been skipped today
     selectedHabits.forEach(habit => {
-      if (canSkipToday(habit)) {
+      if (canSkipToday(habit) && habit.period === 'daily') {
         skipHabit(habit.id);
       }
     });

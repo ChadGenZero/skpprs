@@ -59,6 +59,9 @@ const SkipBoxes: React.FC<{
   // Calculate savings from skips
   const savedAmount = skips.reduce((sum, skip) => sum + skip.amountSaved, 0);
 
+  // Determine if habit is weekly or needs weekly tracking
+  const isWeeklyOrLargerPeriod = habit.period !== 'daily';
+
   return (
     <div className="mt-3">
       <div className="flex justify-between items-center mb-2">
@@ -73,7 +76,8 @@ const SkipBoxes: React.FC<{
       
       <Progress 
         value={progressPercentage} 
-        className="h-2 mb-3"
+        className="h-2 mb-3 bg-orange-100"
+        indicatorClassName="bg-orange-500"
       />
       
       <div className="flex items-center mb-3 justify-between">
@@ -89,6 +93,13 @@ const SkipBoxes: React.FC<{
           </div>
         )}
       </div>
+
+      {isWeeklyOrLargerPeriod && (
+        <div className="px-3 py-2 bg-blue-50 text-blue-600 rounded-md text-xs mb-3 flex items-center">
+          <Info size={14} className="mr-1" />
+          <span>Weekly habits can only be completed at the end of the week</span>
+        </div>
+      )}
       
       <div className="flex flex-wrap gap-2 mb-3">
         {skipBoxes.map((_, index) => {
@@ -112,12 +123,20 @@ const SkipBoxes: React.FC<{
                     : progress.completed >= progress.total
                       ? "bg-amber-100 text-amber-700 hover:bg-amber-200 cursor-pointer"
                       : "bg-gray-50 text-gray-400 cursor-not-allowed",
-                habit.isForfeited && "opacity-50 cursor-not-allowed"
+                habit.isForfeited && "opacity-50 cursor-not-allowed",
+                isWeeklyOrLargerPeriod && !isCompleted && "cursor-not-allowed opacity-60"
               )}
               onClick={() => {
                 if (!isCompleted && !habit.isForfeited) {
                   // Can only click bonus skips if base goal is completed
                   if (isBonusSkip && progress.completed < progress.total) return;
+                  
+                  // Weekly habits can only be skipped at end of week
+                  if (isWeeklyOrLargerPeriod) {
+                    toast.info("Weekly habits can only be completed at the end of the week");
+                    return;
+                  }
+                  
                   onSkip();
                 }
               }}
@@ -245,7 +264,7 @@ const SkipCard: React.FC<{
   onForfeit
 }) => {
   const [skipDialogOpen, setSkipDialogOpen] = useState(false);
-  const { canSkipToday } = useAppContext();
+  const { canSkipToday, isToday } = useAppContext();
 
   const weeklyPotential = habit.weeklyTotalPotential;
   const currentSavings = skippedDays.reduce((sum, skip) => sum + skip.amountSaved, 0);
@@ -265,6 +284,11 @@ const SkipCard: React.FC<{
       });
     }
   };
+
+  // Check if habit can be un-forfeited (if it was forfeited today)
+  const canUnforfeit = habit.isForfeited && 
+                        habit.skippedDays.some(skip => 
+                          skip.isForfeited && isToday(skip.date));
 
   return (
     <Card className="overflow-hidden bg-white">
@@ -309,7 +333,18 @@ const SkipCard: React.FC<{
       </CardContent>
       
       <CardFooter className="flex justify-between pt-2">
-        {!habit.isForfeited && (
+        {habit.isForfeited ? (
+          canUnforfeit && (
+            <Button 
+              variant="ghost" 
+              size="sm"
+              className="text-amber-500 hover:text-amber-600 hover:bg-amber-50 mx-auto"
+              onClick={() => onForfeit()} // Re-using the forfeit function to un-forfeit
+            >
+              Undo Forfeit
+            </Button>
+          )
+        ) : (
           <>
             <Button 
               variant="ghost" 
@@ -368,7 +403,7 @@ const HabitSkipper: React.FC = () => {
     const habit = selectedHabits.find(h => h.id === habitId);
     if (habit) {
       toast.success('Habit skipped!', {
-        description: `Great job! You saved ${formatCurrency(habit.expense)}.`,
+        description: `Great job! You saved ${formatCurrency(habit.expense)}. Check back tomorrow to skip again.`,
       });
     }
   };
@@ -381,19 +416,33 @@ const HabitSkipper: React.FC = () => {
   };
 
   const handleForfeitHabit = (habitId: string) => {
-    forfeitHabit(habitId);
+    const habit = selectedHabits.find(h => h.id === habitId);
+    if (habit?.isForfeited) {
+      // If already forfeited, this is an "undo forfeit" action
+      forfeitHabit(habitId, true); // Add a second parameter to indicate "undo"
+      toast.success('Forfeit undone!', {
+        description: 'Your habit has been restored and you can continue tracking it.',
+      });
+    } else {
+      forfeitHabit(habitId);
+      toast.error('Habit forfeited for this week', {
+        description: 'This habit can no longer be tracked until next week',
+      });
+    }
   };
 
   const handleSuperSkip = () => {
     superSkip();
     toast.success('Super Skip activated!', {
-      description: 'All eligible habits have been skipped for today.',
+      description: 'All eligible daily habits have been skipped for today.',
     });
   };
 
-  // Check if any habits are eligible for super skip
+  // Check if any daily habits are eligible for super skip
   const canSuperSkip = selectedHabits.some(habit => {
-    return !habit.isForfeited && getCurrentWeekSkips(habit.id).filter(skip => isToday(skip.date)).length === 0;
+    return !habit.isForfeited && 
+           habit.period === 'daily' && 
+           getCurrentWeekSkips(habit.id).filter(skip => isToday(skip.date)).length === 0;
   });
 
   return (

@@ -40,9 +40,9 @@ const MainContent: React.FC = () => {
       <header className="flex justify-center md:justify-between items-center py-4 mb-4">
         <div className="flex items-center gap-2">
           <SLogo />
-          <h1 className="text-2xl font-bold text-royal-blue">Skipper Savings</h1>
+          <h1 className="text-2xl font-bold text-royal-blue">Skiiper</h1>
         </div>
-        <p className="hidden md:block text-sm text-gray-500">Stack Sats Skipper</p>
+        <p className="hidden md:block text-sm text-gray-500">Aye Aye, Captain! Skip, Save, & Stack Sats</p>
       </header>
 
       <div className="flex flex-col md:flex-row gap-8">
