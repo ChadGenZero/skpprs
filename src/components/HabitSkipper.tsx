@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { useAppContext, type SkipLog, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon, Check, Calendar, Info, AlertCircle, BadgeCheck, Gift, Clock, XCircle } from 'lucide-react';
+import { ArrowLeftIcon, ArrowRightIcon, Check, Calendar, Info, AlertCircle, BadgeCheck, Gift, Clock, XCircle, Lock } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -41,7 +42,7 @@ const SkipBoxes: React.FC<{
   onUnskip: (index: number) => void;
   skips: SkipLog[];
 }> = ({ habit, progress, maxBonusSkips, onSkip, onUnskip, skips }) => {
-  const { isToday } = useAppContext();
+  const { isToday, getDaysTillNextSkip } = useAppContext();
   
   // Calculate total possible skips (base goal + bonus)
   const totalPossibleSkips = progress.total + maxBonusSkips;
@@ -60,6 +61,12 @@ const SkipBoxes: React.FC<{
 
   // Determine if habit has a period longer than weekly
   const isLongerThanWeeklyPeriod = ['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period);
+  
+  // For fortnightly habits, calculate which week it is
+  const isFortnightly = habit.period === 'fortnightly';
+  
+  // Get days until next skip is available
+  const daysTillNextSkip = getDaysTillNextSkip(habit);
 
   return (
     <div className="mt-3">
@@ -100,13 +107,42 @@ const SkipBoxes: React.FC<{
         </div>
       )}
       
+      {isFortnightly && (
+        <div className="px-3 py-2 bg-amber-50 text-amber-600 rounded-md text-xs mb-3">
+          <span className="block mb-1">Skips are packaged as follows:</span>
+          <div className="flex justify-center space-x-2">
+            <span>Week 1 Skip {daysTillNextSkip <= 7 ? '🔓' : '🔒'}</span>
+            <span>|</span>
+            <span>Week 2 Skip {daysTillNextSkip <= 0 ? '🔓' : '🔒'}</span>
+          </div>
+        </div>
+      )}
+      
       <div className="flex flex-wrap gap-2 mb-3">
         {skipBoxes.map((_, index) => {
           const isCompleted = index < skips.length;
           const isBaseGoal = index < progress.total;
           const isBonusSkip = index >= progress.total;
           const currentSkip = isCompleted ? skips[index] : null;
-          const isEditable = isCompleted && isToday(currentSkip!.date);
+          const isEditable = isCompleted;
+          
+          // Determine if this skip should be locked
+          let isLocked = false;
+          let lockReason = "";
+          
+          if (isLongerThanWeeklyPeriod && !isCompleted) {
+            isLocked = true;
+            lockReason = `Next Skip Available in ${daysTillNextSkip} Day(s) – hold a steady course!`;
+          }
+          
+          // For daily habits with frequency > 1, check if we've reached daily limit
+          const dailySkipsCount = habit.period === 'daily' ? skips.filter(s => isToday(s.date)).length : 0;
+          const dailySkipLimit = habit.period === 'daily' ? habit.frequency : 0;
+          
+          if (habit.period === 'daily' && !isCompleted && dailySkipsCount >= dailySkipLimit) {
+            isLocked = true;
+            lockReason = "Next Skip Available in 1 Day(s) – hold a steady course!";
+          }
           
           return (
             <div
@@ -117,22 +153,28 @@ const SkipBoxes: React.FC<{
                   ? isBaseGoal 
                     ? "bg-green-500 text-white" 
                     : "bg-amber-500 text-white"
-                  : isBaseGoal
-                    ? "bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer"
-                    : progress.completed >= progress.total
-                      ? "bg-amber-100 text-amber-700 hover:bg-amber-200 cursor-pointer"
-                      : "bg-gray-50 text-gray-400 cursor-not-allowed",
-                habit.isForfeited && "opacity-50 cursor-not-allowed",
-                isLongerThanWeeklyPeriod && !isCompleted && "cursor-not-allowed opacity-60"
+                  : isLocked
+                    ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                    : isBaseGoal
+                      ? "bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer"
+                      : progress.completed >= progress.total
+                        ? "bg-amber-100 text-amber-700 hover:bg-amber-200 cursor-pointer"
+                        : "bg-gray-50 text-gray-400 cursor-not-allowed",
+                habit.isForfeited && "opacity-50 cursor-not-allowed"
               )}
               onClick={() => {
+                if (isLocked) {
+                  toast.info(lockReason);
+                  return;
+                }
+                
                 if (!isCompleted && !habit.isForfeited) {
                   // Can only click bonus skips if base goal is completed
                   if (isBonusSkip && progress.completed < progress.total) return;
                   
-                  // Longer than weekly period habits can only be skipped at end of week
-                  if (isLongerThanWeeklyPeriod) {
-                    toast.info("Habits with periods longer than a week can only be skipped at the end of the week");
+                  // Check daily limit for daily habits
+                  if (habit.period === 'daily' && dailySkipsCount >= dailySkipLimit) {
+                    toast.info("You've used all your skips for today. Check back tomorrow!");
                     return;
                   }
                   
@@ -142,6 +184,8 @@ const SkipBoxes: React.FC<{
             >
               {isCompleted ? (
                 <Check size={16} />
+              ) : isLocked ? (
+                <Lock size={16} />
               ) : (
                 index + 1
               )}
@@ -182,6 +226,20 @@ const SkipBoxes: React.FC<{
           <span>Weekly skip goal achieved! Great job!</span>
         </div>
       )}
+      
+      {habit.period === 'daily' && (
+        <div className="px-3 py-2 bg-gray-50 rounded-md text-xs mb-2">
+          <div className="flex items-center gap-1 text-gray-600">
+            <Clock size={14} />
+            <span>Daily Skips: {skips.filter(s => isToday(s.date)).length}/{habit.frequency}</span>
+          </div>
+          {skips.filter(s => isToday(s.date)).length >= habit.frequency && (
+            <div className="mt-1 text-amber-600">
+              Next Skip Available in 1 Day(s) – hold a steady course!
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -191,12 +249,22 @@ const ConfirmSkipDialog: React.FC<{
   onOpenChange: (open: boolean) => void;
   habit: Habit;
   isBonus: boolean;
-  onConfirm: () => void;
+  onConfirm: (skip: boolean) => void;
 }> = ({ open, onOpenChange, habit, isBonus, onConfirm }) => {
-  const handleConfirm = (e: React.FormEvent) => {
-    e.preventDefault();
-    onConfirm();
+  const handleSkip = () => {
+    onConfirm(true);
     onOpenChange(false);
+    toast.success('Habit skipped!', {
+      description: `Great job! You saved ${formatCurrency(habit.expense)}. Check back tomorrow to skip again.`,
+    });
+  };
+  
+  const handleSpend = () => {
+    onConfirm(false);
+    onOpenChange(false);
+    toast.info('Habit spent', {
+      description: `You've decided to spend on this habit.`,
+    });
   };
 
   return (
@@ -207,7 +275,7 @@ const ConfirmSkipDialog: React.FC<{
         </DialogTitle>
       </DialogHeader>
       
-      <form onSubmit={handleConfirm} className="space-y-4 py-2">
+      <div className="space-y-4 py-2">
         <div className="p-4 rounded-md bg-green-50 flex items-center gap-3">
           <div className="text-3xl">{habit.emoji}</div>
           <div>
@@ -232,15 +300,31 @@ const ConfirmSkipDialog: React.FC<{
           </div>
         )}
         
-        <DialogFooter className="gap-2">
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+        <DialogFooter className="gap-2 flex">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={() => onOpenChange(false)}
+            className="flex-1"
+          >
             Cancel
           </Button>
-          <Button type="submit" className="bg-bitcoin hover:bg-bitcoin/90">
-            Confirm Skip
+          <Button 
+            type="button"
+            className="bg-red-500 hover:bg-red-600 text-white flex-1"
+            onClick={handleSpend}
+          >
+            Spend
+          </Button>
+          <Button 
+            type="button" 
+            className="bg-green-500 hover:bg-green-600 text-white flex-1"
+            onClick={handleSkip}
+          >
+            Skip
           </Button>
         </DialogFooter>
-      </form>
+      </div>
     </DialogContent>
   );
 };
@@ -250,7 +334,7 @@ const SkipCard: React.FC<{
   skippedDays: SkipLog[];
   progress: { completed: number; total: number };
   maxBonusSkips: number;
-  onLogSkip: () => void;
+  onLogSkip: (skip: boolean) => void;
   onUnskipLog: (index: number) => void;
   onForfeit: () => void;
 }> = ({ 
@@ -273,22 +357,21 @@ const SkipCard: React.FC<{
   const isLongerThanWeeklyPeriod = ['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period);
 
   const handleSkip = () => {
-    if (canSkipToday(habit)) {
-      if (isLongerThanWeeklyPeriod) {
-        toast.info("Habits with periods longer than a week can only be skipped at the end of the week");
+    if (habit.period === 'daily') {
+      // For daily habits, check if we've reached the frequency limit for today
+      const todaySkips = skippedDays.filter(skip => isToday(skip.date)).length;
+      if (todaySkips >= habit.frequency) {
+        toast.info(`You've used all your skips for today. Check back tomorrow!`);
         return;
       }
-      setSkipDialogOpen(true);
     }
-  };
-
-  const handleForfeit = () => {
-    if (confirm('Are you sure you want to forfeit this habit for the week? You will lose all progress and potential savings.')) {
-      onForfeit();
-      toast.error('Habit forfeited for this week', {
-        description: 'This habit can no longer be tracked until next week',
-      });
+    
+    if (isLongerThanWeeklyPeriod) {
+      toast.info("Habits with periods longer than a week can only be skipped at the end of the week");
+      return;
     }
+    
+    setSkipDialogOpen(true);
   };
 
   // Check if habit can be un-forfeited (if it was forfeited today)
@@ -338,41 +421,18 @@ const SkipCard: React.FC<{
         </div>
       </CardContent>
       
-      <CardFooter className="flex justify-between pt-2">
-        {habit.isForfeited ? (
-          canUnforfeit && (
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="text-amber-500 hover:text-amber-600 hover:bg-amber-50 mx-auto"
-              onClick={() => onForfeit()} // Re-using the forfeit function to un-forfeit
-            >
-              Undo Forfeit
-            </Button>
-          )
-        ) : (
-          <>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="text-red-500 hover:text-red-600 hover:bg-red-50"
-              onClick={handleForfeit}
-            >
-              Forfeit
-            </Button>
-            
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-green-500 text-green-600 hover:bg-green-50"
-              onClick={handleSkip}
-              disabled={!canSkipToday(habit) || isLongerThanWeeklyPeriod}
-            >
-              Log Skip
-            </Button>
-          </>
-        )}
-      </CardFooter>
+      {habit.isForfeited && canUnforfeit && (
+        <CardFooter className="pt-2">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="text-amber-500 hover:text-amber-600 hover:bg-amber-50 mx-auto"
+            onClick={() => onForfeit()} // Re-using the forfeit function to un-forfeit
+          >
+            Undo Forfeit
+          </Button>
+        </CardFooter>
+      )}
       
       <Dialog open={skipDialogOpen} onOpenChange={setSkipDialogOpen}>
         <ConfirmSkipDialog
@@ -403,13 +463,20 @@ const HabitSkipper: React.FC = () => {
     isToday
   } = useAppContext();
   
-  const handleLogSkip = (habitId: string) => {
-    skipHabit(habitId);
-    
-    const habit = selectedHabits.find(h => h.id === habitId);
-    if (habit) {
-      toast.success('Habit skipped!', {
-        description: `Great job! You saved ${formatCurrency(habit.expense)}. Check back tomorrow to skip again.`,
+  const handleLogSkip = (habitId: string, shouldSkip: boolean) => {
+    if (shouldSkip) {
+      skipHabit(habitId);
+      
+      const habit = selectedHabits.find(h => h.id === habitId);
+      if (habit) {
+        toast.success('Habit skipped!', {
+          description: `Great job! You saved ${formatCurrency(habit.expense)}. Check back tomorrow to skip again.`,
+        });
+      }
+    } else {
+      // Handle the "spend" option - don't log a skip
+      toast.info('Habit spent', {
+        description: 'You chose to spend on this habit.',
       });
     }
   };
@@ -446,9 +513,12 @@ const HabitSkipper: React.FC = () => {
 
   // Check if any daily habits are eligible for super skip
   const canSuperSkip = selectedHabits.some(habit => {
-    return !habit.isForfeited && 
-           habit.period === 'daily' && 
-           getCurrentWeekSkips(habit.id).filter(skip => isToday(skip.date)).length === 0;
+    // For daily habits, check if we've reached the frequency limit for today
+    if (habit.period === 'daily') {
+      const todaySkips = getCurrentWeekSkips(habit.id).filter(skip => isToday(skip.date)).length;
+      return !habit.isForfeited && todaySkips < habit.frequency;
+    }
+    return false;
   });
 
   return (
@@ -506,7 +576,7 @@ const HabitSkipper: React.FC = () => {
         <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-blue-50 text-blue-600 rounded-md">
           <Clock size={16} />
           <div className="text-sm">
-            <span className="font-medium">Note:</span> Skips can only be edited on the same day they're logged
+            <span className="font-medium">Note:</span> Habits can be edited anytime during the week
           </div>
         </div>
         
@@ -518,7 +588,7 @@ const HabitSkipper: React.FC = () => {
               skippedDays={getCurrentWeekSkips(habit.id)}
               progress={getSkipGoalProgress(habit)}
               maxBonusSkips={getMaxBonusSkips(habit)}
-              onLogSkip={() => handleLogSkip(habit.id)}
+              onLogSkip={(skip) => handleLogSkip(habit.id, skip)}
               onUnskipLog={(index) => handleUnskipLog(habit.id, index)}
               onForfeit={() => handleForfeitHabit(habit.id)}
             />
