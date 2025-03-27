@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -122,6 +123,10 @@ export default {
 				'rotate': {
 					'from': { transform: 'rotate(0deg)' },
 					'to': { transform: 'rotate(360deg)' }
+				},
+				'buoy-float': {
+					'0%, 100%': { transform: 'translateY(0) scale(1)' },
+					'50%': { transform: 'translateY(-3px) scale(1.03)' }
 				}
 			},
 			animation: {
@@ -135,11 +140,13 @@ export default {
 				'float': 'float 6s ease-in-out infinite',
 				'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
 				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
-				'rotate': 'rotate 2s linear infinite'
+				'rotate': 'rotate 2s linear infinite',
+				'buoy-float': 'buoy-float 3s ease-in-out infinite'
 			},
 			backgroundImage: {
 				'orange-gradient': 'linear-gradient(to bottom right, #F97316, #FBBF24)',
-				'blue-gradient': 'linear-gradient(to bottom right, #0EA5E9, #38BDF8)'
+				'blue-gradient': 'linear-gradient(135deg, #0EA5E9, #1E40AF)',
+				'blue-gradient-alt': 'linear-gradient(to bottom right, #2563EB, #0284C7)'
 			}
 		}
 	},

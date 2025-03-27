@@ -28,8 +28,8 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
   return (
     <div 
       className={cn(
-        "relative flex flex-col justify-between rounded-3xl p-6 h-full min-h-[260px] transition-all duration-300 cursor-pointer",
-        isSkipped ? "bg-blue-gradient text-white" : "bg-orange-gradient text-black"
+        "relative flex flex-col justify-between rounded-3xl p-6 h-full min-h-[260px] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg",
+        isSkipped ? "bg-blue-gradient-alt text-white" : "bg-orange-gradient text-black"
       )}
       onClick={onClick}
     >
