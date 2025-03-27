@@ -9,7 +9,6 @@ import { toast } from 'sonner';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
-import { Checkbox } from '@/components/ui/checkbox';
 
 const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('en-US', {
@@ -33,149 +32,221 @@ const InfoTooltip: React.FC<{ content: string }> = ({ content }) => {
   );
 };
 
-const HabitGridItem: React.FC<{
+const SkipBoxes: React.FC<{
   habit: Habit;
   progress: { completed: number; total: number };
+  maxBonusSkips: number;
   onSkip: () => void;
   onUnskip: (index: number) => void;
   skips: SkipLog[];
-}> = ({ habit, progress, onSkip, onUnskip, skips }) => {
-  const { isToday } = useAppContext();
+}> = ({ habit, progress, maxBonusSkips, onSkip, onUnskip, skips }) => {
+  const { isToday, getDaysTillNextSkip } = useAppContext();
+  
+  const totalPossibleSkips = progress.total + maxBonusSkips;
+  const skipBoxes = Array(totalPossibleSkips).fill(null);
+  const progressPercentage = (progress.completed / progress.total) * 100;
+  const progressText = `${progress.completed}/${progress.total} skips`;
   const savedAmount = skips.filter(skip => !skip.isSpent).reduce((sum, skip) => sum + skip.amountSaved, 0);
-  const todaySkips = skips.filter(s => isToday(s.date) && !s.isSpent);
-  
-  // Calculate number of checkboxes to display based on habit period and frequency
-  const getCheckboxCount = () => {
-    if (habit.period === 'daily') return habit.frequency;
-    if (habit.period === 'weekly') return 1;
-    if (habit.period === 'fortnightly') return 1;
-    if (habit.period === 'monthly') return 1;
-    return 1;
-  };
 
-  // Skip availability
-  const checkboxes = Array(getCheckboxCount()).fill(null);
-  
+  const isLongerThanWeeklyPeriod = ['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period);
+  const daysTillNextSkip = getDaysTillNextSkip(habit);
+
   return (
-    <div className={cn(
-      "relative overflow-hidden rounded-xl p-5 transition-all",
-      habit.isForfeited 
-        ? "bg-gray-100 opacity-60" 
-        : "bg-gradient-to-br from-blue-400 to-blue-600"
-    )}>
-      <div className="absolute top-0 right-0 p-2">
-        {habit.isForfeited && (
-          <span className="inline-block px-2 py-1 text-xs font-medium bg-red-100 text-red-800 rounded-full">
-            Forfeited
+    <div className="mt-3">
+      <div className="flex justify-between items-center mb-2">
+        <div className="flex items-center gap-1">
+          <span className="text-sm font-medium text-gray-700">
+            Skip Progress
           </span>
+          <InfoTooltip content="Your progress toward your weekly skip goal" />
+        </div>
+        <span className="text-xs font-medium text-gray-500">{progressText}</span>
+      </div>
+      
+      <Progress 
+        value={progressPercentage} 
+        className="h-2 mb-3 bg-orange-100"
+        indicatorClassName="bg-orange-500"
+      />
+      
+      <div className="flex items-center mb-3 justify-between">
+        <span className="text-sm font-medium text-green-600">
+          Saved: {formatCurrency(savedAmount)}
+        </span>
+        
+        {progress.completed >= progress.total && maxBonusSkips > 0 && (
+          <div className="flex items-center">
+            <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full flex items-center gap-1">
+              <Gift size={12} /> Bonus skips available!
+            </span>
+          </div>
         )}
       </div>
-      
-      <div className="flex items-center mb-3">
-        <div className="text-3xl mr-3">{habit.emoji}</div>
-        <div>
-          <h3 className="font-semibold text-white">{habit.name}</h3>
-          <p className="text-sm text-blue-100">
-            {formatCurrency(habit.expense)} per {habit.period}
-          </p>
+
+      {isLongerThanWeeklyPeriod && (
+        <div className="px-3 py-2 bg-blue-50 text-blue-600 rounded-md text-xs mb-3 flex items-center">
+          <Info size={14} className="mr-1" />
+          <span>Habits with periods longer than a week can only be skipped at the end of the week</span>
         </div>
-      </div>
+      )}
       
-      <div className="mb-3">
-        <div className="flex justify-between text-xs text-blue-50 mb-1">
-          <span>Skip goal: {progress.completed}/{progress.total}</span>
-          <span>Saved: {formatCurrency(savedAmount)}</span>
-        </div>
-        <Progress 
-          value={(progress.completed / progress.total) * 100} 
-          className="h-1.5 bg-blue-300"
-          indicatorClassName="bg-white"
-        />
-      </div>
-      
-      <div className="grid grid-cols-7 gap-1 mb-3">
-        {/* Display day names */}
-        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, i) => (
-          <div key={i} className="text-center text-xs font-medium text-blue-100">
-            {day}
+      {habit.period === 'fortnightly' && (
+        <div className="px-3 py-2 bg-amber-50 text-amber-600 rounded-md text-xs mb-3">
+          <span className="block mb-1">Skips are packaged as follows:</span>
+          <div className="flex justify-center space-x-2">
+            <span>Week 1 Skip {daysTillNextSkip <= 7 ? '🔓' : '🔒'}</span>
+            <span>|</span>
+            <span>Week 2 Skip {daysTillNextSkip <= 0 ? '🔓' : '🔒'}</span>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
       
-      <div className="relative grid grid-cols-7 gap-1 mb-3">
-        {/* Skip tracking grid */}
-        {Array(7).fill(null).map((_, dayIndex) => {
-          const date = new Date();
-          date.setDate(date.getDate() - date.getDay() + 1 + dayIndex); // Monday-based
+      {habit.period === 'monthly' && (
+        <div className="px-3 py-2 bg-amber-50 text-amber-600 rounded-md text-xs mb-3">
+          <span className="block mb-1">Skips are packaged as follows:</span>
+          <div className="flex justify-center space-x-2 text-xs flex-wrap">
+            <span>Week 1 Skip {daysTillNextSkip <= 21 ? '🔓' : '🔒'}</span>
+            <span>|</span>
+            <span>Week 2 Skip {daysTillNextSkip <= 14 ? '🔓' : '🔒'}</span>
+            <span>|</span>
+            <span>Week 3 Skip {daysTillNextSkip <= 7 ? '🔓' : '🔒'}</span>
+            <span>|</span>
+            <span>Week 4 Skip {daysTillNextSkip <= 0 ? '🔓' : '🔒'}</span>
+          </div>
+        </div>
+      )}
+      
+      <div className="flex flex-wrap gap-2 mb-3">
+        {skipBoxes.map((_, index) => {
+          const isCompleted = index < skips.length;
+          const isBaseGoal = index < progress.total;
+          const isBonusSkip = index >= progress.total;
+          const currentSkip = isCompleted ? skips[index] : null;
+          const isEditable = isCompleted;
+          const isSpent = currentSkip?.isSpent;
           
-          const dateStr = date.toISOString().split('T')[0];
-          const daySkips = skips.filter(s => s.date.startsWith(dateStr) && !s.isSpent);
-          const hasSkip = daySkips.length > 0;
+          let isLocked = false;
+          let lockReason = "";
           
-          // Determine if this day's checkbox should be active
-          const isActive = checkboxes.length > daySkips.length && 
-                          (habit.period === 'daily' || 
-                          (habit.period === 'weekly' && daySkips.length < 1));
+          if (isLongerThanWeeklyPeriod && !isCompleted) {
+            isLocked = true;
+            lockReason = `Next Skip Available in ${daysTillNextSkip} Day(s) – hold a steady course!`;
+          }
           
-          const isToday = new Date().getDay() === (dayIndex + 1) % 7;
+          if (habit.period === 'weekly' && !isCompleted) {
+            const todaySkips = skips.filter(s => isToday(s.date) && !s.isSpent);
+            if (todaySkips.length >= 1) {
+              isLocked = true;
+              lockReason = "Only 1 skip per day allowed for weekly habits – check back tomorrow!";
+            }
+          }
+          
+          const dailySkipsCount = habit.period === 'daily' ? skips.filter(s => isToday(s.date) && !s.isSpent).length : 0;
+          const dailySkipLimit = habit.period === 'daily' ? habit.frequency : 0;
+          
+          if (habit.period === 'daily' && !isCompleted && dailySkipsCount >= dailySkipLimit) {
+            isLocked = true;
+            lockReason = "Next Skip Available in 1 Day(s) – hold a steady course!";
+          }
           
           return (
-            <div 
-              key={dayIndex} 
+            <div
+              key={index}
               className={cn(
-                "relative flex items-center justify-center h-10 rounded",
-                isToday ? "bg-blue-300/20" : "bg-blue-700/20",
-                habit.isForfeited && "opacity-50"
+                "relative w-10 h-10 flex items-center justify-center rounded-md text-xs font-medium transition-all",
+                isSpent 
+                  ? "bg-red-500 text-white"
+                  : isCompleted 
+                    ? isBaseGoal 
+                      ? "bg-green-500 text-white" 
+                      : "bg-amber-500 text-white"
+                    : isLocked
+                      ? "bg-gray-200 text-gray-500 cursor-not-allowed"
+                      : isBaseGoal
+                        ? "bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer"
+                        : progress.completed >= progress.total
+                          ? "bg-amber-100 text-amber-700 hover:bg-amber-200 cursor-pointer"
+                          : "bg-gray-50 text-gray-400 cursor-not-allowed",
+                habit.isForfeited && "opacity-50 cursor-not-allowed"
               )}
+              onClick={() => {
+                if (isLocked) {
+                  toast.info(lockReason);
+                  return;
+                }
+                
+                if (!isCompleted && !habit.isForfeited) {
+                  if (isBonusSkip && progress.completed < progress.total) return;
+                  
+                  if (habit.period === 'daily' && dailySkipsCount >= dailySkipLimit) {
+                    toast.info("You've used all your skips for today. Check back tomorrow!");
+                    return;
+                  }
+                  
+                  onSkip();
+                }
+              }}
             >
-              {hasSkip ? (
-                // Life ring/lifebouy effect for saved amounts
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full border-2 border-dashed border-white animate-spin-slow opacity-60"></div>
-                  </div>
-                  <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-blue-700 font-semibold text-xs">
-                    {formatCurrency(daySkips.reduce((sum, s) => sum + s.amountSaved, 0))}
-                  </div>
-                  <button
-                    onClick={() => daySkips.forEach((_, i) => onUnskip(skips.findIndex(s => s.date.startsWith(dateStr))))}
-                    className="absolute -top-1 -right-1 bg-white rounded-full shadow-sm p-0.5"
-                  >
-                    <XCircle size={12} className="text-red-500" />
-                  </button>
-                </div>
+              {isSpent ? (
+                <X size={16} />
+              ) : isCompleted ? (
+                <Check size={16} />
+              ) : isLocked ? (
+                <Lock size={16} />
               ) : (
-                <div className="flex items-center justify-center">
-                  {isActive && !habit.isForfeited ? (
-                    <Checkbox 
-                      id={`skip-${habit.id}-${dayIndex}`}
-                      className="bg-white/80 data-[state=checked]:bg-green-500"
-                      onCheckedChange={() => onSkip()}
-                    />
-                  ) : (
-                    <div className="w-4 h-4 rounded-sm border border-white/30 flex items-center justify-center">
-                      {habit.isForfeited && <Lock size={10} className="text-white/50" />}
-                    </div>
-                  )}
-                </div>
+                index + 1
+              )}
+              
+              {isEditable && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onUnskip(index);
+                  }}
+                  className="absolute -top-1 -right-1 bg-white rounded-full shadow-sm p-0.5"
+                >
+                  <XCircle size={14} className="text-red-500" />
+                </button>
               )}
             </div>
           );
         })}
       </div>
       
-      <div className="flex justify-between text-xs text-blue-50">
-        <span>Potential: {formatCurrency(habit.weeklyTotalPotential)}</span>
-        <span className="font-medium">
-          {progress.completed >= progress.total ? (
-            <span className="flex items-center text-green-100">
-              <BadgeCheck size={12} className="mr-1" /> Goal reached!
-            </span>
-          ) : (
-            <span>{progress.total - progress.completed} more to goal</span>
+      {habit.isForfeited ? (
+        <div className="text-xs px-3 py-2 bg-red-50 text-red-500 rounded-md flex items-center mb-2">
+          <AlertCircle size={14} className="mr-1" />
+          <span>This habit has been forfeited for this week</span>
+        </div>
+      ) : progress.completed < progress.total ? (
+        <div className="text-xs px-3 py-2 bg-blue-50 text-blue-500 rounded-md mb-2">
+          <span>{progress.total - progress.completed} more skips needed to reach your goal</span>
+        </div>
+      ) : maxBonusSkips > 0 ? (
+        <div className="text-xs px-3 py-2 bg-amber-50 text-amber-700 rounded-md flex items-center mb-2">
+          <Gift size={14} className="mr-1" />
+          <span>You can save up to {formatCurrency(habit.expense * maxBonusSkips)} more with bonus skips!</span>
+        </div>
+      ) : (
+        <div className="text-xs px-3 py-2 bg-green-50 text-green-600 rounded-md flex items-center mb-2">
+          <BadgeCheck size={14} className="mr-1" />
+          <span>Weekly skip goal achieved! Great job!</span>
+        </div>
+      )}
+      
+      {habit.period === 'daily' && (
+        <div className="px-3 py-2 bg-gray-50 rounded-md text-xs mb-2">
+          <div className="flex items-center gap-1 text-gray-600">
+            <Clock size={14} />
+            <span>Daily Skips: {skips.filter(s => isToday(s.date) && !s.isSpent).length}/{habit.frequency}</span>
+          </div>
+          {skips.filter(s => isToday(s.date) && !s.isSpent).length >= habit.frequency && (
+            <div className="mt-1 text-amber-600">
+              Next Skip Available in 1 Day(s) – hold a steady course!
+            </div>
           )}
-        </span>
-      </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -265,6 +336,127 @@ const ConfirmSkipDialog: React.FC<{
   );
 };
 
+const SkipCard: React.FC<{ 
+  habit: Habit;
+  skippedDays: SkipLog[];
+  progress: { completed: number; total: number };
+  maxBonusSkips: number;
+  onLogSkip: (skip: boolean) => void;
+  onUnskipLog: (index: number) => void;
+  onForfeit: () => void;
+}> = ({ 
+  habit, 
+  skippedDays, 
+  progress,
+  maxBonusSkips,
+  onLogSkip,
+  onUnskipLog,
+  onForfeit
+}) => {
+  const [skipDialogOpen, setSkipDialogOpen] = useState(false);
+  const { canSkipToday, isToday, markHabitAsSpent, getCurrentWeekSkips } = useAppContext();
+
+  const weeklyPotential = habit.weeklyTotalPotential;
+  const currentSavings = skippedDays.reduce((sum, skip) => sum + skip.amountSaved, 0);
+  const isBonus = progress.completed >= progress.total;
+
+  const isLongerThanWeeklyPeriod = ['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period);
+
+  const handleSkip = () => {
+    if (habit.period === 'daily') {
+      const todaySkips = getCurrentWeekSkips(habit.id).filter(skip => isToday(skip.date) && !skip.isSpent).length;
+      if (todaySkips >= habit.frequency) {
+        toast.info(`You've used all your skips for today. Check back tomorrow!`);
+        return;
+      }
+    }
+    
+    if (isLongerThanWeeklyPeriod) {
+      toast.info("Habits with periods longer than a week can only be skipped at the end of the week");
+      return;
+    }
+    
+    setSkipDialogOpen(true);
+  };
+
+  const canUnforfeit = habit.isForfeited && 
+                        habit.skippedDays.some(skip => 
+                          skip.isForfeited && isToday(skip.date));
+
+  return (
+    <Card className="overflow-hidden bg-white">
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-3">
+          <div className="text-3xl">{habit.emoji}</div>
+          <div>
+            <CardTitle className="text-lg">{habit.name}</CardTitle>
+            <div className="text-sm text-gray-500 flex items-center gap-2">
+              <span>{formatCurrency(habit.expense)} per occurrence</span>
+              {habit.isForfeited && (
+                <span className="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs">
+                  Forfeited
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      
+      <CardContent>
+        <SkipBoxes 
+          habit={habit} 
+          progress={progress}
+          maxBonusSkips={maxBonusSkips}
+          onSkip={handleSkip}
+          onUnskip={onUnskipLog}
+          skips={skippedDays}
+        />
+        
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          <div className="p-3 bg-gray-50 rounded-md">
+            <div className="text-xs text-gray-500">Weekly Potential</div>
+            <div className="font-medium">{formatCurrency(weeklyPotential)}</div>
+          </div>
+          
+          <div className="p-3 bg-gray-50 rounded-md">
+            <div className="text-xs text-gray-500">Current Savings</div>
+            <div className="font-medium text-green-600">{formatCurrency(currentSavings)}</div>
+          </div>
+        </div>
+      </CardContent>
+      
+      {habit.isForfeited && canUnforfeit && (
+        <CardFooter className="pt-2">
+          <Button 
+            variant="ghost" 
+            size="sm"
+            className="text-amber-500 hover:text-amber-600 hover:bg-amber-50 mx-auto"
+            onClick={() => onForfeit()}
+          >
+            Undo Forfeit
+          </Button>
+        </CardFooter>
+      )}
+      
+      <Dialog open={skipDialogOpen} onOpenChange={setSkipDialogOpen}>
+        <ConfirmSkipDialog
+          open={skipDialogOpen}
+          onOpenChange={setSkipDialogOpen}
+          habit={habit}
+          isBonus={isBonus}
+          onConfirm={(skip, spend) => {
+            if (skip) {
+              onLogSkip(true);
+            } else if (spend) {
+              markHabitAsSpent(habit.id);
+            }
+          }}
+        />
+      </Dialog>
+    </Card>
+  );
+};
+
 const SuperSkipDialog: React.FC<{
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -335,8 +527,6 @@ const HabitSkipper: React.FC = () => {
   } = useAppContext();
   
   const [superSkipDialogOpen, setSuperSkipDialogOpen] = useState(false);
-  const [skipDialogOpen, setSkipDialogOpen] = useState(false);
-  const [selectedHabit, setSelectedHabit] = useState<Habit | null>(null);
   
   const handleLogSkip = (habitId: string, shouldSkip: boolean) => {
     if (shouldSkip) {
@@ -362,9 +552,19 @@ const HabitSkipper: React.FC = () => {
     });
   };
 
-  const handleSkip = (habit: Habit) => {
-    setSelectedHabit(habit);
-    setSkipDialogOpen(true);
+  const handleForfeitHabit = (habitId: string) => {
+    const habit = selectedHabits.find(h => h.id === habitId);
+    if (habit?.isForfeited) {
+      forfeitHabit(habitId, true);
+      toast.success('Forfeit undone!', {
+        description: 'Your habit has been restored and you can continue tracking it.',
+      });
+    } else {
+      forfeitHabit(habitId);
+      toast.error('Habit forfeited for this week', {
+        description: 'This habit can no longer be tracked until next week',
+      });
+    }
   };
 
   const handleSuperSkip = () => {
@@ -375,7 +575,7 @@ const HabitSkipper: React.FC = () => {
     superSkip();
     
     toast.success('Super Skip activated!', {
-      description: 'All eligible habits have been skipped for today.',
+      description: 'All eligible daily habits have been skipped for today.',
     });
   };
 
@@ -395,14 +595,14 @@ const HabitSkipper: React.FC = () => {
 
   return (
     <div className="animate-scale-in">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-2xl mx-auto px-4">
         <div className="text-center mb-8">
           <div className="inline-block px-3 py-1 rounded-full bg-bitcoin/10 text-bitcoin text-sm font-medium mb-3">
             Step 4
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Skip & Save</h1>
           <p className="text-gray-600 max-w-md mx-auto">
-            Track your skipped habits and watch your savings grow. Each day represents a skip opportunity.
+            Track your skipped habits and watch your savings grow. Each box represents one skip opportunity.
           </p>
         </div>
         
@@ -452,19 +652,21 @@ const HabitSkipper: React.FC = () => {
         <div className="flex items-center gap-2 mb-3 px-3 py-2 bg-blue-50 text-blue-600 rounded-md">
           <Clock size={16} />
           <div className="text-sm">
-            <span className="font-medium">Tip:</span> Check in daily to maximize your savings potential
+            <span className="font-medium">Note:</span> Habits can be edited anytime during the week
           </div>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        <div className="grid gap-4 mb-8">
           {selectedHabits.map((habit) => (
-            <HabitGridItem 
+            <SkipCard 
               key={habit.id}
               habit={habit}
-              skips={getCurrentWeekSkips(habit.id)}
+              skippedDays={getCurrentWeekSkips(habit.id)}
               progress={getSkipGoalProgress(habit)}
-              onSkip={() => handleSkip(habit)}
-              onUnskip={(index) => handleUnskipLog(habit.id, index)}
+              maxBonusSkips={getMaxBonusSkips(habit)}
+              onLogSkip={(skip) => handleLogSkip(habit.id, skip)}
+              onUnskipLog={(index) => handleUnskipLog(habit.id, index)}
+              onForfeit={() => handleForfeitHabit(habit.id)}
             />
           ))}
         </div>
@@ -488,24 +690,6 @@ const HabitSkipper: React.FC = () => {
           </Button>
         </div>
       </div>
-      
-      <Dialog open={skipDialogOpen} onOpenChange={setSkipDialogOpen}>
-        {selectedHabit && (
-          <ConfirmSkipDialog
-            open={skipDialogOpen}
-            onOpenChange={setSkipDialogOpen}
-            habit={selectedHabit}
-            isBonus={getSkipGoalProgress(selectedHabit).completed >= selectedHabit.skipGoal}
-            onConfirm={(skip, spend) => {
-              if (skip) {
-                handleLogSkip(selectedHabit.id, true);
-              } else if (spend) {
-                markHabitAsSpent(selectedHabit.id);
-              }
-            }}
-          />
-        )}
-      </Dialog>
       
       <AlertDialog open={superSkipDialogOpen} onOpenChange={setSuperSkipDialogOpen}>
         <SuperSkipDialog 
