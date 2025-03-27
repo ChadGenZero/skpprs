@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -32,7 +31,7 @@ export default {
 				'royal-blue': {
 					DEFAULT: '#1EAEDB',
 					light: '#33C3F0',
-					dark: '#0FA0CE',
+					dark: '#0089B0',
 					foreground: '#ffffff'
 				},
 				primary: {

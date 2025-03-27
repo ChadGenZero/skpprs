@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppContext, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -27,8 +28,8 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
   return (
     <div 
       className={cn(
-        "relative flex flex-col justify-between rounded-3xl p-6 h-full min-h-[260px] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg",
-        isSkipped ? "bg-blue-gradient-alt text-white" : "bg-orange-gradient text-black"
+        "relative flex flex-col justify-between rounded-3xl p-6 h-full min-h-[260px] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg text-white",
+        isSkipped ? "bg-gradient-to-br from-royal-blue to-royal-blue-dark" : "bg-orange-gradient"
       )}
       onClick={onClick}
     >
@@ -43,7 +44,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
       <div className="flex justify-center mt-4">
         {isSkipped ? (
           <div className="lifebuoy-container">
-            <div className="lifebuoy-outer">
+            <div className="lifebuoy-outer lifebuoy-orange">
               <div className="lifebuoy-inner">
                 {formatCurrency(habit.expense)}
               </div>

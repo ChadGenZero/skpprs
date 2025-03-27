@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -139,6 +140,16 @@
     #1E90FF 315deg 360deg
   );
   z-index: -2;
+}
+
+.lifebuoy-orange::after {
+  background: conic-gradient(
+    #f7931a 0deg 45deg, 
+    white 45deg 135deg, 
+    #f7931a 135deg 225deg, 
+    white 225deg 315deg, 
+    #f7931a 315deg 360deg
+  );
 }
 
 .lifebuoy-inner {
