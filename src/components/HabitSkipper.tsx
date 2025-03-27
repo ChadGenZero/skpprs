@@ -44,7 +44,6 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
         {isSkipped ? (
           <div className="lifebuoy-container">
             <div className="lifebuoy-outer">
-              <div className="lifebuoy-rope"></div>
               <div className="lifebuoy-inner">
                 {formatCurrency(habit.expense)}
               </div>
@@ -91,7 +90,6 @@ const HabitSkipper: React.FC = () => {
     const habit = selectedHabits.find(h => h.id === habitId);
     
     if (habit) {
-      // Check if the habit can be skipped today
       const progress = getSkipGoalProgress(habit);
       const canSkip = canSkipToday(habit);
       
@@ -115,7 +113,6 @@ const HabitSkipper: React.FC = () => {
       const todaySkips = habit.skippedDays.filter(skip => isToday(skip.date));
       
       if (todaySkips.length > 0) {
-        // Find the index of the most recent skip for today
         const skipIndex = habit.skippedDays.findIndex(
           skip => isToday(skip.date)
         );
