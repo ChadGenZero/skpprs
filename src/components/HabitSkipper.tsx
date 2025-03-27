@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAppContext, type SkipLog, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -436,7 +437,7 @@ const HabitSkipper: React.FC = () => {
                   "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white p-4 h-auto",
                   !canSuperSkip && "opacity-50 cursor-not-allowed"
                 )}
-                onClick={handleSuperSkip}
+                onClick={() => setSuperSkipDialogOpen(true)}
                 disabled={!canSuperSkip}
               >
                 <Gift size={18} className="mr-2" />
@@ -463,8 +464,16 @@ const HabitSkipper: React.FC = () => {
               habit={habit}
               skips={getCurrentWeekSkips(habit.id)}
               progress={getSkipGoalProgress(habit)}
-              onSkip={() => handleSkip(habit)}
-              onUnskip={(index) => handleUnskipLog(habit.id, index)}
+              onSkip={() => {
+                setSelectedHabit(habit);
+                setSkipDialogOpen(true);
+              }}
+              onUnskip={(index) => {
+                unskipLog(habit.id, index);
+                toast.info('Skip removed', {
+                  description: 'You can still log this skip again today if you change your mind.',
+                });
+              }}
             />
           ))}
         </div>
@@ -498,9 +507,15 @@ const HabitSkipper: React.FC = () => {
             isBonus={getSkipGoalProgress(selectedHabit).completed >= selectedHabit.skipGoal}
             onConfirm={(skip, spend) => {
               if (skip) {
-                handleLogSkip(selectedHabit.id, true);
+                skipHabit(selectedHabit.id);
+                toast.success('Habit skipped!', {
+                  description: `Great job! You saved ${formatCurrency(selectedHabit.expense)}. Check back tomorrow to skip again.`,
+                });
               } else if (spend) {
                 markHabitAsSpent(selectedHabit.id);
+                toast.info('Habit spent', {
+                  description: `You've decided to spend on this habit.`,
+                });
               }
             }}
           />
@@ -512,7 +527,13 @@ const HabitSkipper: React.FC = () => {
           open={superSkipDialogOpen}
           onOpenChange={setSuperSkipDialogOpen}
           eligibleHabits={eligibleHabitsForSuperSkip}
-          onConfirm={confirmSuperSkip}
+          onConfirm={() => {
+            superSkip();
+            setSuperSkipDialogOpen(false);
+            toast.success('Super Skip activated!', {
+              description: 'All eligible habits have been skipped for today.',
+            });
+          }}
         />
       </AlertDialog>
     </div>
