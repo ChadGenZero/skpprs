@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -119,37 +118,28 @@
 
 .lifebuoy-outer {
   @apply relative w-full h-full flex items-center justify-center;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2));
 }
 
 .lifebuoy-outer::before {
   content: '';
   @apply absolute inset-0 rounded-full;
   background: #fff;
+  border: 2px solid #000;
   z-index: -1;
 }
 
 .lifebuoy-outer::after {
   content: '';
-  @apply absolute inset-0 rounded-full;
+  @apply absolute inset-0.5 rounded-full;
   background: conic-gradient(
-    #1E90FF 0deg 45deg, 
+    #ea384c 0deg 45deg, 
     white 45deg 135deg, 
-    #1E90FF 135deg 225deg, 
+    #ea384c 135deg 225deg, 
     white 225deg 315deg, 
-    #1E90FF 315deg 360deg
+    #ea384c 315deg 360deg
   );
   z-index: -2;
-}
-
-.lifebuoy-orange::after {
-  background: conic-gradient(
-    #f7931a 0deg 45deg, 
-    white 45deg 135deg, 
-    #f7931a 135deg 225deg, 
-    white 225deg 315deg, 
-    #f7931a 315deg 360deg
-  );
 }
 
 .lifebuoy-inner {
@@ -158,12 +148,60 @@
   height: 40%;
   border-radius: 50%;
   background: white;
+  border: 2px solid #000;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
   z-index: 1;
 }
 
-.lifebuoy-rope {
-  display: none;
+.lifebuoy-detail {
+  content: '';
+  position: absolute;
+  width: 86%;
+  height: 86%;
+  border-radius: 50%;
+  border: 1.5px solid #ec867a;
+  opacity: 0.6;
+  z-index: -1;
+}
+
+.lifebuoy-shine {
+  position: absolute;
+  top: 5%;
+  right: 15%;
+  width: 10px;
+  height: 10px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 5px white;
+  opacity: 0.8;
+  z-index: 2;
+}
+
+.lifebuoy-lines {
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  z-index: 2;
+}
+
+.lifebuoy-lines::before, 
+.lifebuoy-lines::after {
+  content: '';
+  position: absolute;
+  background: #000;
+  width: 6px;
+  height: 1.5px;
+  right: 0;
+}
+
+.lifebuoy-lines::before {
+  transform: rotate(45deg);
+  top: 0;
+}
+
+.lifebuoy-lines::after {
+  transform: rotate(20deg);
+  top: 4px;
 }
 
 .progress-container {

@@ -44,10 +44,13 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
       <div className="flex justify-center mt-4">
         {isSkipped ? (
           <div className="lifebuoy-container">
-            <div className="lifebuoy-outer lifebuoy-orange">
+            <div className="lifebuoy-outer">
               <div className="lifebuoy-inner">
                 {formatCurrency(habit.expense)}
               </div>
+              <div className="lifebuoy-detail"></div>
+              <div className="lifebuoy-shine"></div>
+              <div className="lifebuoy-lines"></div>
             </div>
           </div>
         ) : (
