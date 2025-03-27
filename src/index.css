@@ -110,6 +110,18 @@
   @apply transition-all duration-300 ease-out hover:scale-[1.02] active:scale-[0.98];
 }
 
+.lifebuoy-container {
+  @apply relative flex items-center justify-center;
+}
+
+.lifebuoy-outer {
+  @apply text-red-500 animate-rotate;
+}
+
+.lifebuoy-inner {
+  @apply absolute inset-0 flex items-center justify-center text-white font-bold;
+}
+
 .progress-container {
   @apply relative flex items-center justify-center;
 }
@@ -238,4 +250,9 @@
 .page-transition-exit-active {
   opacity: 0;
   transition: opacity 150ms;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

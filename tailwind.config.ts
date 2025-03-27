@@ -119,6 +119,10 @@ export default {
 				'pulse-subtle': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.8' }
+				},
+				'rotate': {
+					'from': { transform: 'rotate(0deg)' },
+					'to': { transform: 'rotate(360deg)' }
 				}
 			},
 			animation: {
@@ -131,7 +135,12 @@ export default {
 				'scale-in': 'scale-in 0.2s ease-out',
 				'float': 'float 6s ease-in-out infinite',
 				'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
-				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite'
+				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
+				'rotate': 'rotate 2s linear infinite'
+			},
+			backgroundImage: {
+				'orange-gradient': 'linear-gradient(to bottom right, #F97316, #FBBF24)',
+				'blue-gradient': 'linear-gradient(to bottom right, #0EA5E9, #38BDF8)'
 			}
 		}
 	},
