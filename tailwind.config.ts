@@ -1,4 +1,3 @@
-
 import { type Config } from "tailwindcss";
 import { fontFamily } from "tailwindcss/defaultTheme";
 
@@ -29,7 +28,9 @@ export default {
         bitcoin: {
           DEFAULT: "#f7931a"
         },
-        'royal-blue': "#4169e1",
+        'royal-blue': {
+          DEFAULT: "#4169e1"
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
