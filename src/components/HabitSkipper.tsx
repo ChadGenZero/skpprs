@@ -2,7 +2,7 @@
 import React from 'react';
 import { useAppContext, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon, LifeBuoy } from 'lucide-react';
+import { ArrowLeftIcon, ArrowRightIcon, Undo } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -18,36 +18,36 @@ const formatCurrency = (amount: number): string => {
 interface HabitCardProps {
   habit: Habit;
   onClick: () => void;
+  onUndo: () => void;
   progress: { completed: number; total: number };
 }
 
-const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, progress }) => {
+const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress }) => {
   const isSkipped = progress.completed > 0;
   
   return (
     <div 
       className={cn(
-        "relative flex flex-col justify-between rounded-3xl p-6 h-64 transition-all duration-300 cursor-pointer",
-        isSkipped ? "bg-blue-gradient text-white" : "bg-orange-gradient text-black",
-        "hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+        "relative flex flex-col justify-between rounded-3xl p-6 h-full min-h-[260px] transition-all duration-300 cursor-pointer",
+        isSkipped ? "bg-blue-gradient text-white" : "bg-orange-gradient text-black"
       )}
       onClick={onClick}
     >
       <div className="flex flex-col items-center">
         <div className="text-5xl mb-2">{habit.emoji}</div>
-        <h3 className="text-2xl font-bold text-center">{habit.name}</h3>
-        <div className="text-2xl font-semibold mt-2">
+        <h3 className="text-xl md:text-2xl font-bold text-center break-words">{habit.name}</h3>
+        <div className="text-xl md:text-2xl font-semibold mt-2">
           {progress.completed}/{progress.total} Skips
         </div>
       </div>
       
       <div className="flex justify-center mt-4">
         {isSkipped ? (
-          <div className="relative">
-            <div className="animate-rotate">
-              <LifeBuoy size={80} className="text-red-500" />
+          <div className="lifebuoy-container">
+            <div className="lifebuoy-outer">
+              <span className="text-6xl">🛟</span>
             </div>
-            <div className="absolute inset-0 flex items-center justify-center text-2xl font-bold">
+            <div className="lifebuoy-inner">
               {formatCurrency(habit.expense)}
             </div>
           </div>
@@ -57,6 +57,18 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, progress }) => {
           </div>
         )}
       </div>
+      
+      {isSkipped && (
+        <button 
+          className="absolute top-3 right-3 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+          onClick={(e) => {
+            e.stopPropagation();
+            onUndo();
+          }}
+        >
+          <Undo size={18} />
+        </button>
+      )}
     </div>
   );
 };
@@ -70,7 +82,9 @@ const HabitSkipper: React.FC = () => {
     setStep,
     getSkipGoalProgress,
     superSkip,
-    isToday
+    isToday,
+    getCurrentWeekSkips,
+    unskipLog
   } = useAppContext();
   
   const handleSkipHabit = (habitId: string) => {
@@ -96,10 +110,34 @@ const HabitSkipper: React.FC = () => {
     }
   };
 
+  const handleUndoSkip = (habitId: string) => {
+    const habit = selectedHabits.find(h => h.id === habitId);
+    
+    if (habit) {
+      const todaySkips = habit.skippedDays.filter(skip => isToday(skip.date));
+      
+      if (todaySkips.length > 0) {
+        // Find the index of the most recent skip for today
+        const skipIndex = habit.skippedDays.findIndex(
+          skip => isToday(skip.date)
+        );
+        
+        if (skipIndex !== -1) {
+          unskipLog(habitId, skipIndex);
+          toast.success('Skip undone!', {
+            description: `You've undone your last skip of ${habit.name}.`,
+          });
+        }
+      } else {
+        toast.info('No skips today to undo');
+      }
+    }
+  };
+
   const handleSuperSkip = () => {
     superSkip();
     toast.success('Super Skip activated!', {
-      description: 'All eligible daily habits have been skipped for today.',
+      description: 'All eligible habits have been skipped.',
     });
   };
 
@@ -140,12 +178,13 @@ const HabitSkipper: React.FC = () => {
           </Button>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-fr">
           {selectedHabits.map((habit) => (
             <HabitCard 
               key={habit.id}
               habit={habit}
               onClick={() => handleSkipHabit(habit.id)}
+              onUndo={() => handleUndoSkip(habit.id)}
               progress={getSkipGoalProgress(habit)}
             />
           ))}
