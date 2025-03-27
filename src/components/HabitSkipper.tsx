@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppContext, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -45,10 +44,10 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
         {isSkipped ? (
           <div className="lifebuoy-container">
             <div className="lifebuoy-outer">
-              <span className="text-6xl">🛟</span>
-            </div>
-            <div className="lifebuoy-inner">
-              {formatCurrency(habit.expense)}
+              <div className="lifebuoy-rope"></div>
+              <div className="lifebuoy-inner">
+                {formatCurrency(habit.expense)}
+              </div>
             </div>
           </div>
         ) : (
@@ -83,6 +82,7 @@ const HabitSkipper: React.FC = () => {
     getSkipGoalProgress,
     superSkip,
     isToday,
+    canSkipToday,
     getCurrentWeekSkips,
     unskipLog
   } = useAppContext();
@@ -93,9 +93,7 @@ const HabitSkipper: React.FC = () => {
     if (habit) {
       // Check if the habit can be skipped today
       const progress = getSkipGoalProgress(habit);
-      const canSkip = habit.period === 'daily' || 
-                     (habit.period === 'weekly' && 
-                      !habit.skippedDays.some(skip => isToday(skip.date) && !skip.isSpent));
+      const canSkip = canSkipToday(habit);
       
       if (canSkip && !habit.isForfeited) {
         skipHabit(habitId);
@@ -135,10 +133,22 @@ const HabitSkipper: React.FC = () => {
   };
 
   const handleSuperSkip = () => {
-    superSkip();
-    toast.success('Super Skip activated!', {
-      description: 'All eligible habits have been skipped.',
+    let skipCount = 0;
+    
+    selectedHabits.forEach(habit => {
+      if (canSkipToday(habit) && !habit.isForfeited) {
+        skipHabit(habit.id);
+        skipCount++;
+      }
     });
+    
+    if (skipCount > 0) {
+      toast.success(`Super Skip activated!`, {
+        description: `${skipCount} habits have been skipped.`,
+      });
+    } else {
+      toast.info('No habits available to skip right now.');
+    }
   };
 
   return (
