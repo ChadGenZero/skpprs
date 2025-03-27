@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -133,11 +134,14 @@
   height: 70%;
   border-radius: 50%;
   background: conic-gradient(
-    #ff6600 0deg 45deg,
-    white 45deg 135deg, 
-    #ff6600 135deg 225deg, 
-    white 225deg 315deg, 
-    #ff6600 315deg 360deg
+    #ff6600 0deg 45deg,      /* Orange section 1 */
+    white 45deg 90deg,       /* White section 1 */
+    #ff6600 90deg 135deg,    /* Orange section 2 */
+    white 135deg 180deg,     /* White section 2 */
+    #ff6600 180deg 225deg,   /* Orange section 3 */
+    white 225deg 270deg,     /* White section 3 */
+    #ff6600 270deg 315deg,   /* Orange section 4 */
+    white 315deg 360deg      /* White section 4 */
   );
   border: 2px solid #000;
   z-index: 1;
@@ -150,7 +154,7 @@
   width: 30%;
   height: 30%;
   border-radius: 50%;
-  background: white;
+  background: transparent;  /* Make the center transparent */
   border: 2px solid #000;
   z-index: 2;
   display: flex;
