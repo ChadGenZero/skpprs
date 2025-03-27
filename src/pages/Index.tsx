@@ -41,7 +41,7 @@ const MainContent: React.FC = () => {
         <div className="flex items-center gap-2">
           <SLogo />
           <div className="flex flex-col">
-            <h1 className="text-2xl font-bold text-royal-blue">Skiiper</h1>
+            <h1 className="text-2xl font-bold text-royal-blue">Skiipper</h1>
             <p className="text-xs text-gray-500 ml-1">Set Sail</p>
           </div>
         </div>
