@@ -49,7 +49,7 @@ const Landing: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="container mx-auto px-4 py-12">
         <header className="flex justify-center md:justify-between items-center py-4 mb-12">
-          <div className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 bg-royal-blue rounded-md text-white">
               <span className="text-2xl font-bold tracking-tighter">S</span>
             </div>
@@ -57,7 +57,7 @@ const Landing: React.FC = () => {
               <h1 className="text-2xl font-bold text-royal-blue">Skiipper</h1>
               <p className="text-xs text-gray-500 ml-1">Set Sail</p>
             </div>
-          </div>
+          </Link>
           <div className="hidden md:flex space-x-4">
             <Link to="/">
               <Button variant="ghost">Home</Button>

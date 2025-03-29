@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { AppProvider, useAppContext } from '@/context/AppContext';
 import ProgressBar from '@/components/ProgressBar';
 import HabitSelector from '@/components/HabitSelector';
@@ -38,13 +39,13 @@ const MainContent: React.FC = () => {
   return (
     <div className="app-container">
       <header className="flex justify-center md:justify-between items-center py-4 mb-4">
-        <div className="flex items-center gap-2">
+        <Link to="/" className="flex items-center gap-2">
           <SLogo />
           <div className="flex flex-col">
             <h1 className="text-2xl font-bold text-royal-blue">Skiipper</h1>
             <p className="text-xs text-gray-500 ml-1">Set Sail</p>
           </div>
-        </div>
+        </Link>
         <p className="hidden md:block text-sm text-gray-500">Skip, Save, & Stack Sats!</p>
       </header>
 
