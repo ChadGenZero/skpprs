@@ -63,7 +63,7 @@ const Landing: React.FC = () => {
               <Button variant="ghost">Home</Button>
             </Link>
             <Link to="/app">
-              <Button variant="primary" className="bg-royal-blue hover:bg-royal-blue/90">
+              <Button variant="default" className="bg-royal-blue hover:bg-royal-blue/90">
                 Get Started
               </Button>
             </Link>
@@ -80,7 +80,7 @@ const Landing: React.FC = () => {
                 </p>
                 <div className="md:hidden mt-8">
                   <Link to="/app">
-                    <Button className="w-full bg-royal-blue hover:bg-royal-blue/90">Get Started</Button>
+                    <Button variant="default" className="w-full bg-royal-blue hover:bg-royal-blue/90">Get Started</Button>
                   </Link>
                 </div>
               </div>
