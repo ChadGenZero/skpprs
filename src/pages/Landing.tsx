@@ -77,19 +77,16 @@ const PositionedEmojis = () => (
         className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
         style={{ 
           top: '40%',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          left: '75%',
         }}
       >
         🐋
       </span>
-    </div>
-    <div className="hidden md:block">
       <span 
         className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
         style={{ 
-          top: '55%',
-          right: '5%',
+          top: '60%',
+          right: '10%',
         }}
       >
         🐠
@@ -97,8 +94,8 @@ const PositionedEmojis = () => (
       <span 
         className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
         style={{ 
-          top: '60%',
-          left: '5%',
+          top: '70%',
+          left: '8%',
         }}
       >
         👩‍✈️
@@ -106,9 +103,8 @@ const PositionedEmojis = () => (
       <span 
         className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
         style={{ 
-          top: '80%',
-          left: '50%',
-          transform: 'translateX(-50%)',
+          bottom: '10%',
+          right: '15%',
         }}
       >
         ⚓
@@ -127,11 +123,38 @@ const PositionedEmojis = () => (
       <span 
         className="absolute animate-bounce-subtle text-3xl"
         style={{ 
+          top: '10%',
+          left: '5%',
+        }}
+      >
+        👨‍✈️
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-3xl"
+        style={{ 
           top: '45%',
           left: '8%',
         }}
       >
         🐠
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-3xl"
+        style={{ 
+          bottom: '15%',
+          right: '8%',
+        }}
+      >
+        ⚓
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-3xl"
+        style={{ 
+          bottom: '40%',
+          right: '12%',
+        }}
+      >
+        🐋
       </span>
     </div>
   </div>
@@ -237,4 +260,3 @@ const Landing: React.FC = () => {
 };
 
 export default Landing;
-
