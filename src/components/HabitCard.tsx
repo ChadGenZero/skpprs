@@ -1,8 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Habit } from '@/context/AppContext';
-import { Button } from '@/components/ui/button';
-import { Undo, LifeBuoy } from 'lucide-react';
+import { Undo } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils';
 
@@ -21,11 +20,27 @@ const HabitCard: React.FC<HabitCardProps> = ({
 }) => {
   const isSkipped = progress.completed > 0;
   const [animationKey, setAnimationKey] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
   
   // Reset animation key when skipped status changes to force animation replay
   useEffect(() => {
     setAnimationKey(prev => prev + 1);
+    setIsAnimating(true);
+    
+    // Reset animation state after animation completes
+    const timer = setTimeout(() => {
+      setIsAnimating(false);
+    }, 1000);
+    
+    return () => clearTimeout(timer);
   }, [isSkipped]);
+  
+  // Generate unique IDs for this specific habit card
+  const uniqueId = `habit-${habit.id}`;
+  const sandGradientId = `sandGradient-${uniqueId}`;
+  const waterGradientId = `waterGradient-${uniqueId}`;
+  const sandPatternId = `sandPattern-${uniqueId}`;
+  const sandLightingId = `sandLighting-${uniqueId}`;
   
   return (
     <div 
@@ -37,7 +52,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
     >
       {/* Background with Sand and Water as SVG shapes */}
       <svg
-        key={animationKey}
+        key={`svg-${uniqueId}-${animationKey}`}
         preserveAspectRatio="none"
         viewBox="0 0 1200 600"
         xmlns="http://www.w3.org/2000/svg"
@@ -45,7 +60,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
       >
         {/* Define gradients and patterns */}
         <defs>
-          <linearGradient id={`sandGradient-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id={sandGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" style={{ stopColor: '#f7e1a8', stopOpacity: 1 }} />
             <stop offset="20%" style={{ stopColor: '#edd3a0', stopOpacity: 1 }} />
             <stop offset="40%" style={{ stopColor: '#d4a76a', stopOpacity: 1 }} />
@@ -54,13 +69,13 @@ const HabitCard: React.FC<HabitCardProps> = ({
             <stop offset="100%" style={{ stopColor: '#c2975a', stopOpacity: 1 }} />
           </linearGradient>
           
-          <linearGradient id={`waterGradient-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id={waterGradientId} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" style={{ stopColor: '#80E0F5', stopOpacity: 1 }} />
             <stop offset="50%" style={{ stopColor: '#1E90FF', stopOpacity: 1 }} />
             <stop offset="100%" style={{ stopColor: '#003D66', stopOpacity: 1 }} />
           </linearGradient>
           
-          <pattern id={`sandPattern-${habit.id}`} patternUnits="userSpaceOnUse" width="80" height="80">
+          <pattern id={sandPatternId} patternUnits="userSpaceOnUse" width="80" height="80">
             <rect width="80" height="80" fill="transparent" />
             <image
               href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"
@@ -76,7 +91,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
             />
           </pattern>
           
-          <linearGradient id={`sandLighting-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id={sandLightingId} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" style={{ stopColor: 'rgba(255, 255, 200, 0.3)', stopOpacity: 1 }} />
             <stop offset="70%" style={{ stopColor: 'transparent', stopOpacity: 1 }} />
             <stop offset="100%" style={{ stopColor: 'rgba(0, 0, 0, 0.2)', stopOpacity: 1 }} />
@@ -89,7 +104,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           y="0"
           width="1200"
           height="600"
-          fill={`url(#sandGradient-${habit.id})`}
+          fill={`url(#${sandGradientId})`}
         />
         
         {/* Sand Texture (Fades out when skipped) */}
@@ -98,7 +113,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           y="0"
           width="1200"
           height="600"
-          fill={`url(#sandPattern-${habit.id})`}
+          fill={`url(#${sandPatternId})`}
           opacity={isSkipped ? "0" : "0.5"}
           style={{ transition: 'opacity 0.5s ease-in-out' }}
         />
@@ -109,32 +124,24 @@ const HabitCard: React.FC<HabitCardProps> = ({
           y="0"
           width="1200"
           height="600"
-          fill={`url(#sandLighting-${habit.id})`}
+          fill={`url(#${sandLightingId})`}
           opacity={isSkipped ? "0" : "1"}
           style={{ transition: 'opacity 0.5s ease-in-out' }}
         />
         
-        {/* Water Shape - The position transitions from bottom to top when skipped */}
+        {/* Water Shape - The position is controlled by CSS animation */}
         <path
-          className={`water-shape-${habit.id}`}
-          d={isSkipped ? 
-            "M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0V600H0Z" : 
-            "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"
-          }
-          fill={`url(#waterGradient-${habit.id})`}
-          style={{ transition: 'd 0.5s ease-in-out' }}
+          className={`water-shape-${uniqueId} ${isSkipped ? 'water-flooded' : 'water-low'}`}
+          d="M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"
+          fill={`url(#${waterGradientId})`}
         />
         
-        {/* Foam Effect on the Water's Edge - This also transitions with the water */}
+        {/* Foam Effect on the Water's Edge */}
         <path
-          className={`foam-shape-${habit.id}`}
-          d={isSkipped ? 
-            "M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z" : 
-            "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"
-          }
+          className={`foam-shape-${uniqueId} ${isSkipped ? 'foam-flooded' : 'foam-low'}`}
+          d="M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"
           fill="white"
           fillOpacity="0.5"
-          style={{ transition: 'd 0.5s ease-in-out' }}
         />
       </svg>
       
@@ -180,7 +187,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
         </button>
       )}
 
-      <style>{`
+      <style jsx>{`
         /* Lifebuoy styles */
         .lifebuoyContainer {
           position: relative;
@@ -304,102 +311,62 @@ const HabitCard: React.FC<HabitCardProps> = ({
           z-index: 1;
         }
 
-        /* Animation for water wave and foam */
-        ${Array.from({ length: 5 }).map((_, i) => `
-          .water-shape-${i + 1} {
-            animation: ripple-wave-${i + 1} 3s ease-in-out infinite;
-          }
-          
-          .foam-shape-${i + 1} {
-            animation: wave-foam-${i + 1} 2.5s ease-in-out infinite reverse;
-          }
-          
-          @keyframes ripple-wave-${i + 1} {
-            0% {
-              d: path("${isSkipped ? 
-                "M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0V600H0Z" : 
-                "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"}");
-            }
-            50% {
-              d: path("${isSkipped ? 
-                "M0,0V40C40,20,100,60,180,40C260,20,340,40,420,20C500,0,580,20,660,0C740,-20,820,0,900,-20C980,-40,1060,-20,1140,0C1200,-20,1200,0,1200,0V600H0Z" : 
-                "M0,300C40,280,100,320,180,300C260,280,340,300,420,280C500,260,580,280,660,260C740,240,820,260,900,240C980,220,1060,240,1140,220C1200,200,1200,220,1200,240V600H0Z"}");
-            }
-            100% {
-              d: path("${isSkipped ? 
-                "M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0V600H0Z" : 
-                "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"}");
-            }
-          }
-          
-          @keyframes wave-foam-${i + 1} {
-            0% {
-              d: path("${isSkipped ? 
-                "M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z" : 
-                "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"}");
-              opacity: 0.5;
-            }
-            50% {
-              d: path("${isSkipped ? 
-                "M0,0V20C30,5,80,30,160,15C240,0,320,20,400,5C480,-10,560,0,640,-15C720,-30,800,-10,880,-25C960,-40,1040,-20,1120,-35C1180,-50,1200,-20,1200,0V20C1170,35,1110,10,1050,25C970,40,890,15,810,30C730,45,650,20,570,35C490,50,410,25,330,40C250,55,170,30,90,45C30,60,0,35,0,20Z" : 
-                "M0,300C30,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1170,260,1110,240,1050,260C970,280,890,260,810,280C730,300,650,280,570,300C490,320,410,300,330,320C250,340,170,320,90,340C30,360,0,340,0,320Z"}");
-              opacity: 0.8;
-            }
-            100% {
-              d: path("${isSkipped ? 
-                "M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z" : 
-                "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"}");
-              opacity: 0.5;
-            }
-          }
-        `).join('\n')}
-        
-        /* Custom animations for each habit's water */
-        .water-shape-${habit.id} {
-          animation: ripple-wave-${habit.id} 3s ease-in-out infinite;
+        /* Water and foam animations */
+        .water-shape-${uniqueId} {
+          transition: transform 0.8s ease-in-out;
         }
         
-        .foam-shape-${habit.id} {
-          animation: wave-foam-${habit.id} 2.5s ease-in-out infinite reverse;
+        .water-flooded {
+          transform: translateY(-300px);
         }
         
-        @keyframes ripple-wave-${habit.id} {
+        .water-low {
+          transform: translateY(0);
+        }
+        
+        .foam-shape-${uniqueId} {
+          transition: transform 0.8s ease-in-out;
+        }
+        
+        .foam-flooded {
+          transform: translateY(-300px);
+        }
+        
+        .foam-low {
+          transform: translateY(0);
+        }
+        
+        /* Ripple effect */
+        @keyframes ripple-wave {
           0% {
-            d: path("${isSkipped ? 
-              "M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0V600H0Z" : 
-              "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"}");
+            transform: translateY(${isSkipped ? -300 : 0}px) scaleY(1);
           }
           50% {
-            d: path("${isSkipped ? 
-              "M0,0V40C40,20,100,60,180,40C260,20,340,40,420,20C500,0,580,20,660,0C740,-20,820,0,900,-20C980,-40,1060,-20,1140,0C1200,-20,1200,0,1200,0V600H0Z" : 
-              "M0,300C40,280,100,320,180,300C260,280,340,300,420,280C500,260,580,280,660,260C740,240,820,260,900,240C980,220,1060,240,1140,220C1200,200,1200,220,1200,240V600H0Z"}");
+            transform: translateY(${isSkipped ? -300 : 0}px) scaleY(0.95);
           }
           100% {
-            d: path("${isSkipped ? 
-              "M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0V600H0Z" : 
-              "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"}");
+            transform: translateY(${isSkipped ? -300 : 0}px) scaleY(1);
           }
         }
         
-        @keyframes wave-foam-${habit.id} {
+        .water-shape-${uniqueId} {
+          animation: ripple-wave 3s infinite ease-in-out;
+        }
+        
+        @keyframes foam-wave {
           0% {
-            d: path("${isSkipped ? 
-              "M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z" : 
-              "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"}");
             opacity: 0.5;
           }
           50% {
-            d: path("${isSkipped ? 
-              "M0,0V20C30,5,80,30,160,15C240,0,320,20,400,5C480,-10,560,0,640,-15C720,-30,800,-10,880,-25C960,-40,1040,-20,1120,-35C1180,-50,1200,-20,1200,0V20C1170,35,1110,10,1050,25C970,40,890,15,810,30C730,45,650,20,570,35C490,50,410,25,330,40C250,55,170,30,90,45C30,60,0,35,0,20Z" : 
-              "M0,300C30,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1170,260,1110,240,1050,260C970,280,890,260,810,280C730,300,650,280,570,300C490,320,410,300,330,320C250,340,170,320,90,340C30,360,0,340,0,320Z"}");
             opacity: 0.8;
           }
           100% {
-            d: path("${isSkipped ? 
-              "M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z" : 
-              "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"}");
             opacity: 0.5;
           }
+        }
+        
+        .foam-shape-${uniqueId} {
+          animation: foam-wave 2s infinite ease-in-out;
         }
       `}</style>
     </div>
