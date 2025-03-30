@@ -29,90 +29,109 @@ const HabitCard: React.FC<HabitCardProps> = ({
       )}
       onClick={onClick}
     >
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        {/* Sand part */}
-        <div 
-          className={cn(
-            "absolute top-0 left-0 right-0 transition-all duration-500 ease-in-out",
-            isSkipped ? "h-0" : "h-1/2"
-          )}
-          style={{
-            background: 'linear-gradient(to bottom, #f7e1a8, #edd3a0, #d4a76a, #c2975a, #a87e4a, #c2975a)', // More diverse sand tones
-          }}
-        >
-          <div className="absolute inset-0">
-            {/* Sand texture with enhanced graininess */}
-            <div 
-              className="absolute inset-0 opacity-50" 
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"),
-                                 url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='speckleFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 0 0 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23speckleFilter)'/%3E%3C/svg%3E")`,
-                backgroundSize: '80px, 40px',
-                backgroundBlendMode: 'overlay, soft-light',
-                filter: 'contrast(1.2) brightness(1.1)',
-              }}
-            ></div>
-            
-            {/* Sand lighting and shadow effect */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to bottom, rgba(255, 255, 200, 0.3) 0%, transparent 70%, rgba(0, 0, 0, 0.2) 100%)',
-                backgroundImage: 'radial-gradient(circle at 60% 20%, rgba(255, 255, 200, 0.4) 0%, transparent 50%)',
-              }}
-            ></div>
-          </div>
-        </div>
+      {/* Background with Sand and Water as SVG shapes */}
+      <svg
+        preserveAspectRatio="none"
+        viewBox="0 0 1200 600"
+        xmlns="http://www.w3.org/2000/svg"
+        className="absolute inset-0 w-full h-full z-0"
+      >
+        {/* Sand shape */}
+        <path
+          className="sand-shape"
+          d={isSkipped ? "M0,0H1200V0H0Z" : "M0,0H1200V300C1180,320,1120,280,1060,300C980,320,900,280,820,300C740,320,660,280,580,300C500,320,420,280,340,300C260,320,180,280,100,300C40,320,0,280,0,300V0Z"}
+          fill="url(#sandGradient)"
+          style={{ transition: 'd 0.5s ease-in-out' }}
+        />
         
-        {/* Water part with a single shape and ripple wave line at the top */}
-        <div 
-          className={cn(
-            "absolute left-0 right-0 bottom-0 transition-all duration-500 ease-in-out",
-            isSkipped ? "h-full top-0" : "h-1/2 top-1/2"
-          )}
-        >
-          {/* Water background */}
-          <div 
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(to bottom, #80E0F5 0%, #1E90FF 50%, #003D66 100%)', // Ocean tones
-            }}
-          >
-            {/* Water texture */}
-            <div 
-              className="absolute inset-0 opacity-40"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                backgroundSize: '120px',
-                animation: 'water-shimmer 8s linear infinite',
-              }}
-            ></div>
-          </div>
+        {/* Define gradients and patterns */}
+        <defs>
+          <linearGradient id="sandGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#f7e1a8', stopOpacity: 1 }} />
+            <stop offset="20%" style={{ stopColor: '#edd3a0', stopOpacity: 1 }} />
+            <stop offset="40%" style={{ stopColor: '#d4a76a', stopOpacity: 1 }} />
+            <stop offset="60%" style={{ stopColor: '#c2975a', stopOpacity: 1 }} />
+            <stop offset="80%" style={{ stopColor: '#a87e4a', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#c2975a', stopOpacity: 1 }} />
+          </linearGradient>
           
-          {/* Ripple wave line at the top */}
-          <svg 
-            preserveAspectRatio="none" 
-            viewBox="0 0 1200 120" 
-            xmlns="http://www.w3.org/2000/svg" 
-            className="absolute top-0 left-0 w-full h-16"
-          >
-            {/* Main ripple wave */}
-            <path 
-              d="M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z"
-              fill="#1E90FF" 
-              fillOpacity="0.9"
-              style={{ animation: 'ripple-wave 3s ease-in-out infinite' }}
-            ></path>
-            {/* Foam effect on the ripple */}
-            <path 
-              d="M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0H0Z"
-              fill="white" 
-              fillOpacity="0.5"
-              style={{ animation: 'wave-foam 2.5s ease-in-out infinite reverse' }}
-            ></path>
-          </svg>
-        </div>
-      </div>
+          <linearGradient id="waterGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#80E0F5', stopOpacity: 1 }} />
+            <stop offset="50%" style={{ stopColor: '#1E90FF', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#003D66', stopOpacity: 1 }} />
+          </linearGradient>
+          
+          <pattern id="sandPattern" patternUnits="userSpaceOnUse" width="80" height="80">
+            <rect width="80" height="80" fill="transparent" />
+            <image
+              href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"
+              width="80"
+              height="80"
+              opacity="0.5"
+            />
+            <image
+              href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='speckleFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 0 0 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23speckleFilter)'/%3E%3C/svg%3E"
+              width="40"
+              height="40"
+              opacity="0.5"
+            />
+          </pattern>
+          
+          <mask id="sandMask">
+            <path
+              className="sand-shape"
+              d={isSkipped ? "M0,0H1200V0H0Z" : "M0,0H1200V300C1180,320,1120,280,1060,300C980,320,900,280,820,300C740,320,660,280,580,300C500,320,420,280,340,300C260,320,180,280,100,300C40,320,0,280,0,300V0Z"}
+              fill="white"
+              style={{ transition: 'd 0.5s ease-in-out' }}
+            />
+          </mask>
+          
+          <linearGradient id="sandLighting" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: 'rgba(255, 255, 200, 0.3)', stopOpacity: 1 }} />
+            <stop offset="70%" style={{ stopColor: 'transparent', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: 'rgba(0, 0, 0, 0.2)', stopOpacity: 1 }} />
+          </linearGradient>
+        </defs>
+        
+        {/* Sand texture */}
+        <rect
+          x="0"
+          y="0"
+          width="1200"
+          height="600"
+          fill="url(#sandPattern)"
+          mask="url(#sandMask)"
+        />
+        
+        {/* Sand lighting effect */}
+        <path
+          className="sand-shape"
+          d={isSkipped ? "M0,0H1200V0H0Z" : "M0,0H1200V300C1180,320,1120,280,1060,300C980,320,900,280,820,300C740,320,660,280,580,300C500,320,420,280,340,300C260,320,180,280,100,300C40,320,0,280,0,300V0Z"}
+          fill="url(#sandLighting)"
+          style={{ transition: 'd 0.5s ease-in-out' }}
+        />
+        
+        {/* Water shape with ripple wave at the top */}
+        <path
+          className="water-shape"
+          d={isSkipped ? 
+            "M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H1200V600H0Z" : 
+            "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"}
+          fill="url(#waterGradient)"
+          style={{ transition: 'd 0.5s ease-in-out' }}
+        />
+        
+        {/* Foam effect on the ripple */}
+        <path
+          className="foam-shape"
+          d={isSkipped ? 
+            "M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0H1200V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z" : 
+            "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"}
+          fill="white"
+          fillOpacity="0.5"
+          style={{ transition: 'd 0.5s ease-in-out' }}
+        />
+      </svg>
       
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center">
@@ -280,42 +299,50 @@ const HabitCard: React.FC<HabitCardProps> = ({
           z-index: 1;
         }
 
-        /* Water and wave animations */
-        @keyframes water-shimmer {
-          0% {
-            background-position: 0 0;
-          }
-          100% {
-            background-position: 120px 120px;
-          }
+        /* Animation for water wave and foam */
+        .water-shape {
+          animation: ripple-wave 3s ease-in-out infinite;
+        }
+
+        .foam-shape {
+          animation: wave-foam 2.5s ease-in-out infinite reverse;
         }
 
         @keyframes ripple-wave {
           0% {
-            transform: translateX(0) scaleY(1);
-            d: path("M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z");
+            d: path("${isSkipped ? 
+              "M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H1200V600H0Z" : 
+              "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"}");
           }
           50% {
-            transform: translateX(-20px) scaleY(1.2);
-            d: path("M0,0V40C40,20,100,60,180,40C260,20,340,40,420,20C500,0,580,20,660,0C740,-20,820,0,900,-20C980,-40,1060,-20,1140,0C1200,-20,1200,0,1200,0H0Z");
+            d: path("${isSkipped ? 
+              "M0,0V40C40,20,100,60,180,40C260,20,340,40,420,20C500,0,580,20,660,0C740,-20,820,0,900,-20C980,-40,1060,-20,1140,0C1200,-20,1200,0,1200,0H1200V600H0Z" : 
+              "M0,300C40,280,100,320,180,300C260,280,340,300,420,280C500,260,580,280,660,260C740,240,820,260,900,240C980,220,1060,240,1140,220C1200,200,1200,220,1200,240V600H0Z"}");
           }
           100% {
-            transform: translateX(0) scaleY(1);
-            d: path("M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z");
+            d: path("${isSkipped ? 
+              "M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H1200V600H0Z" : 
+              "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240V600H0Z"}");
           }
         }
 
         @keyframes wave-foam {
           0% {
-            transform: translateX(0) scaleY(1);
+            d: path("${isSkipped ? 
+              "M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0H1200V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z" : 
+              "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"}");
             opacity: 0.5;
           }
           50% {
-            transform: translateX(-15px) scaleY(1.3);
+            d: path("${isSkipped ? 
+              "M0,0V20C30,5,80,30,160,15C240,0,320,20,400,5C480,-10,560,0,640,-15C720,-30,800,-10,880,-25C960,-40,1040,-20,1120,-35C1180,-50,1200,-20,1200,0H1200V20C1170,35,1110,10,1050,25C970,40,890,15,810,30C730,45,650,20,570,35C490,50,410,25,330,40C250,55,170,30,90,45C30,60,0,35,0,20Z" : 
+              "M0,300C30,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1170,260,1110,240,1050,260C970,280,890,260,810,280C730,300,650,280,570,300C490,320,410,300,330,320C250,340,170,320,90,340C30,360,0,340,0,320Z"}");
             opacity: 0.8;
           }
           100% {
-            transform: translateX(0) scaleY(1);
+            d: path("${isSkipped ? 
+              "M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0H1200V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z" : 
+              "M0,300C20,280,80,320,160,300C240,280,320,300,400,280C480,260,560,280,640,260C720,240,800,260,880,240C960,220,1040,240,1120,220C1180,200,1200,220,1200,240C1180,260,1120,240,1060,260C980,280,900,260,820,280C740,300,660,280,580,300C500,320,420,300,340,320C260,340,180,320,100,340C40,360,0,340,0,320Z"}");
             opacity: 0.5;
           }
         }
