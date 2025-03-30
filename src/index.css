@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -217,7 +216,7 @@
 }
 
 .ocean-pattern {
-  animation: ocean-wave 30s linear infinite;
+  animation: ocean-wave 60s linear infinite;
 }
 
 @keyframes ocean-wave {

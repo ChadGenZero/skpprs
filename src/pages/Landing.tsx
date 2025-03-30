@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 
-// Reduced list of habits focusing on the 5 requested types
 const habitItems = [
   { 
     name: "Coffee", 
@@ -44,7 +42,6 @@ const habitItems = [
   }
 ];
 
-// Emoji components with positioning classes
 const PositionedEmojis = () => (
   <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
     <span className="emoji-bounce absolute text-3xl top-[15%] left-[10%]">👨‍✈️</span>
@@ -60,10 +57,9 @@ const PositionedEmojis = () => (
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      {/* Ocean ripple background with slow animation */}
-      <div className="absolute inset-0 z-0">
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 ocean-pattern">
-          <svg width="100%" height="100%">
+          <svg width="100%" height="100%" viewBox="0 0 100 20">
             <defs>
               <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
                 <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.15" />
@@ -79,7 +75,6 @@ const Landing: React.FC = () => {
         </div>
       </div>
       
-      {/* Positioned emojis layer */}
       <PositionedEmojis />
       
       <div className="container mx-auto px-4 py-12 relative z-10">
