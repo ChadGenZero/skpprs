@@ -64,108 +64,53 @@ const HabitCard: React.FC<HabitCardProps> = ({
           </div>
         </div>
         
-        {/* Wavy divider between sand and water with enhanced natural wave shape and animation */}
+        {/* Water part with a single shape and ripple wave line at the top */}
         <div 
           className={cn(
-            "absolute left-0 right-0 h-24 transition-all duration-500 ease-in-out z-10",
-            isSkipped ? "-top-24" : "top-[calc(50%-24px)]"
+            "absolute left-0 right-0 bottom-0 transition-all duration-500 ease-in-out",
+            isSkipped ? "h-full top-0" : "h-1/2 top-1/2"
           )}
         >
+          {/* Water background */}
+          <div 
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(to bottom, #80E0F5 0%, #1E90FF 50%, #003D66 100%)', // Ocean tones
+            }}
+          >
+            {/* Water texture */}
+            <div 
+              className="absolute inset-0 opacity-40"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                backgroundSize: '120px',
+                animation: 'water-shimmer 8s linear infinite',
+              }}
+            ></div>
+          </div>
+          
+          {/* Ripple wave line at the top */}
           <svg 
             preserveAspectRatio="none" 
             viewBox="0 0 1200 120" 
             xmlns="http://www.w3.org/2000/svg" 
-            className="absolute bottom-0 left-0 w-full h-24"
+            className="absolute top-0 left-0 w-full h-16"
           >
-            {/* Base wave with irregular, natural shape */}
+            {/* Main ripple wave */}
             <path 
-              d="M0,0V90C20,60,80,100,160,80C240,60,320,90,400,70C480,50,560,80,640,60C720,40,800,70,880,50C960,30,1040,60,1120,40C1180,20,1200,40,1200,0H0Z"
-              fill="#80E0F5" 
-              fillOpacity="0.9"
-              style={{ animation: 'wave-motion 4s ease-in-out infinite' }}
-            ></path>
-            {/* Secondary wave for depth */}
-            <path 
-              d="M0,0V80C30,50,90,90,170,70C250,50,330,80,410,60C490,40,570,70,650,50C730,30,810,60,890,40C970,20,1050,50,1130,30C1190,10,1200,30,1200,0H0Z"
+              d="M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z"
               fill="#1E90FF" 
-              fillOpacity="0.7"
-              style={{ animation: 'wave-motion 5s ease-in-out infinite reverse' }}
+              fillOpacity="0.9"
+              style={{ animation: 'ripple-wave 3s ease-in-out infinite' }}
             ></path>
-            {/* Foam effect with animation */}
-            <path 
-              d="M0,0V40C20,20,70,50,150,30C230,10,310,40,390,20C470,0,550,30,630,10C710,-10,790,20,870,0C950,-20,1030,10,1110,-10C1170,-20,1200,0,1200,0H0Z"
-              fill="white" 
-              fillOpacity="0.7"
-              style={{ animation: 'wave-foam 3s ease-in-out infinite' }}
-            ></path>
-            {/* Secondary foam layer for realism */}
+            {/* Foam effect on the ripple */}
             <path 
               d="M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0H0Z"
               fill="white" 
-              fillOpacity="0.4"
+              fillOpacity="0.5"
               style={{ animation: 'wave-foam 2.5s ease-in-out infinite reverse' }}
             ></path>
           </svg>
-        </div>
-        
-        {/* Water part with enhanced realism */}
-        <div 
-          className={cn(
-            "absolute bottom-0 left-0 right-0 transition-all duration-500 ease-in-out",
-            isSkipped ? "h-full" : "h-1/2"
-          )}
-          style={{
-            background: 'linear-gradient(to bottom, #80E0F5 0%, #1E90FF 50%, #003D66 100%)',
-          }}
-        >
-          <div className="absolute inset-0">
-            {/* Water texture effect */}
-            <div className="absolute inset-0 opacity-40">
-              <div 
-                className="h-full w-full opacity-60"
-                style={{
-                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.4' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
-                  backgroundSize: '120px',
-                  animation: 'water-shimmer 8s linear infinite',
-                  filter: 'contrast(1.3)',
-                }}
-              ></div>
-            </div>
-            
-            {/* Subtle water shine/reflection */}
-            <div 
-              className="absolute inset-x-0 top-0 h-24 opacity-30"
-              style={{ 
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%)',
-                clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 60%)',
-                animation: 'shine-flow 15s linear infinite',
-              }}
-            ></div>
-            
-            {/* Dynamic waves */}
-            <div className="absolute inset-0 overflow-hidden opacity-70">
-              <div 
-                className="absolute top-1/4 left-0 right-0 h-4 bg-sky-100/70 rounded-full transform -rotate-3"
-                style={{ animation: 'ocean-wave 4s ease-in-out infinite alternate' }}
-              ></div>
-              <div 
-                className="absolute top-2/4 left-0 right-0 h-4 bg-sky-100/60 rounded-full transform rotate-3"
-                style={{ animation: 'ocean-wave 3.5s ease-in-out infinite alternate-reverse' }}
-              ></div>
-              <div 
-                className="absolute top-3/4 left-0 right-0 h-3 bg-sky-100/50 rounded-full transform -rotate-2"
-                style={{ animation: 'ocean-wave 5s ease-in-out infinite alternate' }}
-              ></div>
-            </div>
-            
-            {/* Depth effect */}
-            <div 
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(to bottom, transparent 50%, rgba(0, 0, 50, 0.4) 100%)',
-              }}
-            ></div>
-          </div>
         </div>
       </div>
       
@@ -335,22 +280,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           z-index: 1;
         }
 
-        /* Enhanced animations for water and waves */
-        @keyframes ocean-wave {
-          0% {
-            transform: translateX(-20px) scaleX(0.9) rotate(-3deg);
-            opacity: 0.7;
-          }
-          50% {
-            transform: translateX(0) scaleX(1.1) rotate(0deg);
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(20px) scaleX(0.9) rotate(3deg);
-            opacity: 0.7;
-          }
-        }
-
+        /* Water and wave animations */
         @keyframes water-shimmer {
           0% {
             background-position: 0 0;
@@ -360,44 +290,33 @@ const HabitCard: React.FC<HabitCardProps> = ({
           }
         }
 
-        @keyframes shine-flow {
-          0% {
-            transform: translateX(-150%) skewX(-15deg);
-            opacity: 0.3;
-          }
-          50% {
-            opacity: 0.5;
-          }
-          100% {
-            transform: translateX(150%) skewX(15deg);
-            opacity: 0.3;
-          }
-        }
-
-        @keyframes wave-motion {
+        @keyframes ripple-wave {
           0% {
             transform: translateX(0) scaleY(1);
+            d: path("M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z");
           }
           50% {
-            transform: translateX(-20px) scaleY(1.3);
+            transform: translateX(-20px) scaleY(1.2);
+            d: path("M0,0V40C40,20,100,60,180,40C260,20,340,40,420,20C500,0,580,20,660,0C740,-20,820,0,900,-20C980,-40,1060,-20,1140,0C1200,-20,1200,0,1200,0H0Z");
           }
           100% {
             transform: translateX(0) scaleY(1);
+            d: path("M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z");
           }
         }
 
         @keyframes wave-foam {
           0% {
             transform: translateX(0) scaleY(1);
-            opacity: 0.7;
+            opacity: 0.5;
           }
           50% {
-            transform: translateX(-15px) scaleY(1.4);
-            opacity: 1;
+            transform: translateX(-15px) scaleY(1.3);
+            opacity: 0.8;
           }
           100% {
             transform: translateX(0) scaleY(1);
-            opacity: 0.7;
+            opacity: 0.5;
           }
         }
       `}</style>
