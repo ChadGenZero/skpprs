@@ -64,10 +64,11 @@ const Landing: React.FC = () => {
           <svg width="100%" height="100%" viewBox="0 0 100 20">
             <defs>
               <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
-                <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.15" />
+                {/* Adjusting the wave size to be smaller */}
+                <path d="M0,10 Q25,15 50,10 Q75,5 100,10 Q125,15 150,10" fill="none" stroke="#0EA5E9" strokeWidth="0.8" opacity="0.15" />
               </pattern>
             </defs>
-            {/* Ensure the waves fill the screen without spilling out */}
+            {/* Fill the screen but avoid excess movement outside */}
             <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
             <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" />
             <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" />
