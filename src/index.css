@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -219,78 +220,7 @@
   animation: ocean-wave 15s linear infinite;
 }
 
-/* Wave background styles */
-.wave-container {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.wave {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-.wave-item {
-  position: absolute;
-  width: 100%;
-  right: -50%;
-  background: rgba(30, 174, 219, 0.2);
-}
-
-.wave-item:nth-child(1) {
-  height: 180px;
-  border-radius: 40%;
-  top: 10%;
-  animation: wave-roll-1 12s linear infinite;
-}
-
-.wave-item:nth-child(2) {
-  height: 140px; 
-  border-radius: 38%;
-  top: 40%;
-  background: rgba(14, 165, 233, 0.15);
-  animation: wave-roll-2 10s linear infinite;
-}
-
-.wave-item:nth-child(3) {
-  height: 160px;
-  border-radius: 42%;
-  top: 70%;
-  background: rgba(6, 182, 212, 0.1);
-  animation: wave-roll-3 14s linear infinite;
-}
-
-@keyframes wave-roll-1 {
-  0% {
-    transform: translateX(-5%) rotate(0);
-  }
-  100% {
-    transform: translateX(-100%) rotate(360deg);
-  }
-}
-
-@keyframes wave-roll-2 {
-  0% {
-    transform: translateX(0) rotate(0);
-  }
-  100% {
-    transform: translateX(-100%) rotate(-360deg);
-  }
-}
-
-@keyframes wave-roll-3 {
-  0% {
-    transform: translateX(-10%) rotate(0);
-  }
-  100% {
-    transform: translateX(-100%) rotate(360deg);
-  }
-}
+/* Removed all wave-container, wave, wave-item related styles and keyframes */
 
 .emoji-bounce {
   animation: gentle-bounce 3s ease-in-out infinite;

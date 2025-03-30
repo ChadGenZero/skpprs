@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -54,20 +55,12 @@ const PositionedEmojis = () => (
   </div>
 );
 
-const GlowingWavesBackground = () => (
-  <div className="wave-container">
-    <div className="wave">
-      <div className="wave-item"></div>
-      <div className="wave-item"></div>
-      <div className="wave-item"></div>
-    </div>
-  </div>
-);
+// Removed GlowingWavesBackground component
 
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      <GlowingWavesBackground />
+      {/* Removed GlowingWavesBackground component from here */}
       
       <PositionedEmojis />
       
