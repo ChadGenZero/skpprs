@@ -34,10 +34,10 @@ const HabitCard: React.FC<HabitCardProps> = ({
         <div 
           className={cn(
             "absolute top-0 left-0 right-0 transition-all duration-500 ease-in-out",
-            isSkipped ? "h-0" : "h-1/2"
+            isSkipped ? "h-0" : "h-full"
           )}
           style={{
-            background: 'linear-gradient(to bottom, #f7e1a8, #edd3a0, #d4a76a, #c2975a, #a87e4a, #c2975a)', // More diverse sand tones
+            background: 'linear-gradient(to bottom, #f7e1a8, #edd3a0, #d4a76a, #c2975a, #a87e4a)', // Diverse sand tones
           }}
         >
           <div className="absolute inset-0">
@@ -64,11 +64,11 @@ const HabitCard: React.FC<HabitCardProps> = ({
           </div>
         </div>
         
-        {/* Water part with a single shape and ripple wave line at the top */}
+        {/* Water part with ripple wave overlay */}
         <div 
           className={cn(
             "absolute left-0 right-0 bottom-0 transition-all duration-500 ease-in-out",
-            isSkipped ? "h-full top-0" : "h-1/2 top-1/2"
+            isSkipped ? "h-full" : "h-1/2"
           )}
         >
           {/* Water background */}
@@ -88,28 +88,53 @@ const HabitCard: React.FC<HabitCardProps> = ({
               }}
             ></div>
           </div>
-          
-          {/* Ripple wave line at the top */}
+
+          {/* Ripple wave shape clipping the water */}
+          <div className="absolute top-0 left-0 right-0 overflow-hidden">
+            <svg 
+              viewBox="0 0 1200 120" 
+              preserveAspectRatio="none"
+              className="w-full h-20 -translate-y-full"
+              style={{ filter: 'drop-shadow(0px 3px 3px rgba(0,0,0,0.1))' }}
+            >
+              <path 
+                d="M0,120 L0,40 C20,60,80,20,160,40 C240,60,320,40,400,60 C480,80,560,60,640,80 C720,100,800,80,880,100 C960,120,1040,100,1120,120 L1200,120 L1200,40 C1180,60,1120,20,1060,40 C980,60,900,40,820,60 C740,80,660,60,580,80 C500,100,420,80,340,100 C260,120,180,100,100,120 L0,120 Z"
+                fill="#80E0F5"
+                className="wave-path"
+              />
+            </svg>
+          </div>
+        </div>
+
+        {/* Ripple wave overlay at the boundary */}
+        <div 
+          className={cn(
+            "absolute left-0 right-0 z-10 transition-all duration-500 ease-in-out overflow-hidden",
+            isSkipped ? "top-0 h-16" : `top-[calc(50%-16px)] h-16`
+          )}
+        >
           <svg 
             preserveAspectRatio="none" 
             viewBox="0 0 1200 120" 
             xmlns="http://www.w3.org/2000/svg" 
-            className="absolute top-0 left-0 w-full h-16"
+            className="absolute left-0 w-full h-full"
+            style={{ filter: 'drop-shadow(0px 2px 3px rgba(0,0,0,0.15))' }}
           >
             {/* Main ripple wave */}
             <path 
-              d="M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z"
+              d="M0,120 L0,40 C20,60,80,20,160,40 C240,60,320,40,400,60 C480,80,560,60,640,80 C720,100,800,80,880,100 C960,120,1040,100,1120,120 L1200,120 L1200,40 C1180,60,1120,20,1060,40 C980,60,900,40,820,60 C740,80,660,60,580,80 C500,100,420,80,340,100 C260,120,180,100,100,120 L0,120 Z"
               fill="#1E90FF" 
               fillOpacity="0.9"
-              style={{ animation: 'ripple-wave 3s ease-in-out infinite' }}
-            ></path>
+              className="ripple-wave-main"
+            />
+            
             {/* Foam effect on the ripple */}
             <path 
-              d="M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0H0Z"
+              d="M0,120 L0,70 C15,85,60,60,140,75 C220,90,300,70,380,85 C460,100,540,80,620,95 C700,110,780,90,860,105 C940,120,1020,100,1100,115 C1160,130,1200,110,1200,120 L0,120 Z"
               fill="white" 
               fillOpacity="0.5"
-              style={{ animation: 'wave-foam 2.5s ease-in-out infinite reverse' }}
-            ></path>
+              className="ripple-wave-foam"
+            />
           </svg>
         </div>
       </div>
@@ -290,32 +315,54 @@ const HabitCard: React.FC<HabitCardProps> = ({
           }
         }
 
+        /* Animate the wave paths */
+        .ripple-wave-main {
+          animation: ripple-wave 4s ease-in-out infinite;
+        }
+
+        .ripple-wave-foam {
+          animation: wave-foam 3s ease-in-out infinite reverse;
+        }
+
+        .wave-path {
+          animation: wave-path 5s ease-in-out infinite;
+        }
+
         @keyframes ripple-wave {
           0% {
-            transform: translateX(0) scaleY(1);
-            d: path("M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z");
+            d: path("M0,120 L0,40 C20,60,80,20,160,40 C240,60,320,40,400,60 C480,80,560,60,640,80 C720,100,800,80,880,100 C960,120,1040,100,1120,120 L1200,120 L1200,40 C1180,60,1120,20,1060,40 C980,60,900,40,820,60 C740,80,660,60,580,80 C500,100,420,80,340,100 C260,120,180,100,100,120 L0,120 Z");
           }
           50% {
-            transform: translateX(-20px) scaleY(1.2);
-            d: path("M0,0V40C40,20,100,60,180,40C260,20,340,40,420,20C500,0,580,20,660,0C740,-20,820,0,900,-20C980,-40,1060,-20,1140,0C1200,-20,1200,0,1200,0H0Z");
+            d: path("M0,120 L0,60 C40,80,100,40,180,60 C260,80,340,60,420,80 C500,100,580,80,660,100 C740,120,820,100,900,120 L1200,120 L1200,60 C1160,80,1100,40,1020,60 C940,80,860,60,780,80 C700,100,620,80,540,100 C460,120,380,100,300,120 L0,120 Z");
           }
           100% {
-            transform: translateX(0) scaleY(1);
-            d: path("M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0H0Z");
+            d: path("M0,120 L0,40 C20,60,80,20,160,40 C240,60,320,40,400,60 C480,80,560,60,640,80 C720,100,800,80,880,100 C960,120,1040,100,1120,120 L1200,120 L1200,40 C1180,60,1120,20,1060,40 C980,60,900,40,820,60 C740,80,660,60,580,80 C500,100,420,80,340,100 C260,120,180,100,100,120 L0,120 Z");
+          }
+        }
+
+        @keyframes wave-path {
+          0% {
+            d: path("M0,120 L0,40 C20,60,80,20,160,40 C240,60,320,40,400,60 C480,80,560,60,640,80 C720,100,800,80,880,100 C960,120,1040,100,1120,120 L1200,120 L1200,40 C1180,60,1120,20,1060,40 C980,60,900,40,820,60 C740,80,660,60,580,80 C500,100,420,80,340,100 C260,120,180,100,100,120 L0,120 Z");
+          }
+          50% {
+            d: path("M0,120 L0,50 C30,70,90,30,170,50 C250,70,330,50,410,70 C490,90,570,70,650,90 C730,110,810,90,890,110 C970,130,1050,110,1130,130 L1200,120 L1200,50 C1170,70,1110,30,1030,50 C950,70,870,50,790,70 C710,90,630,70,550,90 C470,110,390,90,310,110 C230,130,150,110,70,130 L0,120 Z");
+          }
+          100% {
+            d: path("M0,120 L0,40 C20,60,80,20,160,40 C240,60,320,40,400,60 C480,80,560,60,640,80 C720,100,800,80,880,100 C960,120,1040,100,1120,120 L1200,120 L1200,40 C1180,60,1120,20,1060,40 C980,60,900,40,820,60 C740,80,660,60,580,80 C500,100,420,80,340,100 C260,120,180,100,100,120 L0,120 Z");
           }
         }
 
         @keyframes wave-foam {
           0% {
-            transform: translateX(0) scaleY(1);
+            d: path("M0,120 L0,70 C15,85,60,60,140,75 C220,90,300,70,380,85 C460,100,540,80,620,95 C700,110,780,90,860,105 C940,120,1020,100,1100,115 C1160,130,1200,110,1200,120 L0,120 Z");
             opacity: 0.5;
           }
           50% {
-            transform: translateX(-15px) scaleY(1.3);
-            opacity: 0.8;
+            d: path("M0,120 L0,80 C30,95,70,70,150,85 C230,100,310,80,390,95 C470,110,550,90,630,105 C710,120,790,100,870,115 C950,130,1030,110,1110,125 C1170,140,1200,120,1200,120 L0,120 Z");
+            opacity: 0.7;
           }
           100% {
-            transform: translateX(0) scaleY(1);
+            d: path("M0,120 L0,70 C15,85,60,60,140,75 C220,90,300,70,380,85 C460,100,540,80,620,95 C700,110,780,90,860,105 C940,120,1020,100,1100,115 C1160,130,1200,110,1200,120 L0,120 Z");
             opacity: 0.5;
           }
         }
