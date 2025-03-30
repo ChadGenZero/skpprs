@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -80,7 +81,7 @@ const PositionedEmojis = () => (
           transform: 'translateX(-50%)',
         }}
       >
-        💎
+        🐋
       </span>
     </div>
     <div className="hidden md:block">
@@ -91,7 +92,7 @@ const PositionedEmojis = () => (
           right: '5%',
         }}
       >
-        🐋
+        🐠
       </span>
       <span 
         className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
@@ -112,15 +113,6 @@ const PositionedEmojis = () => (
       >
         ⚓
       </span>
-      <span 
-        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
-        style={{ 
-          bottom: '10%',
-          right: '15%',
-        }}
-      >
-        💰
-      </span>
     </div>
     <div className="block md:hidden">
       <span 
@@ -139,16 +131,7 @@ const PositionedEmojis = () => (
           left: '8%',
         }}
       >
-        💎
-      </span>
-      <span 
-        className="absolute animate-bounce-subtle text-3xl"
-        style={{ 
-          bottom: '15%',
-          right: '12%',
-        }}
-      >
-        💰
+        🐠
       </span>
     </div>
   </div>
@@ -188,7 +171,7 @@ const Landing: React.FC = () => {
               <h2 className="text-4xl font-bold mb-6 text-gray-900">Skip, Save, & Stack Sats!</h2>
               <div className="glass-card p-8 mb-10 bg-white/80 backdrop-blur-sm rounded-xl shadow-md">
                 <p className="text-lg mb-6 text-gray-700 leading-relaxed">
-                  <span className="font-semibold">Hidden spending is costing you more than you think.</span> A survey found that the average person spends <span className="font-bold text-royal-blue">$18,000 a year</span> on non-essential items—lattes, impulse buys, streaming services, and more. These small purchases add up fast. See how much you could save by making small sacrifices for big rewards!
+                  Hidden spending is costing you more than you think. A survey found that the average person spends <span className="font-bold text-royal-blue">$18,000 a year</span> on non-essential items—lattes, impulse buys, streaming services, and more. These small purchases add up fast. See how much you could save by making small sacrifices for big rewards! 💎
                 </p>
                 <div className="md:hidden mt-8">
                   <Link to="/app">
@@ -232,7 +215,7 @@ const Landing: React.FC = () => {
                   </div>
                   
                   <div className="mt-10 text-center">
-                    <div className="mb-6 text-gray-700">Ready to see how much you can save?</div>
+                    <div className="mb-6 text-gray-700">Ready to see how much you can save? 💰</div>
                     <Link to="/app">
                       <Button size="lg" className="bg-royal-blue hover:bg-royal-blue/90">
                         Start Tracking Your Savings
@@ -254,3 +237,4 @@ const Landing: React.FC = () => {
 };
 
 export default Landing;
+
