@@ -44,14 +44,15 @@ const habitItems = [
 ];
 
 const PositionedEmojis = () => (
-  <div className="absolute inset-0 z-20 pointer-events-none">
+  <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 50, pointerEvents: 'none' }}>
     {/* Captain emoji at top left of text box */}
     <span 
-      className="emoji-bounce fixed text-6xl" 
+      className="animate-bounce-subtle" 
       style={{ 
+        position: 'absolute',
         top: '220px', 
-        left: '100px', 
-        position: 'absolute' 
+        left: '100px',
+        fontSize: '4rem'
       }}
     >
       👨‍✈️
@@ -59,11 +60,12 @@ const PositionedEmojis = () => (
 
     {/* Sailboat at bottom right of text box */}
     <span 
-      className="emoji-bounce fixed text-6xl" 
+      className="animate-bounce-subtle" 
       style={{ 
-        bottom: '250px', 
-        right: '100px', 
-        position: 'absolute' 
+        position: 'absolute',
+        bottom: '450px', 
+        right: '100px',
+        fontSize: '4rem'
       }}
     >
       ⛵
@@ -71,11 +73,12 @@ const PositionedEmojis = () => (
 
     {/* Whale at top right of "Skip & Save Sample" box */}
     <span 
-      className="emoji-bounce fixed text-6xl" 
+      className="animate-bounce-subtle" 
       style={{ 
+        position: 'absolute',
         top: '450px', 
-        right: '100px', 
-        position: 'absolute' 
+        right: '100px',
+        fontSize: '4rem'
       }}
     >
       🐋
@@ -83,12 +86,13 @@ const PositionedEmojis = () => (
 
     {/* Anchor at bottom third of desktop view */}
     <span 
-      className="emoji-bounce fixed text-6xl" 
+      className="animate-bounce-subtle" 
       style={{ 
+        position: 'absolute',
         bottom: '100px', 
         left: '50%', 
-        transform: 'translateX(-50%)', 
-        position: 'absolute' 
+        transform: 'translateX(-50%)',
+        fontSize: '4rem'
       }}
     >
       ⚓
@@ -96,11 +100,12 @@ const PositionedEmojis = () => (
 
     {/* Map emoji in its current desktop position */}
     <span 
-      className="emoji-bounce fixed text-6xl" 
+      className="animate-bounce-subtle" 
       style={{ 
+        position: 'absolute',
         top: '400px', 
-        left: '250px', 
-        position: 'absolute' 
+        left: '250px',
+        fontSize: '4rem'
       }}
     >
       🗺️
@@ -108,11 +113,12 @@ const PositionedEmojis = () => (
 
     {/* Female captain at bottom left of "Skip & Save Sample" box */}
     <span 
-      className="emoji-bounce fixed text-6xl" 
+      className="animate-bounce-subtle" 
       style={{ 
-        bottom: '450px', 
-        left: '100px', 
-        position: 'absolute' 
+        position: 'absolute',
+        bottom: '300px', 
+        left: '100px',
+        fontSize: '4rem'
       }}
     >
       👩‍✈️
@@ -120,12 +126,13 @@ const PositionedEmojis = () => (
 
     {/* Gem at bottom of "Hidden spending" text box */}
     <span 
-      className="emoji-bounce fixed text-6xl" 
+      className="animate-bounce-subtle" 
       style={{ 
-        bottom: '50px', 
+        position: 'absolute',
+        bottom: '380px', 
         left: '50%', 
-        transform: 'translateX(-50%)', 
-        position: 'absolute' 
+        transform: 'translateX(-50%)',
+        fontSize: '4rem'
       }}
     >
       💎
@@ -133,11 +140,12 @@ const PositionedEmojis = () => (
 
     {/* Money bag next to "Start Tracking Your Savings" text */}
     <span 
-      className="emoji-bounce fixed text-6xl" 
+      className="animate-bounce-subtle" 
       style={{ 
+        position: 'absolute',
         bottom: '100px', 
-        right: '250px', 
-        position: 'absolute' 
+        right: '200px',
+        fontSize: '4rem'
       }}
     >
       💰
