@@ -75,7 +75,7 @@ const PositionedEmojis = () => (
       <span 
         className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
         style={{ 
-          top: '55%',
+          top: '45%',
           left: '75%',
         }}
       >
@@ -149,7 +149,7 @@ const PositionedEmojis = () => (
       <span 
         className="absolute animate-bounce-subtle text-3xl"
         style={{ 
-          bottom: '40%',
+          bottom: '50%',
           right: '12%',
         }}
       >
