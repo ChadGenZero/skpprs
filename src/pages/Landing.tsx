@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import InteractiveBackground from '@/components/InteractiveBackground';
 
 const habitItems = [
   { 
@@ -161,12 +160,22 @@ const PositionedEmojis = () => (
   </div>
 );
 
+// Add Ocean Wave Background Component
+const OceanBackground = () => (
+  <div className="ocean-background absolute inset-0 w-full h-full overflow-hidden -z-10">
+    <div className="wave-gradient absolute inset-0 bg-gradient-to-b from-blue-300 via-blue-400 to-blue-500 opacity-60"></div>
+    <div className="wave wave1"></div>
+    <div className="wave wave2"></div>
+    <div className="wave wave3"></div>
+    <div className="wave wave4"></div>
+  </div>
+);
+
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <InteractiveBackground />
-      
-      <div className="container mx-auto px-4 py-12 relative z-10">
+      <OceanBackground />
+      <div className="container mx-auto px-4 py-12 relative">
         <PositionedEmojis />
         
         <header className="flex justify-center md:justify-between items-center py-4 mb-12 relative z-20">
