@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -217,7 +216,7 @@
 }
 
 .ocean-pattern {
-  animation: ocean-wave 30s linear infinite; /* Slowed down animation from 60s to 30s */
+  /* Animation removed to make waves static */
 }
 
 @keyframes ocean-wave {
@@ -232,15 +231,6 @@
 .emoji-bounce {
   animation: gentle-bounce 4s ease-in-out infinite;
   opacity: 0.8;
-}
-
-@keyframes gentle-bounce {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
 }
 
 .progress-container {
