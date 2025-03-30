@@ -219,7 +219,17 @@
   animation: ocean-wave 15s linear infinite;
 }
 
-/* Removed all wave-container, wave, wave-item related styles and keyframes */
+@keyframes ocean-wave {
+  0% {
+    transform: translateX(-10%) scaleY(1);
+  }
+  50% {
+    transform: translateX(5%) scaleY(0.8);
+  }
+  100% {
+    transform: translateX(-10%) scaleY(1);
+  }
+}
 
 .emoji-bounce {
   animation: gentle-bounce 3s ease-in-out infinite;
