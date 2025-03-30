@@ -105,9 +105,9 @@ const HabitSkipper: React.FC = () => {
         </div>
         
         <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-2 bg-blue-50 text-royal-blue-light rounded-lg px-4 py-2">
+          <div className="flex items-center gap-2 bg-blue-50 text-blue-700 rounded-lg px-4 py-2">
             <span className="font-semibold">This Week:</span>
-            <span className="text-xl font-bold text-royal-blue-light">{formatCurrency(weeklySkipSavings)}</span>
+            <span className="text-xl font-bold">{formatCurrency(weeklySkipSavings)}</span>
           </div>
           
           <Button 
