@@ -39,12 +39,12 @@ const HabitCard: React.FC<HabitCardProps> = ({
         {/* Define gradients and patterns */}
         <defs>
           <linearGradient id={`sandGradient-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style={{ stopColor: '#f7e1a8', stopOpacity: 1 }} />
-            <stop offset="20%" style={{ stopColor: '#edd3a0', stopOpacity: 1 }} />
-            <stop offset="40%" style={{ stopColor: '#d4a76a', stopOpacity: 1 }} />
-            <stop offset="60%" style={{ stopColor: '#c2975a', stopOpacity: 1 }} />
-            <stop offset="80%" style={{ stopColor: '#a87e4a', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: '#c2975a', stopOpacity: 1 }} />
+            <stop offset="0%" style={{ stopColor: '#ffcb7d', stopOpacity: 1 }} />
+            <stop offset="20%" style={{ stopColor: '#ffbb54', stopOpacity: 1 }} />
+            <stop offset="40%" style={{ stopColor: '#ffa730', stopOpacity: 1 }} />
+            <stop offset="60%" style={{ stopColor: '#ff9d1f', stopOpacity: 1 }} />
+            <stop offset="80%" style={{ stopColor: '#ff9000', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#ffbb54', stopOpacity: 1 }} />
           </linearGradient>
           
           <linearGradient id={`waterGradient-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
@@ -59,13 +59,13 @@ const HabitCard: React.FC<HabitCardProps> = ({
               href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"
               width="80"
               height="80"
-              opacity="0.5"
+              opacity="0.7"
             />
             <image
-              href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='speckleFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.2 0 0 0 0 0.1 0 0 0 0 0 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23speckleFilter)'/%3E%3C/svg%3E"
+              href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='speckleFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.9 0 0 0 0 0.5 0 0 0 0 0.1 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23speckleFilter)'/%3E%3C/svg%3E"
               width="40"
               height="40"
-              opacity="0.5"
+              opacity="0.6"
             />
           </pattern>
           
@@ -77,9 +77,9 @@ const HabitCard: React.FC<HabitCardProps> = ({
           </mask>
           
           <linearGradient id={`sandLighting-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" style={{ stopColor: 'rgba(255, 255, 200, 0.3)', stopOpacity: 1 }} />
+            <stop offset="0%" style={{ stopColor: 'rgba(255, 233, 180, 0.4)', stopOpacity: 1 }} />
             <stop offset="70%" style={{ stopColor: 'transparent', stopOpacity: 1 }} />
-            <stop offset="100%" style={{ stopColor: 'rgba(0, 0, 0, 0.2)', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: 'rgba(255, 144, 0, 0.2)', stopOpacity: 1 }} />
           </linearGradient>
         </defs>
         
@@ -100,7 +100,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           height="600"
           fill={`url(#sandPattern-${habit.id})`}
           mask={`url(#sandMask-${habit.id})`}
-          className={isSkipped ? "opacity-0" : "opacity-50"}
+          className={isSkipped ? "opacity-0" : "opacity-65"}
           style={{ transition: 'opacity 0.5s ease-in-out' }}
         />
         
@@ -121,12 +121,20 @@ const HabitCard: React.FC<HabitCardProps> = ({
             fill={`url(#waterGradient-${habit.id})`}
           />
           
-          {/* Foam Effect on the Water's Edge */}
+          {/* Foam Effect on the Water's Edge (Enlarged) */}
           <path
             className="foam-shape"
-            d="M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z"
+            d="M0,-30V50C35,25,100,65,200,40C300,15,400,45,500,20C600,-5,700,25,800,0C900,-25,1000,0,1100,-25C1160,-40,1200,-10,1200,-30V50C1160,75,1080,35,980,60C880,85,780,45,680,70C580,95,480,55,380,80C280,105,180,65,80,90C30,105,0,70,0,50Z"
             fill="white"
             fillOpacity="0.5"
+          />
+          
+          {/* Second Foam Layer (Additional enlarged white wash) */}
+          <path
+            className="foam-shape-secondary"
+            d="M0,-10V40C45,15,120,55,220,30C320,5,420,35,520,10C620,-15,720,15,820,-10C920,-35,1020,-10,1120,-35C1170,-45,1200,-20,1200,-10V40C1150,65,1060,25,960,50C860,75,760,35,660,60C560,85,460,45,360,70C260,95,160,55,60,80C20,90,0,60,0,40Z"
+            fill="white"
+            fillOpacity="0.3"
           />
         </g>
       </svg>
@@ -316,6 +324,10 @@ const HabitCard: React.FC<HabitCardProps> = ({
           animation: wave-foam 2.5s ease-in-out infinite reverse;
         }
 
+        .foam-shape-secondary {
+          animation: wave-foam-secondary 3s ease-in-out infinite;
+        }
+
         @keyframes ripple-wave {
           0% {
             d: path("M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0V600H0Z");
@@ -330,16 +342,31 @@ const HabitCard: React.FC<HabitCardProps> = ({
 
         @keyframes wave-foam {
           0% {
-            d: path("M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z");
+            d: path("M0,-30V50C35,25,100,65,200,40C300,15,400,45,500,20C600,-5,700,25,800,0C900,-25,1000,0,1100,-25C1160,-40,1200,-10,1200,-30V50C1160,75,1080,35,980,60C880,85,780,45,680,70C580,95,480,55,380,80C280,105,180,65,80,90C30,105,0,70,0,50Z");
             opacity: 0.5;
           }
           50% {
-            d: path("M0,0V20C30,5,80,30,160,15C240,0,320,20,400,5C480,-10,560,0,640,-15C720,-30,800,-10,880,-25C960,-40,1040,-20,1120,-35C1180,-50,1200,-20,1200,0V20C1170,35,1110,10,1050,25C970,40,890,15,810,30C730,45,650,20,570,35C490,50,410,25,330,40C250,55,170,30,90,45C30,60,0,35,0,20Z");
-            opacity: 0.8;
+            d: path("M0,-20V40C50,15,130,55,230,30C330,5,430,35,530,10C630,-15,730,5,830,-20C930,-45,1030,-15,1130,-40C1180,-55,1200,-25,1200,-20V40C1140,65,1060,25,960,50C860,75,760,35,660,60C560,85,460,45,360,70C260,95,160,55,60,80C20,95,0,60,0,40Z");
+            opacity: 0.7;
           }
           100% {
-            d: path("M0,0V30C15,15,60,40,140,25C220,10,300,30,380,15C460,0,540,20,620,5C700,-10,780,10,860,-5C940,-20,1020,0,1100,-15C1160,-20,1200,0,1200,0V30C1180,45,1120,20,1060,35C980,50,900,25,820,40C740,55,660,30,580,45C500,60,420,35,340,50C260,65,180,40,100,55C40,70,0,45,0,30Z");
+            d: path("M0,-30V50C35,25,100,65,200,40C300,15,400,45,500,20C600,-5,700,25,800,0C900,-25,1000,0,1100,-25C1160,-40,1200,-10,1200,-30V50C1160,75,1080,35,980,60C880,85,780,45,680,70C580,95,480,55,380,80C280,105,180,65,80,90C30,105,0,70,0,50Z");
             opacity: 0.5;
+          }
+        }
+
+        @keyframes wave-foam-secondary {
+          0% {
+            d: path("M0,-10V40C45,15,120,55,220,30C320,5,420,35,520,10C620,-15,720,15,820,-10C920,-35,1020,-10,1120,-35C1170,-45,1200,-20,1200,-10V40C1150,65,1060,25,960,50C860,75,760,35,660,60C560,85,460,45,360,70C260,95,160,55,60,80C20,90,0,60,0,40Z");
+            opacity: 0.3;
+          }
+          50% {
+            d: path("M0,-15V35C55,10,140,50,240,25C340,0,440,30,540,5C640,-20,740,10,840,-15C940,-40,1040,-15,1140,-40C1180,-50,1200,-25,1200,-15V35C1130,60,1040,20,940,45C840,70,740,30,640,55C540,80,440,40,340,65C240,90,140,50,40,75C10,85,0,55,0,35Z");
+            opacity: 0.4;
+          }
+          100% {
+            d: path("M0,-10V40C45,15,120,55,220,30C320,5,420,35,520,10C620,-15,720,15,820,-10C920,-35,1020,-10,1120,-35C1170,-45,1200,-20,1200,-10V40C1150,65,1060,25,960,50C860,75,760,35,660,60C560,85,460,45,360,70C260,95,160,55,60,80C20,90,0,60,0,40Z");
+            opacity: 0.3;
           }
         }
         `}
