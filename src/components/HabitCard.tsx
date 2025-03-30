@@ -223,10 +223,10 @@ const HabitCard: React.FC<HabitCardProps> = ({
           width: 100%;
           height: 100%;
           background: transparent;
-          border: 12px solid #d3d3d3;
+          border: 10px solid #ff7300;
           border-radius: 50%;
           box-sizing: border-box;
-          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 0 10px rgba(255, 115, 0, 0.5), inset 0 0 5px rgba(255, 115, 0, 0.3);
         }
 
         .lifebuoySegments {
@@ -235,17 +235,19 @@ const HabitCard: React.FC<HabitCardProps> = ({
           height: 100%;
           border-radius: 50%;
           background: conic-gradient(
-            #ff4500 0deg 45deg,
-            #d3d3d3 45deg 90deg,
-            #ff0000 90deg 135deg,
-            #d3d3d3 135deg 180deg,
-            #ff4500 180deg 225deg,
-            #d3d3d3 225deg 270deg,
-            #ff0000 270deg 315deg,
-            #d3d3d3 315deg 360deg
+            #ff7300 0deg 45deg,
+            white 45deg 90deg,
+            #ff7300 90deg 135deg,
+            white 135deg 180deg,
+            #ff7300 180deg 225deg,
+            white 225deg 270deg,
+            #ff7300 270deg 315deg,
+            white 315deg 360deg
           );
           -webkit-mask: radial-gradient(transparent 40%, #fff 40%);
           mask: radial-gradient(transparent 40%, #fff 40%);
+          opacity: 0.9;
+          transform: rotate(22.5deg);
         }
 
         .lifebuoyNubs {
@@ -260,33 +262,34 @@ const HabitCard: React.FC<HabitCardProps> = ({
         .lifebuoyNubs > div::after {
           content: '';
           position: absolute;
-          width: 10px;
-          height: 10px;
-          background: #a9a9a9;
+          width: 12px;
+          height: 12px;
+          background: #ff7300;
           border-radius: 50%;
+          box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
         }
 
         .lifebuoyNubs::before {
-          top: -5px;
+          top: -6px;
           left: 50%;
           transform: translateX(-50%);
         }
 
         .lifebuoyNubs::after {
-          bottom: -5px;
+          bottom: -6px;
           left: 50%;
           transform: translateX(-50%);
         }
 
         .lifebuoyNubs > div::before {
           top: 50%;
-          left: -5px;
+          left: -6px;
           transform: translateY(-50%);
         }
 
         .lifebuoyNubs > div::after {
           top: 50%;
-          right: -5px;
+          right: -6px;
           transform: translateY(-50%);
         }
 
@@ -301,8 +304,12 @@ const HabitCard: React.FC<HabitCardProps> = ({
           justify-content: center;
           font-size: 1rem;
           font-weight: bold;
-          color: #fff;
-          text-align: center;
+          background: rgba(255, 255, 255, 0.85);
+          border-radius: 50%;
+          border: 2px solid #ff7300;
+          color: #ff7300;
+          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
           z-index: 1;
         }
 
