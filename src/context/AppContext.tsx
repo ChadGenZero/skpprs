@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export type Frequency = 'daily' | 'weekly' | 'fortnightly' | 'monthly' | 'quarterly' | 'yearly';
@@ -59,7 +60,7 @@ export interface AppContextType {
 const defaultHabits: Habit[] = [
   {
     id: '1',
-    name: 'Coffee',
+    name: 'Daily Coffee',
     emoji: '☕',
     expense: 5.00,
     frequency: 7,
@@ -107,6 +108,18 @@ const defaultHabits: Habit[] = [
   },
   {
     id: '5',
+    name: 'In-game Purchases',
+    emoji: '🎮',
+    expense: 10.00,
+    frequency: 2,
+    period: 'weekly',
+    skipped: 0,
+    skippedDays: [],
+    skipGoal: 1,
+    weeklyTotalPotential: 20.00
+  },
+  {
+    id: '6',
     name: 'Energy Drinks/Sodas',
     emoji: '⚡',
     expense: 3.50,
@@ -116,6 +129,30 @@ const defaultHabits: Habit[] = [
     skippedDays: [],
     skipGoal: 3,
     weeklyTotalPotential: 17.50
+  },
+  {
+    id: '7',
+    name: 'Lottery/Gambling',
+    emoji: '🎰',
+    expense: 50.00,
+    frequency: 2,
+    period: 'weekly',
+    skipped: 0,
+    skippedDays: [],
+    skipGoal: 1,
+    weeklyTotalPotential: 100.00
+  },
+  {
+    id: '8',
+    name: 'Alcohol',
+    emoji: '🍺',
+    expense: 40.00,
+    frequency: 2,
+    period: 'weekly',
+    skipped: 0,
+    skippedDays: [],
+    skipGoal: 1,
+    weeklyTotalPotential: 80.00
   }
 ];
 
