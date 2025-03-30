@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -57,6 +58,7 @@ const PositionedEmojis = () => (
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
+      {/* Ocean ripple background with slow animation */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 ocean-pattern">
           <svg width="100%" height="100%" viewBox="0 0 100 20">
@@ -65,6 +67,7 @@ const Landing: React.FC = () => {
                 <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.15" />
               </pattern>
             </defs>
+            {/* Ensure the waves fill the screen without spilling out */}
             <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
             <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" />
             <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" />
