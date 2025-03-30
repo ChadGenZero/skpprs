@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Coffee, Pizza, ShoppingBag, FastForward, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
@@ -9,45 +8,92 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 const habitItems = [
   { 
     name: "Daily Coffee", 
-    icon: <Coffee className="text-orange-500" />, 
-    cost: "$4.50", 
+    icon: <span className="text-orange-500 text-xl">☕</span>, 
+    cost: "$5.00", 
     frequency: "Daily", 
-    savings: "$1,642 / year" 
+    savings: "$1,825 / year" 
   },
   { 
     name: "Fast Food", 
-    icon: <Pizza className="text-red-500" />, 
-    cost: "$12.00", 
+    icon: <span className="text-red-500 text-xl">🍕</span>, 
+    cost: "$20.00", 
     frequency: "3x week", 
-    savings: "$1,872 / year" 
+    savings: "$3,120 / year" 
   },
   { 
     name: "Impulse Shopping", 
-    icon: <ShoppingBag className="text-blue-500" />, 
-    cost: "$25.00", 
+    icon: <span className="text-blue-500 text-xl">🛍️</span>, 
+    cost: "$50.00", 
     frequency: "2x week", 
-    savings: "$2,600 / year" 
+    savings: "$5,200 / year" 
   },
   { 
-    name: "Streaming Services", 
-    icon: <FastForward className="text-purple-500" />, 
-    cost: "$45.00", 
-    frequency: "Monthly", 
-    savings: "$540 / year" 
+    name: "Smoking/Vaping", 
+    icon: <span className="text-gray-500 text-xl">🚬</span>, 
+    cost: "$20.00", 
+    frequency: "2x week", 
+    savings: "$2,080 / year" 
   },
   { 
-    name: "Dining Out", 
-    icon: <Star className="text-yellow-500" />, 
-    cost: "$75.00", 
-    frequency: "Weekly", 
-    savings: "$3,900 / year" 
+    name: "In-game Purchases", 
+    icon: <span className="text-green-500 text-xl">🎮</span>, 
+    cost: "$10.00", 
+    frequency: "2x week", 
+    savings: "$1,040 / year" 
+  },
+  { 
+    name: "Energy Drinks/Sodas", 
+    icon: <span className="text-yellow-500 text-xl">⚡</span>, 
+    cost: "$3.50", 
+    frequency: "5x week", 
+    savings: "$910 / year" 
+  },
+  { 
+    name: "Lottery/Gambling", 
+    icon: <span className="text-purple-500 text-xl">🎰</span>, 
+    cost: "$50.00", 
+    frequency: "2x week", 
+    savings: "$5,200 / year" 
+  },
+  { 
+    name: "Alcohol", 
+    icon: <span className="text-amber-500 text-xl">🍺</span>, 
+    cost: "$40.00", 
+    frequency: "2x week", 
+    savings: "$4,160 / year" 
   }
 ];
 
 const Landing: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="container mx-auto px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
+      {/* Ocean ripple background */}
+      <div className="absolute inset-0 z-0 opacity-10">
+        <div className="absolute top-20 left-10 text-6xl animate-pulse">🐋</div>
+        <div className="absolute top-40 right-20 text-5xl animate-bounce">⛵</div>
+        <div className="absolute bottom-40 left-1/4 text-4xl">⚓</div>
+        <div className="absolute top-1/3 right-1/3 text-5xl animate-pulse">🧭</div>
+        <div className="absolute bottom-20 right-10 text-6xl">🗺️</div>
+        <div className="absolute top-10 right-1/4 text-4xl">👨‍✈️</div>
+        <div className="absolute bottom-1/3 left-20 text-5xl">👩‍✈️</div>
+        
+        {/* Ocean ripple effect */}
+        <svg width="100%" height="100%" className="absolute inset-0">
+          <defs>
+            <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
+              <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.3" />
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
+          <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" />
+          <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" />
+          <rect x="0" y="60" width="100%" height="100%" fill="url(#ocean-pattern)" />
+          <rect x="0" y="80" width="100%" height="100%" fill="url(#ocean-pattern)" />
+          <rect x="0" y="100" width="100%" height="100%" fill="url(#ocean-pattern)" />
+        </svg>
+      </div>
+      
+      <div className="container mx-auto px-4 py-12 relative z-10">
         <header className="flex justify-center md:justify-between items-center py-4 mb-12">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 bg-royal-blue rounded-md text-white">
@@ -74,7 +120,7 @@ const Landing: React.FC = () => {
           <section className="mb-16">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-4xl font-bold mb-6 text-gray-900">Skip, Save, & Stack Sats!</h2>
-              <div className="glass-card p-8 mb-10">
+              <div className="glass-card p-8 mb-10 bg-white/80 backdrop-blur-sm rounded-xl shadow-md">
                 <p className="text-lg mb-6 text-gray-700 leading-relaxed">
                   <span className="font-semibold">Hidden spending is costing you more than you think.</span> A survey found that the average person spends <span className="font-bold text-royal-blue">$18,000 a year</span> on non-essential items—lattes, impulse buys, streaming services, and more. These small purchases add up fast. See how much you could save by making small sacrifices for big rewards!
                 </p>
@@ -89,9 +135,9 @@ const Landing: React.FC = () => {
 
           <section className="mb-16">
             <div className="max-w-4xl mx-auto">
-              <Card>
+              <Card className="backdrop-blur-sm bg-white/90">
                 <CardHeader>
-                  <CardTitle className="text-2xl text-center">Habits - Skip & Save Example</CardTitle>
+                  <CardTitle className="text-2xl text-center">Skip & Save Sample</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="overflow-x-auto">

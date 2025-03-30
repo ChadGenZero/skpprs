@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export type Frequency = 'daily' | 'weekly' | 'fortnightly' | 'monthly' | 'quarterly' | 'yearly';
@@ -59,7 +60,7 @@ export interface AppContextType {
 const defaultHabits: Habit[] = [
   {
     id: '1',
-    name: 'Coffee',
+    name: 'Daily Coffee',
     emoji: '☕',
     expense: 5.00,
     frequency: 7,
@@ -72,50 +73,86 @@ const defaultHabits: Habit[] = [
   {
     id: '2',
     name: 'Fast Food',
-    emoji: '🍔',
-    expense: 15.00,
+    emoji: '🍕',
+    expense: 20.00,
     frequency: 3,
     period: 'weekly',
     skipped: 0,
     skippedDays: [],
     skipGoal: 2,
-    weeklyTotalPotential: 45.00
+    weeklyTotalPotential: 60.00
   },
   {
     id: '3',
-    name: 'Shopping',
+    name: 'Impulse Shopping',
     emoji: '🛍️',
     expense: 50.00,
-    frequency: 1,
+    frequency: 2,
     period: 'weekly',
     skipped: 0,
     skippedDays: [],
     skipGoal: 1,
-    weeklyTotalPotential: 50.00
+    weeklyTotalPotential: 100.00
   },
   {
     id: '4',
-    name: 'Snacks',
-    emoji: '🍫',
-    expense: 5.00,
+    name: 'Smoking/Vaping',
+    emoji: '🚬',
+    expense: 20.00,
+    frequency: 2,
+    period: 'weekly',
+    skipped: 0,
+    skippedDays: [],
+    skipGoal: 1,
+    weeklyTotalPotential: 40.00
+  },
+  {
+    id: '5',
+    name: 'In-game Purchases',
+    emoji: '🎮',
+    expense: 10.00,
+    frequency: 2,
+    period: 'weekly',
+    skipped: 0,
+    skippedDays: [],
+    skipGoal: 1,
+    weeklyTotalPotential: 20.00
+  },
+  {
+    id: '6',
+    name: 'Energy Drinks/Sodas',
+    emoji: '⚡',
+    expense: 3.50,
     frequency: 5,
     period: 'weekly',
     skipped: 0,
     skippedDays: [],
     skipGoal: 3,
-    weeklyTotalPotential: 25.00
+    weeklyTotalPotential: 17.50
   },
   {
-    id: '5',
-    name: 'Streaming',
-    emoji: '📺',
-    expense: 15.00,
-    frequency: 1,
-    period: 'monthly',
+    id: '7',
+    name: 'Lottery/Gambling',
+    emoji: '🎰',
+    expense: 50.00,
+    frequency: 2,
+    period: 'weekly',
     skipped: 0,
     skippedDays: [],
     skipGoal: 1,
-    weeklyTotalPotential: 3.75
+    weeklyTotalPotential: 100.00
+  },
+  {
+    id: '8',
+    name: 'Alcohol',
+    emoji: '🍺',
+    expense: 40.00,
+    frequency: 2,
+    period: 'weekly',
+    skipped: 0,
+    skippedDays: [],
+    skipGoal: 1,
+    weeklyTotalPotential: 80.00
   }
 ];
 
