@@ -233,6 +233,15 @@
   opacity: 0.8;
 }
 
+@keyframes gentle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 .progress-container {
   @apply relative flex items-center justify-center;
 }
