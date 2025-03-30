@@ -28,16 +28,61 @@ const HabitCard: React.FC<HabitCardProps> = ({
       )}
       onClick={onClick}
     >
+      {/* Background with Sand and Water as SVG shapes */}
       <svg
         preserveAspectRatio="none"
         viewBox="0 0 1200 600"
         xmlns="http://www.w3.org/2000/svg"
         className="absolute inset-0 w-full h-full z-0"
       >
+        {/* Define gradients and patterns */}
         <defs>
-          {/* ... keep existing SVG defs and gradients the same */}
+          <linearGradient id={`sandGradient-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#ffcb7d', stopOpacity: 1 }} />
+            <stop offset="20%" style={{ stopColor: '#ffbb54', stopOpacity: 1 }} />
+            <stop offset="40%" style={{ stopColor: '#ffa730', stopOpacity: 1 }} />
+            <stop offset="60%" style={{ stopColor: '#ff9d1f', stopOpacity: 1 }} />
+            <stop offset="80%" style={{ stopColor: '#ff9000', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#ffbb54', stopOpacity: 1 }} />
+          </linearGradient>
+          
+          <linearGradient id={`waterGradient-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: '#80E0F5', stopOpacity: 1 }} />
+            <stop offset="50%" style={{ stopColor: '#1E90FF', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: '#003D66', stopOpacity: 1 }} />
+          </linearGradient>
+          
+          <pattern id={`sandPattern-${habit.id}`} patternUnits="userSpaceOnUse" width="80" height="80">
+            <rect width="80" height="80" fill="transparent" />
+            <image
+              href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='5' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E"
+              width="80"
+              height="80"
+              opacity="0.7"
+            />
+            <image
+              href="data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='speckleFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='3' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.9 0 0 0 0 0.5 0 0 0 0 0.1 0 0 0 0.3 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23speckleFilter)'/%3E%3C/svg%3E"
+              width="40"
+              height="40"
+              opacity="0.6"
+            />
+          </pattern>
+          
+          <mask id={`sandMask-${habit.id}`}>
+            <path
+              d="M0,0H1200V300C1180,320,1120,280,1060,300C980,320,900,280,820,300C740,320,660,280,580,300C500,320,420,280,340,300C260,320,180,280,100,300C40,320,0,280,0,300V0Z"
+              fill="white"
+            />
+          </mask>
+          
+          <linearGradient id={`sandLighting-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style={{ stopColor: 'rgba(255, 233, 180, 0.4)', stopOpacity: 1 }} />
+            <stop offset="70%" style={{ stopColor: 'transparent', stopOpacity: 1 }} />
+            <stop offset="100%" style={{ stopColor: 'rgba(255, 144, 0, 0.2)', stopOpacity: 1 }} />
+          </linearGradient>
         </defs>
         
+        {/* Sand Base (Always visible) */}
         <rect
           x="0"
           y="0"
@@ -46,6 +91,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           fill={`url(#sandGradient-${habit.id})`}
         />
         
+        {/* Sand Texture */}
         <rect
           x="0"
           y="0"
@@ -57,6 +103,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           style={{ transition: 'opacity 0.5s ease-in-out' }}
         />
         
+        {/* Sand Lighting Effect */}
         <path
           d="M0,0H1200V300C1180,320,1120,280,1060,300C980,320,900,280,820,300C740,320,660,280,580,300C500,320,420,280,340,300C260,320,180,280,100,300C40,320,0,280,0,300V0Z"
           fill={`url(#sandLighting-${habit.id})`}
@@ -64,13 +111,16 @@ const HabitCard: React.FC<HabitCardProps> = ({
           style={{ transition: 'opacity 0.5s ease-in-out' }}
         />
         
+        {/* Water Group - Uses CSS transform for the flood animation */}
         <g className={`water-group ${isSkipped ? "water-skipped" : ""}`}>
+          {/* Water Shape - Only does the ripple animation */}
           <path
             className="water-shape"
             d="M0,0V60C20,40,80,80,160,60C240,40,320,60,400,40C480,20,560,40,640,20C720,0,800,20,880,0C960,-20,1040,0,1120,-20C1180,-40,1200,0,1200,0V600H0Z"
             fill={`url(#waterGradient-${habit.id})`}
           />
           
+          {/* Foam Effect on the Water's Edge (Enlarged) */}
           <path
             className="foam-shape"
             d="M0,-30V50C35,25,100,65,200,40C300,15,400,45,500,20C600,-5,700,25,800,0C900,-25,1000,0,1100,-25C1160,-40,1200,-10,1200,-30V50C1160,75,1080,35,980,60C880,85,780,45,680,70C580,95,480,55,380,80C280,105,180,65,80,90C30,105,0,70,0,50Z"
@@ -78,6 +128,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
             fillOpacity="0.5"
           />
           
+          {/* Second Foam Layer (Additional enlarged white wash) */}
           <path
             className="foam-shape-secondary"
             d="M0,-10V40C45,15,120,55,220,30C320,5,420,35,520,10C620,-15,720,15,820,-10C920,-35,1020,-10,1120,-35C1170,-45,1200,-20,1200,-10V40C1150,65,1060,25,960,50C860,75,760,35,660,60C560,85,460,45,360,70C260,95,160,55,60,80C20,90,0,60,0,40Z"
@@ -87,6 +138,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
         </g>
       </svg>
       
+      {/* Content */}
       <div className="relative z-10 flex flex-col items-center">
         <div className="text-5xl mb-2">{habit.emoji}</div>
         <h3 className="text-xl md:text-2xl font-bold text-center break-words">{habit.name}</h3>
