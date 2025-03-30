@@ -190,7 +190,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
 
         .lifebuoyAnim {
           animation: throwLifebuoy 0.5s ease-out forwards;
-          animation-delay: 1s; /* Start after the water flood animation */
+          animation-delay: 0.5s; /* Reduced from 1s to 0.5s for faster appearance */
         }
 
         @keyframes throwLifebuoy {
@@ -218,26 +218,18 @@ const HabitCard: React.FC<HabitCardProps> = ({
           position: absolute;
           width: 100%;
           height: 100%;
-          background: #d3d3d3; /* Light gray ring */
+          background: transparent;
+          border: 12px solid #d3d3d3; /* Light gray ring with hollow center */
           border-radius: 50%;
-          box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .lifebuoyRing::before {
-          content: '';
-          position: absolute;
-          width: 60%;
-          height: 60%;
-          top: 20%;
-          left: 20%;
-          background: #fff; /* White center */
-          border-radius: 50%;
+          box-sizing: border-box;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         }
 
         .lifebuoySegments {
           position: absolute;
           width: 100%;
           height: 100%;
+          border-radius: 50%;
           background: conic-gradient(
             #ff4500 0deg 45deg, /* Orange */
             #d3d3d3 45deg 90deg, /* Gray */
@@ -248,20 +240,8 @@ const HabitCard: React.FC<HabitCardProps> = ({
             #ff0000 270deg 315deg, /* Red */
             #d3d3d3 315deg 360deg /* Gray */
           );
-          border-radius: 50%;
-          clip-path: circle(50% at 50% 50%);
-        }
-
-        .lifebuoySegments::before {
-          content: '';
-          position: absolute;
-          width: 60%;
-          height: 60%;
-          top: 20%;
-          left: 20%;
-          background: transparent;
-          border-radius: 50%;
-          box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+          -webkit-mask: radial-gradient(transparent 40%, #fff 40%);
+          mask: radial-gradient(transparent 40%, #fff 40%);
         }
 
         .lifebuoyNubs {
