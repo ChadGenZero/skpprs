@@ -44,122 +44,74 @@ const habitItems = [
 ];
 
 const PositionedEmojis = () => (
-  <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 50, pointerEvents: 'none' }}>
-    {/* Captain emoji at top left of text box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        top: '220px', 
-        left: '100px',
-        fontSize: '4rem'
-      }}
-    >
-      👨‍✈️
-    </span>
+  <>
+    {/* Hero section emojis */}
+    <div className="hero-emojis relative">
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ top: '10%', left: '5%' }}
+      >
+        👨‍✈️
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ top: '15%', right: '5%' }}
+      >
+        ⛵
+      </span>
+    </div>
 
-    {/* Sailboat at bottom right of text box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '450px', 
-        right: '100px',
-        fontSize: '4rem'
-      }}
-    >
-      ⛵
-    </span>
+    {/* Table section emojis */}
+    <div className="table-section-emojis relative">
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ top: '-15%', right: '5%' }}
+      >
+        🐋
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ bottom: '-10%', left: '10%' }}
+      >
+        👩‍✈️
+      </span>
+    </div>
 
-    {/* Whale at top right of "Skip & Save Sample" box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        top: '450px', 
-        right: '100px',
-        fontSize: '4rem'
-      }}
-    >
-      🐋
-    </span>
-
-    {/* Anchor at bottom third of desktop view */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '100px', 
-        left: '50%', 
-        transform: 'translateX(-50%)',
-        fontSize: '4rem'
-      }}
-    >
-      ⚓
-    </span>
-
-    {/* Map emoji in its current desktop position */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        top: '400px', 
-        left: '250px',
-        fontSize: '4rem'
-      }}
-    >
-      🗺️
-    </span>
-
-    {/* Female captain at bottom left of "Skip & Save Sample" box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '300px', 
-        left: '100px',
-        fontSize: '4rem'
-      }}
-    >
-      👩‍✈️
-    </span>
-
-    {/* Gem at bottom of "Hidden spending" text box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '380px', 
-        left: '50%', 
-        transform: 'translateX(-50%)',
-        fontSize: '4rem'
-      }}
-    >
-      💎
-    </span>
-
-    {/* Money bag next to "Start Tracking Your Savings" text */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '100px', 
-        right: '200px',
-        fontSize: '4rem'
-      }}
-    >
-      💰
-    </span>
-  </div>
+    {/* Bottom section emojis */}
+    <div className="bottom-section-emojis relative">
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ bottom: '10%', left: '50%', transform: 'translateX(-50%)' }}
+      >
+        ⚓
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ bottom: '15%', right: '10%' }}
+      >
+        💰
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ top: '30%', left: '10%' }}
+      >
+        🗺️
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ top: '40%', left: '50%', transform: 'translateX(-50%)' }}
+      >
+        💎
+      </span>
+    </div>
+  </>
 );
 
-const Landing: React.FC = () => {
+const Landing = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      <PositionedEmojis />
-      
       <div className="container mx-auto px-4 py-12 relative z-10">
-        <header className="flex justify-center md:justify-between items-center py-4 mb-12">
+        <header className="flex justify-center md:justify-between items-center py-4 mb-12 relative">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 bg-royal-blue rounded-md text-white">
               <span className="text-2xl font-bold tracking-tighter">S</span>
@@ -182,7 +134,12 @@ const Landing: React.FC = () => {
         </header>
         
         <main>
-          <section className="mb-16">
+          <section className="mb-16 relative">
+            {/* Hero section with emojis */}
+            <div className="hero-emojis-container relative">
+              <PositionedEmojis />
+            </div>
+            
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-4xl font-bold mb-6 text-gray-900">Skip, Save, & Stack Sats!</h2>
               <div className="glass-card p-8 mb-10 bg-white/80 backdrop-blur-sm rounded-xl shadow-md">
@@ -198,9 +155,9 @@ const Landing: React.FC = () => {
             </div>
           </section>
 
-          <section className="mb-16">
+          <section className="mb-16 relative">
             <div className="max-w-4xl mx-auto">
-              <Card className="backdrop-blur-sm bg-white/90">
+              <Card className="backdrop-blur-sm bg-white/90 relative">
                 <CardHeader>
                   <CardTitle className="text-2xl text-center">Skip & Save Sample</CardTitle>
                 </CardHeader>
@@ -230,7 +187,7 @@ const Landing: React.FC = () => {
                     </Table>
                   </div>
                   
-                  <div className="mt-10 text-center">
+                  <div className="mt-10 text-center relative">
                     <div className="mb-6 text-gray-700">Ready to see how much you can save?</div>
                     <Link to="/app">
                       <Button size="lg" className="bg-royal-blue hover:bg-royal-blue/90">
