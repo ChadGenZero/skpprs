@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 
+// Reduced list of habits focusing on the 5 requested types
 const habitItems = [
   { 
-    name: "Daily Coffee", 
+    name: "Coffee", 
     icon: <span className="text-orange-500 text-xl">☕</span>, 
     cost: "$5.00", 
     frequency: "Daily", 
@@ -21,25 +22,11 @@ const habitItems = [
     savings: "$3,120 / year" 
   },
   { 
-    name: "Impulse Shopping", 
-    icon: <span className="text-blue-500 text-xl">🛍️</span>, 
-    cost: "$50.00", 
-    frequency: "2x week", 
-    savings: "$5,200 / year" 
-  },
-  { 
     name: "Smoking/Vaping", 
     icon: <span className="text-gray-500 text-xl">🚬</span>, 
     cost: "$20.00", 
     frequency: "2x week", 
     savings: "$2,080 / year" 
-  },
-  { 
-    name: "In-game Purchases", 
-    icon: <span className="text-green-500 text-xl">🎮</span>, 
-    cost: "$10.00", 
-    frequency: "2x week", 
-    savings: "$1,040 / year" 
   },
   { 
     name: "Energy Drinks/Sodas", 
@@ -49,36 +36,32 @@ const habitItems = [
     savings: "$910 / year" 
   },
   { 
-    name: "Lottery/Gambling", 
-    icon: <span className="text-purple-500 text-xl">🎰</span>, 
+    name: "Impulse Shopping", 
+    icon: <span className="text-blue-500 text-xl">🛍️</span>, 
     cost: "$50.00", 
     frequency: "2x week", 
     savings: "$5,200 / year" 
-  },
-  { 
-    name: "Alcohol", 
-    icon: <span className="text-amber-500 text-xl">🍺</span>, 
-    cost: "$40.00", 
-    frequency: "2x week", 
-    savings: "$4,160 / year" 
   }
 ];
 
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      {/* Ocean ripple background */}
-      <div className="absolute inset-0 z-0 opacity-10">
-        <div className="absolute top-20 left-10 text-6xl animate-pulse">🐋</div>
-        <div className="absolute top-40 right-20 text-5xl animate-bounce">⛵</div>
-        <div className="absolute bottom-40 left-1/4 text-4xl">⚓</div>
-        <div className="absolute top-1/3 right-1/3 text-5xl animate-pulse">🧭</div>
-        <div className="absolute bottom-20 right-10 text-6xl">🗺️</div>
-        <div className="absolute top-10 right-1/4 text-4xl">👨‍✈️</div>
-        <div className="absolute bottom-1/3 left-20 text-5xl">👩‍✈️</div>
+      {/* Ocean ripple background with continuous animation */}
+      <div className="absolute inset-0 z-0">
+        {/* Ocean emojis with uniform size and gentle bounce */}
+        <div className="absolute z-10">
+          <div className="absolute top-[10%] left-[8%] emoji-bounce text-4xl">🐋</div>
+          <div className="absolute top-[25%] right-[15%] emoji-bounce text-4xl">⛵</div>
+          <div className="absolute bottom-[30%] left-[20%] emoji-bounce text-4xl">⚓</div>
+          <div className="absolute top-[40%] right-[30%] emoji-bounce text-4xl">🧭</div>
+          <div className="absolute bottom-[15%] right-[12%] emoji-bounce text-4xl">🗺️</div>
+          <div className="absolute top-[15%] right-[28%] emoji-bounce text-4xl">👨‍✈️</div>
+          <div className="absolute bottom-[35%] left-[15%] emoji-bounce text-4xl">👩‍✈️</div>
+        </div>
         
-        {/* Ocean ripple effect */}
-        <svg width="100%" height="100%" className="absolute inset-0">
+        {/* Ocean ripple effect with continuous horizontal animation */}
+        <svg width="100%" height="100%" className="absolute inset-0 ocean-waves">
           <defs>
             <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
               <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.3" />

@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -214,6 +213,33 @@
 .lifebuoy-lines::after {
   transform: rotate(20deg);
   top: 4px;
+}
+
+.ocean-waves {
+  animation: ocean-drift 30s linear infinite;
+}
+
+@keyframes ocean-drift {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.emoji-bounce {
+  animation: gentle-bounce 3s ease-in-out infinite;
+  opacity: 0.8;
+}
+
+@keyframes gentle-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 
 .progress-container {

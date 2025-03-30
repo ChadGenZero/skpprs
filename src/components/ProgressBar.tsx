@@ -73,7 +73,7 @@ const ProgressBar: React.FC = () => {
                   "progress-dot group flex items-center justify-center",
                   isStepCurrent && "active",
                   isStepCompleted && "completed",
-                  canNavigate ? "cursor-pointer" : "cursor-not-allowed opacity-60"
+                  canNavigate ? "cursor-pointer" : "cursor-not-allowed"
                 )}
                 disabled={!canNavigate}
                 aria-label={`Go to step ${s.step}: ${s.title}`}

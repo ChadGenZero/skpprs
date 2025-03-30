@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext, type Habit, type Frequency } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { PlusIcon, ArrowRightIcon, Info } from 'lucide-react';
@@ -206,7 +205,6 @@ const HabitDialog: React.FC<{
     }
   }, [habit, isEditing, open]);
 
-  // Calculate weekly total whenever inputs change
   React.useEffect(() => {
     if (expense && frequency) {
       const expenseNum = parseFloat(expense);
@@ -232,7 +230,6 @@ const HabitDialog: React.FC<{
       return;
     }
 
-    // Make sure skip goal is reasonable given the frequency
     const expenseNum = parseFloat(expense);
     const frequencyNum = parseInt(frequency);
     let weeklyFreq = frequencyNum;
@@ -386,9 +383,58 @@ const HabitDialog: React.FC<{
 };
 
 const HabitSelector: React.FC = () => {
-  const { habits, selectedHabits, toggleHabit, setStep } = useAppContext();
+  const { habits, selectedHabits, toggleHabit, setStep, addHabit } = useAppContext();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | undefined>(undefined);
+  
+  useEffect(() => {
+    if (habits.length === 0) {
+      const defaultHabits = [
+        {
+          name: "Coffee",
+          emoji: "☕",
+          expense: 5.00,
+          frequency: 1,
+          period: "daily" as Frequency,
+          skipGoal: 3
+        },
+        {
+          name: "Fast Food",
+          emoji: "🍕",
+          expense: 20.00,
+          frequency: 3,
+          period: "weekly" as Frequency,
+          skipGoal: 1
+        },
+        {
+          name: "Smoking/Vaping",
+          emoji: "🚬",
+          expense: 20.00,
+          frequency: 2,
+          period: "weekly" as Frequency,
+          skipGoal: 1
+        },
+        {
+          name: "Energy Drinks/Sodas",
+          emoji: "⚡",
+          expense: 3.50,
+          frequency: 5,
+          period: "weekly" as Frequency,
+          skipGoal: 2
+        },
+        {
+          name: "Impulse Shopping",
+          emoji: "🛍️",
+          expense: 50.00,
+          frequency: 2,
+          period: "weekly" as Frequency,
+          skipGoal: 1
+        }
+      ];
+      
+      defaultHabits.forEach(habit => addHabit(habit));
+    }
+  }, [habits.length, addHabit]);
   
   const handleEditHabit = (habit: Habit) => {
     setEditingHabit(habit);
