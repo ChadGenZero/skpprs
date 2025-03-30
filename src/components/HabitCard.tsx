@@ -101,6 +101,8 @@ const HabitCard: React.FC<HabitCardProps> = ({
           height="600"
           fill="url(#sandPattern)"
           mask="url(#sandMask)"
+          opacity={isSkipped ? "0" : "1"}
+          style={{ transition: 'opacity 0.5s ease-in-out' }}
         />
         
         {/* Sand lighting effect */}
