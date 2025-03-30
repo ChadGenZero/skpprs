@@ -51,29 +51,31 @@ const Landing: React.FC = () => {
       <div className="absolute inset-0 z-0">
         {/* Ocean emojis with uniform size and gentle bounce */}
         <div className="absolute z-10">
-          <div className="absolute top-[10%] left-[8%] emoji-bounce text-4xl">🐋</div>
-          <div className="absolute top-[25%] right-[15%] emoji-bounce text-4xl">⛵</div>
-          <div className="absolute bottom-[30%] left-[20%] emoji-bounce text-4xl">⚓</div>
-          <div className="absolute top-[40%] right-[30%] emoji-bounce text-4xl">🧭</div>
-          <div className="absolute bottom-[15%] right-[12%] emoji-bounce text-4xl">🗺️</div>
-          <div className="absolute top-[15%] right-[28%] emoji-bounce text-4xl">👨‍✈️</div>
-          <div className="absolute bottom-[35%] left-[15%] emoji-bounce text-4xl">👩‍✈️</div>
+          <div className="absolute top-[10%] left-[8%] emoji-bounce text-5xl">🐋</div>
+          <div className="absolute top-[25%] right-[25%] emoji-bounce text-5xl">⛵</div>
+          <div className="absolute bottom-[30%] left-[20%] emoji-bounce text-5xl">⚓</div>
+          <div className="absolute top-[40%] left-[35%] emoji-bounce text-5xl">🧭</div>
+          <div className="absolute bottom-[20%] right-[22%] emoji-bounce text-5xl">🗺️</div>
+          <div className="absolute top-[18%] right-[10%] emoji-bounce text-5xl">👨‍✈️</div>
+          <div className="absolute bottom-[40%] right-[35%] emoji-bounce text-5xl">👩‍✈️</div>
         </div>
         
         {/* Ocean ripple effect with continuous horizontal animation */}
-        <svg width="100%" height="100%" className="absolute inset-0 ocean-waves">
-          <defs>
-            <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
-              <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.3" />
-            </pattern>
-          </defs>
-          <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="60" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="80" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="100" width="100%" height="100%" fill="url(#ocean-pattern)" />
-        </svg>
+        <div className="absolute inset-0 ocean-pattern">
+          <svg width="100%" height="100%">
+            <defs>
+              <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
+                <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.3" />
+              </pattern>
+            </defs>
+            <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="60" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="80" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="100" width="100%" height="100%" fill="url(#ocean-pattern)" />
+          </svg>
+        </div>
       </div>
       
       <div className="container mx-auto px-4 py-12 relative z-10">

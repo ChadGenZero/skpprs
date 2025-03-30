@@ -215,11 +215,11 @@
   top: 4px;
 }
 
-.ocean-waves {
-  animation: ocean-drift 30s linear infinite;
+.ocean-pattern {
+  animation: ocean-wave 20s linear infinite;
 }
 
-@keyframes ocean-drift {
+@keyframes ocean-wave {
   0% {
     transform: translateX(0%);
   }
@@ -229,7 +229,7 @@
 }
 
 .emoji-bounce {
-  animation: gentle-bounce 3s ease-in-out infinite;
+  animation: gentle-bounce 4s ease-in-out infinite;
   opacity: 0.8;
 }
 
@@ -238,7 +238,7 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-8px);
   }
 }
 
