@@ -31,7 +31,7 @@ const ProgressBar: React.FC = () => {
         <div className="absolute left-1/2 top-0 h-full w-[3px] -translate-x-1/2 bg-gray-200 rounded-full">
           {/* Active progress line - animated with CSS */}
           <div 
-            className={`absolute top-0 left-0 w-full rounded-full bg-royal-blue transition-all duration-1000 ease-out`} 
+            className="absolute top-0 left-0 w-full rounded-full bg-royal-blue transition-all duration-1000 ease-out" 
             style={{ 
               height: `${Math.max(0, Math.min(100, (step - 1) * 25))}%`
             }}
