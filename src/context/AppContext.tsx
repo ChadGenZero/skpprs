@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export type Frequency = 'daily' | 'weekly' | 'fortnightly' | 'monthly' | 'quarterly' | 'yearly';
@@ -64,6 +65,8 @@ const defaultHabits: Habit[] = [
     expense: 5.00,
     frequency: 1,
     period: 'daily' as Frequency,
+    skipped: 0,
+    skippedDays: [],
     skipGoal: 3,
     weeklyTotalPotential: 35.00
   },
@@ -74,6 +77,8 @@ const defaultHabits: Habit[] = [
     expense: 20.00,
     frequency: 3,
     period: 'weekly' as Frequency,
+    skipped: 0,
+    skippedDays: [],
     skipGoal: 1,
     weeklyTotalPotential: 60.00
   },
@@ -84,6 +89,8 @@ const defaultHabits: Habit[] = [
     expense: 20.00,
     frequency: 2,
     period: 'weekly' as Frequency,
+    skipped: 0,
+    skippedDays: [],
     skipGoal: 1,
     weeklyTotalPotential: 40.00
   },
@@ -94,6 +101,8 @@ const defaultHabits: Habit[] = [
     expense: 3.50,
     frequency: 5,
     period: 'weekly' as Frequency,
+    skipped: 0,
+    skippedDays: [],
     skipGoal: 2,
     weeklyTotalPotential: 17.50
   },
@@ -104,6 +113,8 @@ const defaultHabits: Habit[] = [
     expense: 50.00,
     frequency: 2,
     period: 'weekly' as Frequency,
+    skipped: 0,
+    skippedDays: [],
     skipGoal: 1,
     weeklyTotalPotential: 100.00
   }
