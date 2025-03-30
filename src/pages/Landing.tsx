@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -44,14 +45,103 @@ const habitItems = [
 
 const PositionedEmojis = () => (
   <div className="absolute inset-0 z-20 pointer-events-none">
-    <span className="emoji-bounce fixed text-6xl" style={{ top: '340px', left: '220px' }}>👨‍✈️</span>
-    <span className="emoji-bounce fixed text-6xl" style={{ top: '520px', left: '780px' }}>⛵</span>
-    <span className="emoji-bounce fixed text-6xl" style={{ top: '600px', left: '780px' }}>🐋</span>
-    <span className="emoji-bounce fixed text-6xl" style={{ top: '850px', left: '500px' }}>⚓</span>
-    <span className="emoji-bounce fixed text-6xl" style={{ top: '400px', left: '250px' }}>🗺️</span>
-    <span className="emoji-bounce fixed text-6xl" style={{ top: '800px', left: '220px' }}>👩‍✈️</span>
-    <span className="emoji-bounce fixed text-6xl" style={{ top: '520px', left: '480px' }}>💎</span>
-    <span className="emoji-bounce fixed text-6xl" style={{ top: '850px', left: '630px' }}>💰</span>
+    {/* Captain emoji at top left of text box */}
+    <span 
+      className="emoji-bounce fixed text-6xl" 
+      style={{ 
+        top: '220px', 
+        left: '100px', 
+        position: 'absolute' 
+      }}
+    >
+      👨‍✈️
+    </span>
+
+    {/* Sailboat at bottom right of text box */}
+    <span 
+      className="emoji-bounce fixed text-6xl" 
+      style={{ 
+        bottom: '250px', 
+        right: '100px', 
+        position: 'absolute' 
+      }}
+    >
+      ⛵
+    </span>
+
+    {/* Whale at top right of "Skip & Save Sample" box */}
+    <span 
+      className="emoji-bounce fixed text-6xl" 
+      style={{ 
+        top: '450px', 
+        right: '100px', 
+        position: 'absolute' 
+      }}
+    >
+      🐋
+    </span>
+
+    {/* Anchor at bottom third of desktop view */}
+    <span 
+      className="emoji-bounce fixed text-6xl" 
+      style={{ 
+        bottom: '100px', 
+        left: '50%', 
+        transform: 'translateX(-50%)', 
+        position: 'absolute' 
+      }}
+    >
+      ⚓
+    </span>
+
+    {/* Map emoji in its current desktop position */}
+    <span 
+      className="emoji-bounce fixed text-6xl" 
+      style={{ 
+        top: '400px', 
+        left: '250px', 
+        position: 'absolute' 
+      }}
+    >
+      🗺️
+    </span>
+
+    {/* Female captain at bottom left of "Skip & Save Sample" box */}
+    <span 
+      className="emoji-bounce fixed text-6xl" 
+      style={{ 
+        bottom: '450px', 
+        left: '100px', 
+        position: 'absolute' 
+      }}
+    >
+      👩‍✈️
+    </span>
+
+    {/* Gem at bottom of "Hidden spending" text box */}
+    <span 
+      className="emoji-bounce fixed text-6xl" 
+      style={{ 
+        bottom: '50px', 
+        left: '50%', 
+        transform: 'translateX(-50%)', 
+        position: 'absolute' 
+      }}
+    >
+      💎
+    </span>
+
+    {/* Money bag next to "Start Tracking Your Savings" text */}
+    <span 
+      className="emoji-bounce fixed text-6xl" 
+      style={{ 
+        bottom: '100px', 
+        right: '250px', 
+        position: 'absolute' 
+      }}
+    >
+      💰
+    </span>
   </div>
 );
 
