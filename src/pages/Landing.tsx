@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 const PositionedEmojis = () => (
   <div 
     className="absolute inset-0 z-50 pointer-events-none overflow-hidden"
@@ -106,3 +108,20 @@ const PositionedEmojis = () => (
     </span>
   </div>
 );
+
+const Landing = () => {
+  return (
+    <div className="relative min-h-screen">
+      <PositionedEmojis />
+      {/* Add the rest of the Landing page content here */}
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-4xl font-bold text-center mb-8">
+          Welcome to Your Financial Journey
+        </h1>
+        {/* Add more content as needed */}
+      </div>
+    </div>
+  );
+};
+
+export default Landing;
