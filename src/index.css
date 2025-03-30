@@ -397,3 +397,19 @@
     font-size: 4rem !important;
   }
 }
+
+.water-flooded {
+  transform: translateY(-300px) !important;
+}
+
+.water-low {
+  transform: translateY(0) !important;
+}
+
+.foam-flooded {
+  transform: translateY(-300px) !important;
+}
+
+.foam-low {
+  transform: translateY(0) !important;
+}
