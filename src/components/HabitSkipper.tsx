@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppContext, type Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -28,12 +27,36 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
   return (
     <div 
       className={cn(
-        "relative flex flex-col justify-between rounded-3xl p-6 h-full min-h-[260px] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg text-white",
-        isSkipped ? "bg-gradient-to-br from-royal-blue to-royal-blue-dark" : "bg-orange-gradient"
+        "relative flex flex-col justify-between rounded-3xl p-6 h-full min-h-[260px] transition-all duration-300 cursor-pointer shadow-md hover:shadow-lg overflow-hidden",
+        isSkipped ? "text-white" : "text-gray-800"
       )}
       onClick={onClick}
     >
-      <div className="flex flex-col items-center">
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div 
+          className={cn(
+            "absolute top-0 left-0 right-0 bg-[#FDE1D3] transition-all duration-500 ease-in-out",
+            isSkipped ? "h-0" : "h-1/2"
+          )}
+        >
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute inset-0 bg-[radial-gradient(#d7c0b0_1px,transparent_1px)] bg-[length:10px_10px]"></div>
+          </div>
+        </div>
+        
+        <div 
+          className={cn(
+            "absolute bottom-0 left-0 right-0 bg-gradient-to-br from-[#33C3F0] to-[#0089B0] transition-all duration-500 ease-in-out",
+            isSkipped ? "h-full" : "h-1/2"
+          )}
+        >
+          <div className="absolute inset-0 opacity-20">
+            <div className="h-full w-full bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-[length:8px_8px]"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div className="relative z-10 flex flex-col items-center">
         <div className="text-5xl mb-2">{habit.emoji}</div>
         <h3 className="text-xl md:text-2xl font-bold text-center break-words">{habit.name}</h3>
         <div className="text-xl md:text-2xl font-semibold mt-2">
@@ -41,7 +64,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
         </div>
       </div>
       
-      <div className="flex justify-center mt-4">
+      <div className="relative z-10 flex justify-center mt-4">
         {isSkipped ? (
           <div className="lifebuoy-container">
             <div className="lifebuoy-outer">
@@ -63,7 +86,7 @@ const HabitCard: React.FC<HabitCardProps> = ({ habit, onClick, onUndo, progress 
       
       {isSkipped && (
         <button 
-          className="absolute top-3 right-3 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors"
+          className="absolute top-3 right-3 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors z-20"
           onClick={(e) => {
             e.stopPropagation();
             onUndo();
