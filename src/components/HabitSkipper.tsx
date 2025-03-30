@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -75,10 +74,7 @@ const HabitSkipper: React.FC = () => {
       return;
     }
     
-    // Skip all eligible habits at once
-    skippableHabits.forEach(habit => {
-      skipHabit(habit.id);
-    });
+    superSkip();
     
     toast.success(`Super Skip activated!`, {
       description: `${skippableHabits.length} habits have been skipped.`,

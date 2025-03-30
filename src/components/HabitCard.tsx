@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -305,7 +304,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           font-size: 1rem;
           font-weight: bold;
           color: #39FF14;
-          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+          text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
           z-index: 1;
           background: transparent;
           border: none;
