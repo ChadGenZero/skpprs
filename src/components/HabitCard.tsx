@@ -178,7 +178,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
         </button>
       )}
 
-      <style jsx>{`
+      <style>{`
         /* Lifebuoy styles */
         .lifebuoyContainer {
           position: relative;
