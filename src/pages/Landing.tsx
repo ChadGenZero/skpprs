@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -76,7 +75,7 @@ const PositionedEmojis = () => (
       <span 
         className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
         style={{ 
-          top: '40%',
+          top: '50%',
           left: '75%',
         }}
       >
