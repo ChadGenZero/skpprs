@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -369,4 +368,22 @@
 @keyframes rotate {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .emoji-mobile {
+    font-size: 2rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .emoji-tablet {
+    font-size: 3rem !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .emoji-desktop {
+    font-size: 4rem !important;
+  }
 }

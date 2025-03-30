@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -44,122 +43,124 @@ const habitItems = [
 ];
 
 const PositionedEmojis = () => (
-  <div style={{ position: 'absolute', width: '100%', height: '100%', zIndex: 50, pointerEvents: 'none' }}>
-    {/* Captain emoji at top left of text box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        top: '220px', 
-        left: '100px',
-        fontSize: '4rem'
-      }}
-    >
-      👨‍✈️
-    </span>
-
-    {/* Sailboat at bottom right of text box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '450px', 
-        right: '100px',
-        fontSize: '4rem'
-      }}
-    >
-      ⛵
-    </span>
-
-    {/* Whale at top right of "Skip & Save Sample" box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        top: '450px', 
-        right: '100px',
-        fontSize: '4rem'
-      }}
-    >
-      🐋
-    </span>
-
-    {/* Anchor at bottom third of desktop view */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '100px', 
-        left: '50%', 
-        transform: 'translateX(-50%)',
-        fontSize: '4rem'
-      }}
-    >
-      ⚓
-    </span>
-
-    {/* Map emoji in its current desktop position */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        top: '400px', 
-        left: '250px',
-        fontSize: '4rem'
-      }}
-    >
-      🗺️
-    </span>
-
-    {/* Female captain at bottom left of "Skip & Save Sample" box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '300px', 
-        left: '100px',
-        fontSize: '4rem'
-      }}
-    >
-      👩‍✈️
-    </span>
-
-    {/* Gem at bottom of "Hidden spending" text box */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '380px', 
-        left: '50%', 
-        transform: 'translateX(-50%)',
-        fontSize: '4rem'
-      }}
-    >
-      💎
-    </span>
-
-    {/* Money bag next to "Start Tracking Your Savings" text */}
-    <span 
-      className="animate-bounce-subtle" 
-      style={{ 
-        position: 'absolute',
-        bottom: '100px', 
-        right: '200px',
-        fontSize: '4rem'
-      }}
-    >
-      💰
-    </span>
+  <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-10">
+    <div className="hidden md:block">
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ 
+          top: '10%',
+          left: '5%',
+        }}
+      >
+        👨‍✈️
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ 
+          top: '15%',
+          right: '5%',
+        }}
+      >
+        ⛵
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ 
+          top: '30%',
+          left: '7%',
+        }}
+      >
+        🗺️
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ 
+          top: '40%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        }}
+      >
+        💎
+      </span>
+    </div>
+    <div className="hidden md:block">
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ 
+          top: '55%',
+          right: '5%',
+        }}
+      >
+        🐋
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ 
+          top: '60%',
+          left: '5%',
+        }}
+      >
+        👩‍✈️
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ 
+          top: '80%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        }}
+      >
+        ⚓
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
+        style={{ 
+          bottom: '10%',
+          right: '15%',
+        }}
+      >
+        💰
+      </span>
+    </div>
+    <div className="block md:hidden">
+      <span 
+        className="absolute animate-bounce-subtle text-3xl"
+        style={{ 
+          top: '5%',
+          right: '10%',
+        }}
+      >
+        ⛵
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-3xl"
+        style={{ 
+          top: '45%',
+          left: '8%',
+        }}
+      >
+        💎
+      </span>
+      <span 
+        className="absolute animate-bounce-subtle text-3xl"
+        style={{ 
+          bottom: '15%',
+          right: '12%',
+        }}
+      >
+        💰
+      </span>
+    </div>
   </div>
 );
 
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      <PositionedEmojis />
-      
-      <div className="container mx-auto px-4 py-12 relative z-10">
-        <header className="flex justify-center md:justify-between items-center py-4 mb-12">
+      <div className="container mx-auto px-4 py-12 relative">
+        <PositionedEmojis />
+        
+        <header className="flex justify-center md:justify-between items-center py-4 mb-12 relative z-20">
           <Link to="/" className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10 h-10 bg-royal-blue rounded-md text-white">
               <span className="text-2xl font-bold tracking-tighter">S</span>
@@ -181,7 +182,7 @@ const Landing: React.FC = () => {
           </div>
         </header>
         
-        <main>
+        <main className="relative z-20">
           <section className="mb-16">
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-4xl font-bold mb-6 text-gray-900">Skip, Save, & Stack Sats!</h2>
@@ -244,7 +245,7 @@ const Landing: React.FC = () => {
           </section>
         </main>
         
-        <footer className="text-center py-8 text-gray-500 text-sm">
+        <footer className="text-center py-8 text-gray-500 text-sm relative z-20">
           <p>© 2025 Skiipper. All rights reserved.</p>
         </footer>
       </div>
