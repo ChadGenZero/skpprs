@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -45,23 +44,18 @@ const habitItems = [
 
 const PositionedEmojis = () => (
   <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
-    <span className="emoji-bounce absolute text-6xl top-[8%] left-[15%]">👨‍✈️</span>
+    <span className="emoji-bounce absolute text-6xl top-[12%] left-[15%]">👨‍✈️</span>
     <span className="emoji-bounce absolute text-6xl top-[42%] left-[85%]">🐋</span>
     <span className="emoji-bounce absolute text-6xl top-[30%] left-[20%]">🗺️</span>
     <span className="emoji-bounce absolute text-6xl top-[65%] left-[55%]">⚓</span>
-    <span className="emoji-bounce absolute text-6xl top-[15%] left-[75%]">🧭</span>
-    <span className="emoji-bounce absolute text-6xl top-[75%] left-[10%]">⛵</span>
-    <span className="emoji-bounce absolute text-6xl top-[85%] left-[35%]">👩‍✈️</span>
+    <span className="emoji-bounce absolute text-6xl top-[15%] left-[75%]">⛵</span>
+    <span className="emoji-bounce absolute text-6xl top-[75%] left-[10%]">👩‍✈️</span>
   </div>
 );
-
-// Removed GlowingWavesBackground component
 
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      {/* Removed GlowingWavesBackground component from here */}
-      
       <PositionedEmojis />
       
       <div className="container mx-auto px-4 py-12 relative z-10">
