@@ -56,27 +56,28 @@ const PositionedEmojis = () => (
   </div>
 );
 
+// Dynamic glowing waves background component
+const GlowingWavesBackground = () => (
+  <div className="wave-container">
+    <div className="wave">
+      <div className="wave-item">
+        <div className="wave-inner"></div>
+      </div>
+      <div className="wave-item">
+        <div className="wave-inner"></div>
+      </div>
+      <div className="wave-item">
+        <div className="wave-inner"></div>
+      </div>
+    </div>
+  </div>
+);
+
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      {/* Wave ripple background effect */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0">
-          <svg width="100%" height="100%" viewBox="0 0 100 20">
-            <defs>
-              <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
-                <path d="M0,10 Q25,15 50,10 Q75,5 100,10 Q125,15 150,10" fill="none" stroke="#0EA5E9" strokeWidth="0.8" opacity="0.15" />
-              </pattern>
-            </defs>
-            <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
-            <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" />
-            <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" />
-            <rect x="0" y="60" width="100%" height="100%" fill="url(#ocean-pattern)" />
-            <rect x="0" y="80" width="100%" height="100%" fill="url(#ocean-pattern)" />
-            <rect x="0" y="100" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          </svg>
-        </div>
-      </div>
+      {/* Dynamic glowing waves background effect */}
+      <GlowingWavesBackground />
       
       <PositionedEmojis />
       
