@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 
-// Updated habit items to match the ones from HabitSelector
 const habitItems = [
   { 
     name: "Coffee", 
@@ -55,19 +54,12 @@ const PositionedEmojis = () => (
   </div>
 );
 
-// Enhanced glowing waves background component
 const GlowingWavesBackground = () => (
   <div className="wave-container">
     <div className="wave">
-      <div className="wave-item">
-        <div className="wave-inner"></div>
-      </div>
-      <div className="wave-item">
-        <div className="wave-inner"></div>
-      </div>
-      <div className="wave-item">
-        <div className="wave-inner"></div>
-      </div>
+      <div className="wave-item"></div>
+      <div className="wave-item"></div>
+      <div className="wave-item"></div>
     </div>
   </div>
 );
@@ -75,7 +67,6 @@ const GlowingWavesBackground = () => (
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      {/* Dynamic glowing waves background effect */}
       <GlowingWavesBackground />
       
       <PositionedEmojis />
