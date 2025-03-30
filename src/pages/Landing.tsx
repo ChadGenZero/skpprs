@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import InteractiveBackground from '@/components/InteractiveBackground';
 
 const habitItems = [
   { 
@@ -161,8 +163,10 @@ const PositionedEmojis = () => (
 
 const Landing: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      <div className="container mx-auto px-4 py-12 relative">
+    <div className="min-h-screen relative overflow-hidden">
+      <InteractiveBackground />
+      
+      <div className="container mx-auto px-4 py-12 relative z-10">
         <PositionedEmojis />
         
         <header className="flex justify-center md:justify-between items-center py-4 mb-12 relative z-20">

@@ -387,3 +387,98 @@
     font-size: 4rem !important;
   }
 }
+
+/* Interactive Background Styles */
+.interactive-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(0deg, #0EA5E9 0%, #7DD3FC 100%);
+  transition: background 0.3s ease-out;
+}
+
+.ocean-surface {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, transparent 0%, rgba(14, 165, 233, 0.2) 30%, rgba(14, 165, 233, 0.5) 100%);
+  background-size: 400% 400%;
+  animation: ocean-wave 15s ease infinite;
+}
+
+.ocean-surface::before,
+.ocean-surface::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 200%;
+  height: 12px;
+  background-repeat: repeat-x;
+  opacity: 0.5;
+}
+
+.ocean-surface::before {
+  top: 50%;
+  background-image: radial-gradient(ellipse at center, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 70%);
+  background-size: 50px 10px;
+  animation: wave-move 10s linear infinite;
+}
+
+.ocean-surface::after {
+  top: 55%;
+  background-image: radial-gradient(ellipse at center, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%);
+  background-size: 40px 8px;
+  animation: wave-move 12s linear infinite reverse;
+}
+
+@keyframes wave-move {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ocean-wave {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+/* Ripple effect */
+.ripple {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: ripple-effect 2s ease-out forwards;
+}
+
+@keyframes ripple-effect {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 0.5;
+  }
+  100% {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+}
