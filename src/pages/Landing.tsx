@@ -7,7 +7,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@
 
 const habitItems = [
   { 
-    name: "Daily Coffee", 
+    name: "Coffee", 
     icon: <span className="text-orange-500 text-xl">☕</span>, 
     cost: "$5.00", 
     frequency: "Daily", 
@@ -35,32 +35,11 @@ const habitItems = [
     savings: "$2,080 / year" 
   },
   { 
-    name: "In-game Purchases", 
-    icon: <span className="text-green-500 text-xl">🎮</span>, 
-    cost: "$10.00", 
-    frequency: "2x week", 
-    savings: "$1,040 / year" 
-  },
-  { 
     name: "Energy Drinks/Sodas", 
     icon: <span className="text-yellow-500 text-xl">⚡</span>, 
     cost: "$3.50", 
     frequency: "5x week", 
     savings: "$910 / year" 
-  },
-  { 
-    name: "Lottery/Gambling", 
-    icon: <span className="text-purple-500 text-xl">🎰</span>, 
-    cost: "$50.00", 
-    frequency: "2x week", 
-    savings: "$5,200 / year" 
-  },
-  { 
-    name: "Alcohol", 
-    icon: <span className="text-amber-500 text-xl">🍺</span>, 
-    cost: "$40.00", 
-    frequency: "2x week", 
-    savings: "$4,160 / year" 
   }
 ];
 
@@ -69,28 +48,31 @@ const Landing: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
       {/* Ocean ripple background */}
       <div className="absolute inset-0 z-0 opacity-10">
-        <div className="absolute top-20 left-10 text-6xl animate-pulse">🐋</div>
-        <div className="absolute top-40 right-20 text-5xl animate-bounce">⛵</div>
-        <div className="absolute bottom-40 left-1/4 text-4xl">⚓</div>
-        <div className="absolute top-1/3 right-1/3 text-5xl animate-pulse">🧭</div>
-        <div className="absolute bottom-20 right-10 text-6xl">🗺️</div>
-        <div className="absolute top-10 right-1/4 text-4xl">👨‍✈️</div>
-        <div className="absolute bottom-1/3 left-20 text-5xl">👩‍✈️</div>
-        
-        {/* Ocean ripple effect */}
+        {/* Ocean ripple effect - animated with CSS */}
         <svg width="100%" height="100%" className="absolute inset-0">
           <defs>
             <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
               <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.3" />
             </pattern>
           </defs>
-          <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="60" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="80" width="100%" height="100%" fill="url(#ocean-pattern)" />
-          <rect x="0" y="100" width="100%" height="100%" fill="url(#ocean-pattern)" />
+          <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" className="animate-ocean-ripple" />
+          <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" className="animate-ocean-ripple" />
+          <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" className="animate-ocean-ripple" />
+          <rect x="0" y="60" width="100%" height="100%" fill="url(#ocean-pattern)" className="animate-ocean-ripple" />
+          <rect x="0" y="80" width="100%" height="100%" fill="url(#ocean-pattern)" className="animate-ocean-ripple" />
+          <rect x="0" y="100" width="100%" height="100%" fill="url(#ocean-pattern)" className="animate-ocean-ripple" />
         </svg>
+      </div>
+      
+      {/* Floating emoji decorations - moved to foreground */}
+      <div className="absolute inset-0 z-1 pointer-events-none">
+        <div className="absolute top-[15%] left-[10%] text-4xl animate-bounce-subtle">🐋</div>
+        <div className="absolute top-[25%] right-[15%] text-4xl animate-bounce-subtle">⛵</div>
+        <div className="absolute bottom-[30%] left-[25%] text-4xl animate-bounce-subtle">⚓</div>
+        <div className="absolute top-[40%] right-[30%] text-4xl animate-bounce-subtle">🧭</div>
+        <div className="absolute bottom-[15%] right-[10%] text-4xl animate-bounce-subtle">🗺️</div>
+        <div className="absolute top-[10%] right-[25%] text-4xl animate-bounce-subtle">👨‍✈️</div>
+        <div className="absolute bottom-[25%] left-[15%] text-4xl animate-bounce-subtle">👩‍✈️</div>
       </div>
       
       <div className="container mx-auto px-4 py-12 relative z-10">

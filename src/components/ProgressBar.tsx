@@ -18,20 +18,8 @@ const ProgressBar: React.FC = () => {
 
   // Function to handle step click, ensuring proper navigation rules
   const handleStepClick = (clickedStep: number) => {
-    // Always allow clicking on step 1
-    if (clickedStep === 1) {
-      setStep(1);
-      return;
-    }
-    
-    // For step 2 and beyond, only allow if user has selected habits or already reached a later step
-    if (clickedStep === 2 && (selectedHabits.length > 0 || step > 2)) {
-      setStep(2);
-      return;
-    }
-    
-    // For other steps, only allow navigation to steps we've already reached
-    if (clickedStep <= Math.max(step, 2)) {
+    // Only allow clicking previous steps if we've already been there
+    if (clickedStep < step) {
       setStep(clickedStep);
     }
   };
@@ -55,14 +43,12 @@ const ProgressBar: React.FC = () => {
           const verticalPosition = index * (100 / (steps.length - 1));
           const isStepCompleted = s.step < step;
           const isStepCurrent = s.step === step;
-          const canNavigate = s.step === 1 || 
-                             (s.step === 2 && selectedHabits.length > 0) || 
-                             (s.step <= Math.max(step, 2));
+          const canNavigate = s.step < step; // Only allow navigation to previous steps
           
           return (
             <div 
               key={s.step}
-              className="absolute left-1/2 -translate-x-1/2"
+              className="absolute left-1/2 -translate-x-1/2 flex items-center"
               style={{ 
                 top: `${verticalPosition}%`
               }}
@@ -70,31 +56,28 @@ const ProgressBar: React.FC = () => {
               <button
                 onClick={() => handleStepClick(s.step)}
                 className={cn(
-                  "progress-dot group flex items-center justify-center",
+                  "progress-dot flex items-center justify-center",
                   isStepCurrent && "active",
                   isStepCompleted && "completed",
-                  canNavigate ? "cursor-pointer" : "cursor-not-allowed opacity-60"
+                  canNavigate ? "cursor-pointer" : "cursor-default"
                 )}
-                disabled={!canNavigate}
+                disabled={!canNavigate && !isStepCurrent}
                 aria-label={`Go to step ${s.step}: ${s.title}`}
               >
                 {isStepCompleted ? (
                   <Check className="w-4 h-4 text-white" />
                 ) : (
-                  <span className={cn(
-                    "font-medium",
-                    isStepCurrent ? "text-white" : "text-white"
-                  )}>{s.step}</span>
+                  <span className="font-medium text-white">{s.step}</span>
                 )}
                 
                 {/* Life buoy ring effect */}
                 <div className="absolute inset-0 ring-effect"></div>
               </button>
               
-              {/* Step Title */}
+              {/* Step Title - positioned horizontally to the right */}
               <div className={cn(
-                "text-sm font-medium mt-2 whitespace-nowrap transition-all absolute left-10",
-                isStepCurrent ? "text-royal-blue font-semibold scale-105" : "text-gray-500",
+                "text-sm font-medium ml-4 whitespace-nowrap",
+                isStepCurrent ? "text-royal-blue font-semibold" : "text-gray-500",
                 isStepCompleted && "text-gray-400"
               )}>
                 {s.title}

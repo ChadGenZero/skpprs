@@ -111,6 +111,10 @@ export default {
 					'0%, 100%': { transform: 'translateY(0)' },
 					'50%': { transform: 'translateY(-10px)' }
 				},
+				'ocean-ripple': {
+					'0%': { transform: 'translateX(0%)' },
+					'100%': { transform: 'translateX(-50%)' }
+				},
 				'bounce-subtle': {
 					'0%, 100%': { transform: 'translateY(0)' },
 					'50%': { transform: 'translateY(-5px)' }
@@ -137,7 +141,8 @@ export default {
 				'slide-out': 'slide-out-left 0.3s ease-out',
 				'scale-in': 'scale-in 0.2s ease-out',
 				'float': 'float 6s ease-in-out infinite',
-				'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
+				'ocean-ripple': 'ocean-ripple 20s linear infinite',
+				'bounce-subtle': 'bounce-subtle 3s ease-in-out infinite',
 				'pulse-subtle': 'pulse-subtle 3s ease-in-out infinite',
 				'rotate': 'rotate 2s linear infinite',
 				'buoy-float': 'buoy-float 3s ease-in-out infinite'
