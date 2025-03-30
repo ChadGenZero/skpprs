@@ -229,7 +229,7 @@
 }
 
 .emoji-bounce {
-  animation: gentle-bounce 4s ease-in-out infinite;
+  animation: gentle-bounce 3s ease-in-out infinite;
   opacity: 0.8;
 }
 

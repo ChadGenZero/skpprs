@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 
+// Updated habit items to match the ones from HabitSelector
 const habitItems = [
   { 
     name: "Coffee", 
@@ -47,17 +48,36 @@ const PositionedEmojis = () => (
   <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
     <span className="emoji-bounce absolute text-6xl top-[8%] left-[15%]">👨‍✈️</span>
     <span className="emoji-bounce absolute text-6xl top-[42%] left-[85%]">🐋</span>
-    <span className="emoji-bounce absolute text-6xl top-[75%] left-[10%]">⛵</span>
+    <span className="emoji-bounce absolute text-6xl top-[30%] left-[20%]">⛵</span>
     <span className="emoji-bounce absolute text-6xl top-[65%] left-[55%]">⚓</span>
     <span className="emoji-bounce absolute text-6xl top-[15%] left-[75%]">🧭</span>
-    <span className="emoji-bounce absolute text-6xl top-[85%] left-[35%]">🗺️</span>
-    <span className="emoji-bounce absolute text-6xl top-[30%] left-[20%]">👩‍✈️</span>
+    <span className="emoji-bounce absolute text-6xl top-[75%] left-[10%]">🗺️</span>
+    <span className="emoji-bounce absolute text-6xl top-[85%] left-[35%]">👩‍✈️</span>
   </div>
 );
 
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
+      {/* Wave ripple background effect */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <div className="absolute inset-0">
+          <svg width="100%" height="100%" viewBox="0 0 100 20">
+            <defs>
+              <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
+                <path d="M0,10 Q25,15 50,10 Q75,5 100,10 Q125,15 150,10" fill="none" stroke="#0EA5E9" strokeWidth="0.8" opacity="0.15" />
+              </pattern>
+            </defs>
+            <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="20" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="40" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="60" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="80" width="100%" height="100%" fill="url(#ocean-pattern)" />
+            <rect x="0" y="100" width="100%" height="100%" fill="url(#ocean-pattern)" />
+          </svg>
+        </div>
+      </div>
+      
       <PositionedEmojis />
       
       <div className="container mx-auto px-4 py-12 relative z-10">
