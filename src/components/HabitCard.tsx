@@ -187,7 +187,8 @@ const HabitCard: React.FC<HabitCardProps> = ({
         </button>
       )}
 
-      <style jsx>{`
+      <style>
+        {`
         /* Lifebuoy styles */
         .lifebuoyContainer {
           position: relative;
@@ -368,7 +369,8 @@ const HabitCard: React.FC<HabitCardProps> = ({
         .foam-shape-${uniqueId} {
           animation: foam-wave 2s infinite ease-in-out;
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
