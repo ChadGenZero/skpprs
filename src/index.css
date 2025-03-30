@@ -230,8 +230,6 @@
 
 .wave {
   position: absolute;
-  bottom: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
@@ -239,35 +237,58 @@
 
 .wave-item {
   position: absolute;
-  width: 200%;
-  height: 200px;
+  width: 100%;
+  right: -50%;
   background: rgba(30, 174, 219, 0.2);
-  border-radius: 48%;
 }
 
 .wave-item:nth-child(1) {
-  bottom: -25%;
-  animation: wave-roll 20s linear infinite;
+  height: 180px;
+  border-radius: 40%;
+  top: 10%;
+  animation: wave-roll-1 12s linear infinite;
 }
 
 .wave-item:nth-child(2) {
-  bottom: -35%;
+  height: 140px; 
+  border-radius: 38%;
+  top: 40%;
   background: rgba(14, 165, 233, 0.15);
-  animation: wave-roll 15s linear infinite;
+  animation: wave-roll-2 10s linear infinite;
 }
 
 .wave-item:nth-child(3) {
-  bottom: -50%;
+  height: 160px;
+  border-radius: 42%;
+  top: 70%;
   background: rgba(6, 182, 212, 0.1);
-  animation: wave-roll 10s linear infinite;
+  animation: wave-roll-3 14s linear infinite;
 }
 
-@keyframes wave-roll {
+@keyframes wave-roll-1 {
+  0% {
+    transform: translateX(-5%) rotate(0);
+  }
+  100% {
+    transform: translateX(-100%) rotate(360deg);
+  }
+}
+
+@keyframes wave-roll-2 {
   0% {
     transform: translateX(0) rotate(0);
   }
   100% {
-    transform: translateX(-50%) rotate(360deg);
+    transform: translateX(-100%) rotate(-360deg);
+  }
+}
+
+@keyframes wave-roll-3 {
+  0% {
+    transform: translateX(-10%) rotate(0);
+  }
+  100% {
+    transform: translateX(-100%) rotate(360deg);
   }
 }
 
