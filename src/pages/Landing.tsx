@@ -47,7 +47,7 @@ const habitItems = [
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      {/* Ocean ripple background with continuous animation */}
+      {/* Ocean ripple background now stationary */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 ocean-pattern">
           <svg width="100%" height="100%">

@@ -216,7 +216,7 @@
 }
 
 .ocean-pattern {
-  animation: ocean-wave 20s linear infinite;
+  /* Removed animation to make the pattern stationary */
 }
 
 @keyframes ocean-wave {
