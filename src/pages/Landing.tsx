@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 const PositionedEmojis = () => (
   <div 
     className="absolute inset-0 z-50 pointer-events-none overflow-hidden"
@@ -106,3 +108,25 @@ const PositionedEmojis = () => (
     </span>
   </div>
 );
+
+const Landing = () => {
+  return (
+    <div className="relative min-h-screen bg-background flex flex-col items-center justify-center p-4">
+      <PositionedEmojis />
+      <div className="max-w-3xl text-center">
+        <h1 className="text-4xl md:text-6xl font-bold mb-6">Save Through Small Changes</h1>
+        <p className="text-xl mb-8">
+          Track spending habits and see how small daily changes can lead to big savings over time.
+        </p>
+        <a 
+          href="/app" 
+          className="bg-primary text-primary-foreground px-6 py-3 rounded-md text-lg font-medium hover:bg-primary/90 transition-colors"
+        >
+          Start Saving Now
+        </a>
+      </div>
+    </div>
+  );
+};
+
+export default Landing;
