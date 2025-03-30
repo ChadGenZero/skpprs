@@ -49,18 +49,6 @@ const Landing: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
       {/* Ocean ripple background with continuous animation */}
       <div className="absolute inset-0 z-0">
-        {/* Ocean emojis with uniform size and gentle bounce */}
-        <div className="absolute z-10">
-          <div className="absolute top-[10%] left-[8%] emoji-bounce text-5xl">🐋</div>
-          <div className="absolute top-[25%] right-[25%] emoji-bounce text-5xl">⛵</div>
-          <div className="absolute bottom-[30%] left-[20%] emoji-bounce text-5xl">⚓</div>
-          <div className="absolute top-[40%] left-[35%] emoji-bounce text-5xl">🧭</div>
-          <div className="absolute bottom-[20%] right-[22%] emoji-bounce text-5xl">🗺️</div>
-          <div className="absolute top-[18%] right-[10%] emoji-bounce text-5xl">👨‍✈️</div>
-          <div className="absolute bottom-[40%] right-[35%] emoji-bounce text-5xl">👩‍✈️</div>
-        </div>
-        
-        {/* Ocean ripple effect with continuous horizontal animation */}
         <div className="absolute inset-0 ocean-pattern">
           <svg width="100%" height="100%">
             <defs>
@@ -165,7 +153,7 @@ const Landing: React.FC = () => {
         </main>
         
         <footer className="text-center py-8 text-gray-500 text-sm">
-          <p>© 2023 Skiipper. All rights reserved.</p>
+          <p>© 2025 Skiipper. All rights reserved.</p>
         </footer>
       </div>
     </div>
