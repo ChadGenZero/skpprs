@@ -66,22 +66,23 @@ const HabitSkipper: React.FC = () => {
   };
 
   const handleSuperSkip = () => {
-    let skipCount = 0;
+    const skippableHabits = selectedHabits.filter(habit => 
+      canSkipToday(habit) && !habit.isForfeited
+    );
     
-    selectedHabits.forEach(habit => {
-      if (canSkipToday(habit) && !habit.isForfeited) {
-        skipHabit(habit.id);
-        skipCount++;
-      }
+    if (skippableHabits.length === 0) {
+      toast.info('No habits available to skip right now.');
+      return;
+    }
+    
+    // Skip all eligible habits at once
+    skippableHabits.forEach(habit => {
+      skipHabit(habit.id);
     });
     
-    if (skipCount > 0) {
-      toast.success(`Super Skip activated!`, {
-        description: `${skipCount} habits have been skipped.`,
-      });
-    } else {
-      toast.info('No habits available to skip right now.');
-    }
+    toast.success(`Super Skip activated!`, {
+      description: `${skippableHabits.length} habits have been skipped.`,
+    });
   };
 
   return (

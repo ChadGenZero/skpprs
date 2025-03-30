@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 export type Frequency = 'daily' | 'weekly' | 'fortnightly' | 'monthly' | 'quarterly' | 'yearly';
@@ -453,17 +452,33 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const superSkip = () => {
-    selectedHabits.forEach(habit => {
-      if (habit.period === 'daily' && !habit.isForfeited) {
-        const todaySkips = getTodaySkips(habit.id);
-        if (todaySkips.length < habit.frequency) {
-          const remainingSkips = habit.frequency - todaySkips.length;
-          for (let i = 0; i < remainingSkips; i++) {
-            skipHabit(habit.id);
-          }
-        }
+    const habitsToSkip = selectedHabits.filter(habit => 
+      canSkipToday(habit) && !habit.isForfeited
+    );
+    
+    let updatedHabits = [...habits];
+    
+    habitsToSkip.forEach(habit => {
+      const habitIndex = updatedHabits.findIndex(h => h.id === habit.id);
+      if (habitIndex !== -1) {
+        const skipAmount = habit.expense;
+        updatedHabits[habitIndex] = {
+          ...updatedHabits[habitIndex],
+          skipped: updatedHabits[habitIndex].skipped + 1,
+          skippedDays: [
+            ...updatedHabits[habitIndex].skippedDays,
+            {
+              habitId: habit.id,
+              date: new Date().toISOString(),
+              amountSaved: skipAmount,
+              isSpent: false
+            }
+          ]
+        };
       }
     });
+    
+    setHabits(updatedHabits);
   };
 
   const getDaysTillNextSkip = (habit: Habit): number => {
@@ -471,24 +486,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     const dayOfWeek = today.getDay(); // 0 is Sunday, 1 is Monday, etc.
     
     if (['fortnightly', 'monthly', 'quarterly', 'yearly'].includes(habit.period)) {
-      // For longer period habits, skips are available at the end of the week (Sunday)
       return dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
     }
     
-    // Daily habits can skip any day, so 0 days
     if (habit.period === 'daily') {
       const todaySkips = getTodaySkips(habit.id);
       if (todaySkips.length >= habit.frequency) {
-        return 1; // Need to wait until tomorrow
+        return 1;
       }
       return 0;
     }
     
-    // Weekly habits are limited to one skip per day
     if (habit.period === 'weekly') {
       const todaySkips = getTodaySkips(habit.id).filter(skip => !skip.isSpent);
       if (todaySkips.length >= 1) {
-        return 1; // Need to wait until tomorrow
+        return 1;
       }
       return 0;
     }
@@ -506,7 +518,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             {
               habitId,
               date: new Date().toISOString(),
-              amountSaved: 0, // No savings when spent
+              amountSaved: 0,
               isSpent: true
             }
           ]

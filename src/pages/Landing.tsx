@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -229,7 +230,7 @@ const Landing: React.FC = () => {
                             <TableCell className="font-medium">{item.name}</TableCell>
                             <TableCell>{item.cost}</TableCell>
                             <TableCell>{item.frequency}</TableCell>
-                            <TableCell className="font-bold text-green-600">{item.savings}</TableCell>
+                            <TableCell className="font-bold" style={{ color: "#39FF14" }}>{item.savings}</TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
