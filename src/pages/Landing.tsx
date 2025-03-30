@@ -102,8 +102,8 @@ const PositionedEmojis = () => (
       <span 
         className="absolute animate-bounce-subtle text-4xl md:text-5xl lg:text-6xl"
         style={{ 
-          bottom: '5%',
-          right: '15%',
+          bottom: '7%',
+          right: '18%',
         }}
       >
         ⚓
