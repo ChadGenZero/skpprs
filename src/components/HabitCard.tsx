@@ -303,7 +303,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           justify-content: center;
           font-size: 1rem;
           font-weight: bold;
-          color: #39FF14;
+          color: theme('colors.green.500');
           text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
           z-index: 1;
           background: transparent;
