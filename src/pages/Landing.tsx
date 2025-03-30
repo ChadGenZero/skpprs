@@ -44,16 +44,29 @@ const habitItems = [
   }
 ];
 
+// Emoji components with positioning classes
+const PositionedEmojis = () => (
+  <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
+    <span className="emoji-bounce absolute text-3xl top-[15%] left-[10%]">👨‍✈️</span>
+    <span className="emoji-bounce absolute text-3xl top-[40%] left-[80%]">🐋</span>
+    <span className="emoji-bounce absolute text-3xl top-[70%] left-[15%]">⛵</span>
+    <span className="emoji-bounce absolute text-3xl top-[60%] left-[60%]">⚓</span>
+    <span className="emoji-bounce absolute text-3xl top-[25%] left-[70%]">🧭</span>
+    <span className="emoji-bounce absolute text-3xl top-[80%] left-[40%]">🗺️</span>
+    <span className="emoji-bounce absolute text-3xl top-[35%] left-[25%]">👩‍✈️</span>
+  </div>
+);
+
 const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
-      {/* Ocean ripple background now stationary */}
+      {/* Ocean ripple background with slow animation */}
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 ocean-pattern">
           <svg width="100%" height="100%">
             <defs>
               <pattern id="ocean-pattern" x="0" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
-                <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.3" />
+                <path d="M0,10 Q25,20 50,10 Q75,0 100,10 Q125,20 150,10" fill="none" stroke="#0EA5E9" strokeWidth="1" opacity="0.15" />
               </pattern>
             </defs>
             <rect x="0" y="0" width="100%" height="100%" fill="url(#ocean-pattern)" />
@@ -65,6 +78,9 @@ const Landing: React.FC = () => {
           </svg>
         </div>
       </div>
+      
+      {/* Positioned emojis layer */}
+      <PositionedEmojis />
       
       <div className="container mx-auto px-4 py-12 relative z-10">
         <header className="flex justify-center md:justify-between items-center py-4 mb-12">
