@@ -43,13 +43,15 @@ const habitItems = [
 ];
 
 const PositionedEmojis = () => (
-  <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
-    <span className="emoji-bounce absolute text-6xl top-[12%] left-[15%]">👨‍✈️</span>
-    <span className="emoji-bounce absolute text-6xl top-[42%] left-[85%]">🐋</span>
-    <span className="emoji-bounce absolute text-6xl top-[30%] left-[20%]">🗺️</span>
-    <span className="emoji-bounce absolute text-6xl top-[65%] left-[55%]">⚓</span>
-    <span className="emoji-bounce absolute text-6xl top-[15%] left-[75%]">⛵</span>
-    <span className="emoji-bounce absolute text-6xl top-[75%] left-[10%]">👩‍✈️</span>
+  <div className="absolute inset-0 z-20 pointer-events-none">
+    <span className="emoji-bounce fixed text-6xl" style={{ top: '340px', left: '220px' }}>👨‍✈️</span>
+    <span className="emoji-bounce fixed text-6xl" style={{ top: '520px', left: '780px' }}>⛵</span>
+    <span className="emoji-bounce fixed text-6xl" style={{ top: '600px', left: '780px' }}>🐋</span>
+    <span className="emoji-bounce fixed text-6xl" style={{ top: '850px', left: '500px' }}>⚓</span>
+    <span className="emoji-bounce fixed text-6xl" style={{ top: '400px', left: '250px' }}>🗺️</span>
+    <span className="emoji-bounce fixed text-6xl" style={{ top: '800px', left: '220px' }}>👩‍✈️</span>
+    <span className="emoji-bounce fixed text-6xl" style={{ top: '520px', left: '480px' }}>💎</span>
+    <span className="emoji-bounce fixed text-6xl" style={{ top: '850px', left: '630px' }}>💰</span>
   </div>
 );
 
