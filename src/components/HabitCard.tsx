@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { Undo, LifeBuoy } from 'lucide-react';
@@ -19,7 +19,23 @@ const HabitCard: React.FC<HabitCardProps> = ({
   onUndo, 
   progress 
 }) => {
+  const [isAnimating, setIsAnimating] = useState(false);
   const isSkipped = progress.completed > 0;
+  
+  // Reset animation state when habit skipped status changes
+  useEffect(() => {
+    setIsAnimating(isSkipped);
+  }, [isSkipped]);
+  
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    onClick();
+  };
+
+  const handleUndoClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onUndo();
+  };
   
   return (
     <div 
@@ -27,7 +43,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
         "relative flex flex-col justify-between rounded-3xl p-6 h-full min-h-[260px] transition-all duration-500 ease-in-out cursor-pointer shadow-md hover:shadow-lg overflow-hidden habit-card",
         isSkipped ? "text-white" : "text-gray-800"
       )}
-      onClick={onClick}
+      onClick={handleClick}
     >
       {/* Background with Sand and Water as SVG shapes */}
       <svg
@@ -172,17 +188,13 @@ const HabitCard: React.FC<HabitCardProps> = ({
       {isSkipped && (
         <button 
           className="absolute top-3 right-3 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors z-20"
-          onClick={(e) => {
-            e.stopPropagation();
-            onUndo();
-          }}
+          onClick={handleUndoClick}
         >
           <Undo size={18} />
         </button>
       )}
 
-      <style>
-        {`
+      <style jsx>{`
         /* Lifebuoy styles */
         .lifebuoyContainer {
           position: relative;
@@ -304,7 +316,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           justify-content: center;
           font-size: 1rem;
           font-weight: bold;
-          color: theme('colors.green.500');
+          color: ${theme('colors.green.500')};
           text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
           z-index: 1;
           background: transparent;
@@ -375,8 +387,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
             opacity: 0.3;
           }
         }
-        `}
-      </style>
+      `}</style>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
@@ -22,18 +22,36 @@ const HabitSkipper: React.FC = () => {
     unskipLog
   } = useAppContext();
   
+  // Track habits being processed to prevent simultaneous skip operations
+  const [processingHabits, setProcessingHabits] = useState<Set<string>>(new Set());
+  
   const handleSkipHabit = (habitId: string) => {
+    // Prevent duplicate skip operations
+    if (processingHabits.has(habitId)) return;
+    
     const habit = selectedHabits.find(h => h.id === habitId);
     
     if (habit) {
       const progress = getSkipGoalProgress(habit);
       const canSkip = canSkipToday(habit);
       
+      // Skip if possible
       if (canSkip && !habit.isForfeited) {
+        setProcessingHabits(prev => new Set(prev).add(habitId));
+        
         skipHabit(habitId);
         toast.success('Habit skipped!', {
           description: `Great job! You saved ${formatCurrency(habit.expense)}.`,
         });
+        
+        // Remove from processing after animation has time to complete
+        setTimeout(() => {
+          setProcessingHabits(prev => {
+            const updated = new Set(prev);
+            updated.delete(habitId);
+            return updated;
+          });
+        }, 1000);
       } else if (habit.isForfeited) {
         toast.error('This habit has been forfeited for this week');
       } else {
@@ -43,12 +61,17 @@ const HabitSkipper: React.FC = () => {
   };
 
   const handleUndoSkip = (habitId: string) => {
+    // Prevent duplicate undo operations
+    if (processingHabits.has(habitId)) return;
+    
     const habit = selectedHabits.find(h => h.id === habitId);
     
     if (habit) {
       const todaySkips = habit.skippedDays.filter(skip => isToday(skip.date));
       
       if (todaySkips.length > 0) {
+        setProcessingHabits(prev => new Set(prev).add(habitId));
+        
         const skipIndex = habit.skippedDays.findIndex(
           skip => isToday(skip.date)
         );
@@ -58,6 +81,15 @@ const HabitSkipper: React.FC = () => {
           toast.success('Skip undone!', {
             description: `You've undone your last skip of ${habit.name}.`,
           });
+          
+          // Remove from processing after animation has time to complete
+          setTimeout(() => {
+            setProcessingHabits(prev => {
+              const updated = new Set(prev);
+              updated.delete(habitId);
+              return updated;
+            });
+          }, 1000);
         }
       } else {
         toast.info('No skips today to undo');
@@ -75,11 +107,26 @@ const HabitSkipper: React.FC = () => {
       return;
     }
     
+    // Mark all habits as processing
+    const processingIds = new Set(skippableHabits.map(h => h.id));
+    setProcessingHabits(processingIds);
+    
     superSkip();
     
     toast.success(`Super Skip activated!`, {
       description: `${skippableHabits.length} habits have been skipped.`,
     });
+    
+    // Clear processing state after animation completes
+    setTimeout(() => {
+      setProcessingHabits(new Set());
+    }, 1000);
+  };
+
+  // Function to determine if card should show skipped state
+  const shouldShowSkipped = (habit: Habit) => {
+    const todaySkips = habit.skippedDays.filter(skip => isToday(skip.date));
+    return todaySkips.length > 0;
   };
 
   return (
