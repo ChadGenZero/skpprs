@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -152,7 +153,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           <div className="lifebuoyContainer lifebuoyAnim">
             <div className="lifebuoyOuter">
               <div className="lifebuoyRing"></div>
-              <div className="lifebuoyCenter text-green-500">
+              <div className="lifebuoyCenter">
                 {formatCurrency(habit.expense)}
               </div>
               <div className="lifebuoySegments"></div>
