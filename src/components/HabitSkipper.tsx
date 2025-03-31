@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useAppContext } from '@/context/AppContext';
+import { useAppContext, Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';

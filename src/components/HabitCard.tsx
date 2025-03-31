@@ -194,7 +194,8 @@ const HabitCard: React.FC<HabitCardProps> = ({
         </button>
       )}
 
-      <style jsx>{`
+      <style>
+        {`
         /* Lifebuoy styles */
         .lifebuoyContainer {
           position: relative;
@@ -316,7 +317,7 @@ const HabitCard: React.FC<HabitCardProps> = ({
           justify-content: center;
           font-size: 1rem;
           font-weight: bold;
-          color: ${theme('colors.green.500')};
+          color: #22c55e;
           text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
           z-index: 1;
           background: transparent;
@@ -387,7 +388,8 @@ const HabitCard: React.FC<HabitCardProps> = ({
             opacity: 0.3;
           }
         }
-      `}</style>
+        `}
+      </style>
     </div>
   );
 };
