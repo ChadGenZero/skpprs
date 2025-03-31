@@ -162,7 +162,14 @@ const PositionedEmojis = () => (
 
 const Landing: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white relative overflow-hidden">
+    <div 
+      className="min-h-screen relative overflow-hidden" 
+      style={{ 
+        backgroundImage: "url('/lovable-uploads/0c012198-1109-4f31-b91b-0e9ab8cd3ad5.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center"
+      }}
+    >
       <div className="container mx-auto px-4 py-12 relative">
         <PositionedEmojis />
         
