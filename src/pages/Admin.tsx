@@ -14,6 +14,12 @@ interface UserStats {
   total_savings: number;
 }
 
+// Define the type for the RPC function parameters
+interface UserStatsParams {
+  week_start: string;
+  week_end: string;
+}
+
 const Admin: React.FC = () => {
   const [users, setUsers] = useState<UserStats[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,12 +60,14 @@ const Admin: React.FC = () => {
     try {
       setLoading(true);
       
-      // Get user stats for the current week - pass parameters as an object
+      // Get user stats for the current week - explicitly type the parameters
+      const params: UserStatsParams = {
+        week_start: weekStart.toISOString(),
+        week_end: weekEnd.toISOString()
+      };
+      
       const { data, error } = await supabase
-        .rpc('get_user_stats_for_week', {
-          week_start: weekStart.toISOString(),
-          week_end: weekEnd.toISOString()
-        });
+        .rpc('get_user_stats_for_week', params);
         
       if (error) throw error;
       
