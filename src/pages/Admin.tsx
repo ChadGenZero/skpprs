@@ -54,7 +54,7 @@ const Admin: React.FC = () => {
     try {
       setLoading(true);
       
-      // Get user stats for the current week - fix the type issue by passing parameters as an object
+      // Get user stats for the current week - pass parameters as an object
       const { data, error } = await supabase
         .rpc('get_user_stats_for_week', {
           week_start: weekStart.toISOString(),

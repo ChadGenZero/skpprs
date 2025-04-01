@@ -88,7 +88,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_stats_for_week: {
+        Args: {
+          week_start: string
+          week_end: string
+        }
+        Returns: {
+          email: string
+          total_skips: number
+          total_savings: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
