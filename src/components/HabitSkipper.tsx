@@ -1,11 +1,43 @@
+
 import React, { useState } from 'react';
-import { useAppContext, Habit } from '@/context/AppContext';
+import { useAppContext, Habit, SkipLog } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
 import { ArrowLeftIcon, ArrowRightIcon, Plus } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
 import HabitCard from '@/components/HabitCard';
 import CustomSkipModal from '@/components/CustomSkipModal';
+
+interface CustomSkipCardProps {
+  skipLog: SkipLog;
+  onUndo: () => void;
+}
+
+const CustomSkipCard: React.FC<CustomSkipCardProps> = ({ skipLog, onUndo }) => {
+  const emoji = skipLog.customEmoji || '🌊';
+  const name = skipLog.customName || 'Custom Skip';
+  
+  return (
+    <HabitCard 
+      habit={{
+        id: `custom-${skipLog.date}`,
+        name: name,
+        emoji: emoji,
+        expense: skipLog.amountSaved,
+        frequency: 1,
+        period: 'daily',
+        skipped: 1,
+        skippedDays: [skipLog],
+        skipGoal: 1,
+        weeklyTotalPotential: skipLog.amountSaved,
+        isCustomSkip: true
+      }}
+      onClick={() => {}} // Custom skips are already skipped
+      onUndo={onUndo}
+      progress={{ completed: 1, total: 1 }}
+    />
+  );
+};
 
 const HabitSkipper: React.FC = () => {
   const { 
@@ -27,6 +59,19 @@ const HabitSkipper: React.FC = () => {
   // State for custom skip modal
   const [showCustomSkipModal, setShowCustomSkipModal] = useState(false);
   const [selectedHabitForCustomSkip, setSelectedHabitForCustomSkip] = useState<Habit | null>(null);
+  
+  // Get today's custom skips
+  const getTodayCustomSkips = (): SkipLog[] => {
+    return selectedHabits.flatMap(habit => 
+      habit.skippedDays.filter(skip => 
+        isToday(skip.date) && 
+        skip.customName && 
+        skip.customEmoji
+      )
+    );
+  };
+  
+  const todayCustomSkips = getTodayCustomSkips();
   
   const handleSkipHabit = (habitId: string) => {
     // Prevent duplicate skip operations
@@ -96,6 +141,39 @@ const HabitSkipper: React.FC = () => {
         }
       } else {
         toast.info('No skips today to undo');
+      }
+    }
+  };
+
+  const handleUndoCustomSkip = (skipLog: SkipLog) => {
+    const habitId = skipLog.habitId;
+    
+    // Prevent duplicate undo operations
+    if (processingHabits.has(habitId)) return;
+    
+    const habit = selectedHabits.find(h => h.id === habitId);
+    
+    if (habit) {
+      setProcessingHabits(prev => new Set(prev).add(habitId));
+      
+      const skipIndex = habit.skippedDays.findIndex(
+        skip => skip.date === skipLog.date && skip.customName === skipLog.customName
+      );
+      
+      if (skipIndex !== -1) {
+        unskipLog(habitId, skipIndex);
+        toast.success('Custom skip removed!', {
+          description: `You've removed your custom skip of ${skipLog.customName}.`,
+        });
+        
+        // Remove from processing after animation has time to complete
+        setTimeout(() => {
+          setProcessingHabits(prev => {
+            const updated = new Set(prev);
+            updated.delete(habitId);
+            return updated;
+          });
+        }, 1000);
       }
     }
   };
@@ -216,6 +294,15 @@ const HabitSkipper: React.FC = () => {
               onClick={() => handleSkipHabit(habit.id)}
               onUndo={() => handleUndoSkip(habit.id)}
               progress={getSkipGoalProgress(habit)}
+            />
+          ))}
+          
+          {/* Display Custom Skips */}
+          {todayCustomSkips.map((skipLog) => (
+            <CustomSkipCard 
+              key={`${skipLog.habitId}-${skipLog.date}`}
+              skipLog={skipLog}
+              onUndo={() => handleUndoCustomSkip(skipLog)}
             />
           ))}
           

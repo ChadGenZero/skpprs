@@ -25,6 +25,7 @@ export interface Habit {
   skipGoal: number; // Weekly skip goal
   weeklyTotalPotential: number; // Calculated total possible weekly spend
   isForfeited?: boolean; // Whether the weekly/monthly habit has been forfeited
+  isCustomSkip?: boolean; // Whether this is a custom skip (not a regular habit)
 }
 
 export interface AppContextType {
