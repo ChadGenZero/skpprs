@@ -23,59 +23,9 @@ const formSchema = z.object({
 // Get inferred type from schema
 type FormValues = z.infer<typeof formSchema>;
 
-const PositionedEmojis = () => (
-  <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none opacity-30">
-    <span 
-      className="absolute animate-bounce-subtle text-4xl"
-      style={{ 
-        top: '10%',
-        left: '5%',
-      }}
-    >
-      👨‍✈️
-    </span>
-    <span 
-      className="absolute animate-bounce-subtle text-4xl"
-      style={{ 
-        top: '15%',
-        right: '5%',
-      }}
-    >
-      ⛵
-    </span>
-    <span 
-      className="absolute animate-bounce-subtle text-4xl"
-      style={{ 
-        top: '30%',
-        left: '7%',
-      }}
-    >
-      🗺️
-    </span>
-    <span 
-      className="absolute animate-bounce-subtle text-4xl"
-      style={{ 
-        bottom: '15%',
-        right: '8%',
-      }}
-    >
-      ⚓
-    </span>
-    <span 
-      className="absolute animate-bounce-subtle text-4xl"
-      style={{ 
-        bottom: '40%',
-        left: '10%',
-      }}
-    >
-      🐠
-    </span>
-  </div>
-);
-
 const SignUp: React.FC = () => {
   const { totalSavings, weeklySkipSavings, setStep } = useAppContext();
-  const [authMethod, setAuthMethod] = useState<'email' | 'oauth'>('email');
+  const [showFullForm, setShowFullForm] = useState(false);
   
   // Initialize form
   const form = useForm<FormValues>({
@@ -115,7 +65,7 @@ const SignUp: React.FC = () => {
     <div className="animate-scale-in relative">
       <div className="max-w-md mx-auto px-4">
         <div className="text-center mb-8">
-          <div className="inline-block px-3 py-1 rounded-full bg-royal-blue/10 text-royal-blue text-sm font-medium mb-3">
+          <div className="inline-block px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-sm font-medium mb-3">
             Step 5
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Achieve Your Goals</h1>
@@ -125,17 +75,11 @@ const SignUp: React.FC = () => {
         </div>
         
         <Card className="relative overflow-hidden mb-8 border-0 shadow-lg">
-          <PositionedEmojis />
-          <CardHeader className="text-center space-y-1 relative z-10">
-            <CardTitle className="text-2xl font-bold">Build habits you won't quit</CardTitle>
-            <p className="text-sm text-gray-500">Grow your Habit Garden!</p>
-          </CardHeader>
-          
-          <CardContent className="relative z-10">
+          <CardContent className="pt-6 relative z-10">
             <div className="space-y-4">
               <Button 
                 variant="outline" 
-                className="w-full border bg-white hover:bg-gray-50 text-gray-700"
+                className="w-full border bg-white hover:bg-gray-200 text-gray-700"
                 onClick={() => handleOAuthSignUp('Google')}
               >
                 <span className="mr-2">
@@ -148,12 +92,12 @@ const SignUp: React.FC = () => {
               
               <Button 
                 variant="outline" 
-                className="w-full bg-black hover:bg-gray-900 text-white"
+                className="w-full bg-black hover:bg-gray-800 text-white"
                 onClick={() => handleOAuthSignUp('Apple')}
               >
                 <span className="mr-2">
                   <svg viewBox="0 0 24 24" width="16" height="16" className="inline" fill="white">
-                    <path d="M17.6,13.8c0-3,2.5-4.5,2.6-4.6c-1.4-2.1-3.6-2.3-4.4-2.4c-1.9-0.2-3.6,1.1-4.6,1.1c-0.9,0-2.4-1.1-4-1.1c-2,0-3.9,1.2-5,3c-2.1,3.7-0.5,9.1,1.5,12.1c1,1.5,2.2,3.1,3.8,3c1.5-0.1,2.1-1,3.9-1c1.8,0,2.4,1,4,1c1.7,0,2.7-1.5,3.7-2.9c1.2-1.7,1.6-3.3,1.7-3.4C20.8,18.5,17.6,17,17.6,13.8z M14.5,4.2c0.8-1,1.4-2.4,1.2-3.8c-1.2,0-2.7,0.8-3.5,1.8c-0.8,0.9-1.5,2.3-1.3,3.7C12.1,6,13.7,5.2,14.5,4.2z" />
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
                   </svg>
                 </span>
                 SIGN UP WITH APPLE
@@ -170,68 +114,78 @@ const SignUp: React.FC = () => {
                 </div>
               </div>
               
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Name</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                            <Input placeholder="Your name" className="pl-10" {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                            <Input placeholder="Your email" type="email" className="pl-10" {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <div className="relative">
-                            <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
-                            <Input placeholder="Create a password" type="password" className="pl-10" {...field} />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-royal-blue hover:bg-royal-blue/90"
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    SIGN UP WITH EMAIL
-                  </Button>
-                </form>
-              </Form>
+              {!showFullForm ? (
+                <Button 
+                  type="button" 
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                  onClick={() => setShowFullForm(true)}
+                >
+                  <Mail className="mr-2 h-4 w-4" />
+                  SIGN UP WITH EMAIL
+                </Button>
+              ) : (
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                              <Input placeholder="Your name" className="pl-10" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                              <Input placeholder="Your email" type="email" className="pl-10" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Password</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Lock className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                              <Input placeholder="Create a password" type="password" className="pl-10" {...field} />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <Button 
+                      type="submit" 
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                    >
+                      SIGN UP
+                    </Button>
+                  </form>
+                </Form>
+              )}
               
               <div className="mt-6 text-center text-xs text-gray-500">
                 By signing up, you agree to our <a href="#" className="underline">Terms of Service</a> & <a href="#" className="underline">Privacy Policy</a>
