@@ -1,14 +1,17 @@
+
 import React, { useState, useEffect } from 'react';
 import { Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { Undo, LifeBuoy } from 'lucide-react';
+import { Undo, LifeBuoy, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/lib/utils';
+import CustomSkipModal from './CustomSkipModal';
 
 interface HabitCardProps {
   habit: Habit;
   onClick: () => void;
   onUndo: () => void;
+  onCustomSkip?: (name: string, emoji: string, amount: number) => void;
   progress: { completed: number; total: number };
 }
 
@@ -16,10 +19,12 @@ const HabitCard: React.FC<HabitCardProps> = ({
   habit, 
   onClick, 
   onUndo, 
+  onCustomSkip,
   progress 
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const isSkipped = progress.completed > 0;
+  const [showCustomSkipModal, setShowCustomSkipModal] = useState(false);
   
   // Reset animation state when habit skipped status changes
   useEffect(() => {
@@ -34,6 +39,17 @@ const HabitCard: React.FC<HabitCardProps> = ({
   const handleUndoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     onUndo();
+  };
+  
+  const handleAddCustomSkip = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowCustomSkipModal(true);
+  };
+  
+  const handleSaveCustomSkip = (name: string, emoji: string, amount: number) => {
+    if (onCustomSkip) {
+      onCustomSkip(name, emoji, amount);
+    }
   };
   
   return (
@@ -184,6 +200,18 @@ const HabitCard: React.FC<HabitCardProps> = ({
         )}
       </div>
       
+      <div className="absolute bottom-3 left-3 z-20">
+        <Button
+          size="sm"
+          variant="ghost" 
+          className="bg-white/20 hover:bg-white/30 transition-colors"
+          onClick={handleAddCustomSkip}
+        >
+          <Plus size={16} className="mr-1" />
+          Add Custom Skip
+        </Button>
+      </div>
+      
       {isSkipped && (
         <button 
           className="absolute top-3 right-3 p-2 bg-white/20 rounded-full hover:bg-white/30 transition-colors z-20"
@@ -192,6 +220,13 @@ const HabitCard: React.FC<HabitCardProps> = ({
           <Undo size={18} />
         </button>
       )}
+
+      <CustomSkipModal 
+        habit={habit}
+        isOpen={showCustomSkipModal}
+        onClose={() => setShowCustomSkipModal(false)}
+        onSave={handleSaveCustomSkip}
+      />
 
       <style>
         {`

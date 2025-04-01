@@ -9,6 +9,8 @@ export interface SkipLog {
   amountSaved: number;
   isForfeited?: boolean;
   isSpent?: boolean; // New field to track spent habits
+  customName?: string; // Optional field for custom skips
+  customEmoji?: string; // Optional field for custom skips
 }
 
 export interface Habit {
@@ -34,7 +36,7 @@ export interface AppContextType {
   addHabit: (habit: Omit<Habit, 'id' | 'skipped' | 'skippedDays' | 'weeklyTotalPotential'>) => void;
   updateHabit: (habitId: string, updatedHabit: Partial<Omit<Habit, 'id'>>) => void;
   toggleHabit: (habitId: string) => void;
-  skipHabit: (habitId: string, amount?: number) => void;
+  skipHabit: (habitId: string, amount?: number, customName?: string, customEmoji?: string) => void;
   forfeitHabit: (habitId: string, undo?: boolean) => void;
   unskipLog: (habitId: string, skipLogIndex: number) => void;
   resetSkips: () => void;
@@ -347,7 +349,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     }
   };
 
-  const skipHabit = (habitId: string, amount?: number) => {
+  const skipHabit = (habitId: string, amount?: number, customName?: string, customEmoji?: string) => {
     setHabits(habits.map(habit => {
       if (habit.id === habitId) {
         if (habit.isForfeited) return habit;
@@ -359,7 +361,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         
         if (habit.period === 'daily') {
           const todaySkips = getTodaySkips(habit.id);
-          if (todaySkips.length >= habit.frequency) return habit;
+          if (todaySkips.length >= habit.frequency && !customName) return habit;
         }
         
         const skipAmount = amount || habit.expense;
@@ -373,7 +375,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
               habitId,
               date: new Date().toISOString(),
               amountSaved: skipAmount,
-              isSpent: false
+              isSpent: false,
+              customName,
+              customEmoji
             }
           ]
         };

@@ -97,6 +97,36 @@ const HabitSkipper: React.FC = () => {
     }
   };
 
+  const handleCustomSkip = (habitId: string, name: string, emoji: string, amount: number) => {
+    // Prevent duplicate skip operations
+    if (processingHabits.has(habitId)) return;
+    
+    const habit = selectedHabits.find(h => h.id === habitId);
+    
+    if (habit) {
+      if (habit.isForfeited) {
+        toast.error('This habit has been forfeited for this week');
+        return;
+      }
+      
+      setProcessingHabits(prev => new Set(prev).add(habitId));
+      
+      skipHabit(habitId, amount, name, emoji);
+      toast.success('Custom skip added!', {
+        description: `You've added "${name}" and saved ${formatCurrency(amount)}.`,
+      });
+      
+      // Remove from processing after animation has time to complete
+      setTimeout(() => {
+        setProcessingHabits(prev => {
+          const updated = new Set(prev);
+          updated.delete(habitId);
+          return updated;
+        });
+      }, 1000);
+    }
+  };
+
   const handleSuperSkip = () => {
     const skippableHabits = selectedHabits.filter(habit => 
       canSkipToday(habit) && !habit.isForfeited
@@ -121,12 +151,6 @@ const HabitSkipper: React.FC = () => {
     setTimeout(() => {
       setProcessingHabits(new Set());
     }, 1000);
-  };
-
-  // Function to determine if card should show skipped state
-  const shouldShowSkipped = (habit: Habit) => {
-    const todaySkips = habit.skippedDays.filter(skip => isToday(skip.date));
-    return todaySkips.length > 0;
   };
 
   return (
@@ -173,6 +197,7 @@ const HabitSkipper: React.FC = () => {
               habit={habit}
               onClick={() => handleSkipHabit(habit.id)}
               onUndo={() => handleUndoSkip(habit.id)}
+              onCustomSkip={(name, emoji, amount) => handleCustomSkip(habit.id, name, emoji, amount)}
               progress={getSkipGoalProgress(habit)}
             />
           ))}
