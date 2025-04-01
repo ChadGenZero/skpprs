@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -50,7 +51,34 @@ const HabitCard: React.FC<HabitCardProps> = ({
         className="absolute inset-0 w-full h-full z-0"
       >
         <defs>
-          {/* ... keep existing SVG definitions the same ... */}
+          <linearGradient id={`sandGradient-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#f5e2c9" />
+            <stop offset="100%" stopColor="#e6c9a2" />
+          </linearGradient>
+          
+          <pattern id={`sandPattern-${habit.id}`} patternUnits="userSpaceOnUse" width="40" height="40" patternTransform="rotate(45)">
+            <rect width="100%" height="100%" fill="#f5e2c9" />
+            <rect width="10" height="10" fill="#e6c9a2" />
+          </pattern>
+          
+          <linearGradient id={`sandLighting-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+          </linearGradient>
+          
+          <linearGradient id={`waterGradient-${habit.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#0CA5E9" />
+            <stop offset="100%" stopColor="#0078b1" />
+          </linearGradient>
+          
+          <mask id={`sandMask-${habit.id}`}>
+            <rect width="1200" height="600" fill="white" />
+            <circle cx="400" cy="180" r="5" fill="black" />
+            <circle cx="800" cy="120" r="3" fill="black" />
+            <circle cx="600" cy="200" r="4" fill="black" />
+            <circle cx="200" cy="120" r="3" fill="black" />
+            <circle cx="1000" cy="180" r="5" fill="black" />
+          </mask>
         </defs>
         
         <rect
