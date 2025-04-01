@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -13,21 +12,18 @@ import { z } from 'zod';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
-// Create a schema for form validation
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
   password: z.string().min(8, { message: "Password must be at least 8 characters" }),
   name: z.string().min(2, { message: "Name must be at least 2 characters" }),
 });
 
-// Get inferred type from schema
 type FormValues = z.infer<typeof formSchema>;
 
 const SignUp: React.FC = () => {
   const { totalSavings, weeklySkipSavings, setStep } = useAppContext();
   const [showFullForm, setShowFullForm] = useState(false);
   
-  // Initialize form
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -42,8 +38,6 @@ const SignUp: React.FC = () => {
     console.log('Total savings tracking:', totalSavings);
     console.log('Weekly skips tracking:', weeklySkipSavings);
     
-    // In a real app, we would send this data to an API
-    // For now, we'll just show a success message
     toast.success('Account created!', {
       description: `Welcome aboard, ${values.name}! Your savings journey awaits.`,
     });
@@ -54,8 +48,6 @@ const SignUp: React.FC = () => {
     console.log('Total savings tracking:', totalSavings);
     console.log('Weekly skips tracking:', weeklySkipSavings);
     
-    // In a real app, we would redirect to OAuth provider
-    // For now, we'll just show a success message
     toast.success(`${provider} sign-up initiated`, {
       description: "This would redirect to the provider in a real app.",
     });
@@ -92,7 +84,7 @@ const SignUp: React.FC = () => {
               
               <Button 
                 variant="outline" 
-                className="w-full bg-black hover:!bg-black text-white"
+                className="w-full bg-black hover:bg-[#1a1a1a] text-white hover:text-white"
                 onClick={() => handleOAuthSignUp('Apple')}
               >
                 <span className="mr-2">

@@ -405,7 +405,7 @@
 
 /* Super Skip button animation */
 .super-skip-button {
-  @apply text-lg font-bold px-10 py-6 rounded-xl transition-all relative;
+  @apply text-lg font-bold px-4 py-2 rounded-xl transition-all relative;
   animation: scale-pulse 3s infinite, pulse-glow 2s infinite alternate;
   box-shadow: 0 0 15px rgba(247, 147, 26, 0.6), 0 0 30px rgba(247, 147, 26, 0.2);
 }
