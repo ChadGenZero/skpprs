@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext, Habit, SkipLog } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -54,13 +53,10 @@ const HabitSkipper: React.FC = () => {
     unskipLog
   } = useAppContext();
   
-  // Track habits being processed to prevent simultaneous skip operations
   const [processingHabits, setProcessingHabits] = useState<Set<string>>(new Set());
-  // State for custom skip modal
   const [showCustomSkipModal, setShowCustomSkipModal] = useState(false);
   const [selectedHabitForCustomSkip, setSelectedHabitForCustomSkip] = useState<Habit | null>(null);
   
-  // Get today's custom skips
   const getTodayCustomSkips = (): SkipLog[] => {
     return selectedHabits.flatMap(habit => 
       habit.skippedDays.filter(skip => 
@@ -74,7 +70,6 @@ const HabitSkipper: React.FC = () => {
   const todayCustomSkips = getTodayCustomSkips();
   
   const handleSkipHabit = (habitId: string) => {
-    // Prevent duplicate skip operations
     if (processingHabits.has(habitId)) return;
     
     const habit = selectedHabits.find(h => h.id === habitId);
@@ -83,7 +78,6 @@ const HabitSkipper: React.FC = () => {
       const progress = getSkipGoalProgress(habit);
       const canSkip = canSkipToday(habit);
       
-      // Skip if possible
       if (canSkip && !habit.isForfeited) {
         setProcessingHabits(prev => new Set(prev).add(habitId));
         
@@ -92,7 +86,6 @@ const HabitSkipper: React.FC = () => {
           description: `Great job! You saved ${formatCurrency(habit.expense)}.`,
         });
         
-        // Remove from processing after animation has time to complete
         setTimeout(() => {
           setProcessingHabits(prev => {
             const updated = new Set(prev);
@@ -109,7 +102,6 @@ const HabitSkipper: React.FC = () => {
   };
 
   const handleUndoSkip = (habitId: string) => {
-    // Prevent duplicate undo operations
     if (processingHabits.has(habitId)) return;
     
     const habit = selectedHabits.find(h => h.id === habitId);
@@ -130,7 +122,6 @@ const HabitSkipper: React.FC = () => {
             description: `You've undone your last skip of ${habit.name}.`,
           });
           
-          // Remove from processing after animation has time to complete
           setTimeout(() => {
             setProcessingHabits(prev => {
               const updated = new Set(prev);
@@ -148,7 +139,6 @@ const HabitSkipper: React.FC = () => {
   const handleUndoCustomSkip = (skipLog: SkipLog) => {
     const habitId = skipLog.habitId;
     
-    // Prevent duplicate undo operations
     if (processingHabits.has(habitId)) return;
     
     const habit = selectedHabits.find(h => h.id === habitId);
@@ -166,7 +156,6 @@ const HabitSkipper: React.FC = () => {
           description: `You've removed your custom skip of ${skipLog.customName}.`,
         });
         
-        // Remove from processing after animation has time to complete
         setTimeout(() => {
           setProcessingHabits(prev => {
             const updated = new Set(prev);
@@ -183,7 +172,6 @@ const HabitSkipper: React.FC = () => {
     
     const habitId = selectedHabitForCustomSkip.id;
     
-    // Prevent duplicate skip operations
     if (processingHabits.has(habitId)) return;
     
     const habit = selectedHabits.find(h => h.id === habitId);
@@ -201,7 +189,6 @@ const HabitSkipper: React.FC = () => {
         description: `You've added "${name}" and saved ${formatCurrency(amount)}.`,
       });
       
-      // Remove from processing after animation has time to complete
       setTimeout(() => {
         setProcessingHabits(prev => {
           const updated = new Set(prev);
@@ -231,7 +218,6 @@ const HabitSkipper: React.FC = () => {
       return;
     }
     
-    // Mark all habits as processing
     const processingIds = new Set(skippableHabits.map(h => h.id));
     setProcessingHabits(processingIds);
     
@@ -241,7 +227,6 @@ const HabitSkipper: React.FC = () => {
       description: `${skippableHabits.length} habits have been skipped.`,
     });
     
-    // Clear processing state after animation completes
     setTimeout(() => {
       setProcessingHabits(new Set());
     }, 1000);
@@ -279,7 +264,7 @@ const HabitSkipper: React.FC = () => {
           <div className="flex gap-3">
             <Button 
               onClick={handleSuperSkip}
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+              className="super-skip-button bg-bitcoin text-white"
             >
               Super Skip All
             </Button>
@@ -297,7 +282,6 @@ const HabitSkipper: React.FC = () => {
             />
           ))}
           
-          {/* Display Custom Skips */}
           {todayCustomSkips.map((skipLog) => (
             <CustomSkipCard 
               key={`${skipLog.habitId}-${skipLog.date}`}
@@ -340,7 +324,6 @@ const HabitSkipper: React.FC = () => {
         </div>
       </div>
       
-      {/* Custom Skip Modal */}
       {selectedHabitForCustomSkip && (
         <CustomSkipModal
           habit={selectedHabitForCustomSkip}
