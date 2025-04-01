@@ -9,7 +9,80 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      habits: {
+        Row: {
+          cost_per_skip: number
+          created_at: string
+          habit_id: string
+          habit_name: string
+          user_id: string
+        }
+        Insert: {
+          cost_per_skip: number
+          created_at?: string
+          habit_id?: string
+          habit_name: string
+          user_id: string
+        }
+        Update: {
+          cost_per_skip?: number
+          created_at?: string
+          habit_id?: string
+          habit_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      skips: {
+        Row: {
+          habit_id: string
+          skip_date: string
+          skip_id: string
+          user_id: string
+        }
+        Insert: {
+          habit_id: string
+          skip_date?: string
+          skip_id?: string
+          user_id: string
+        }
+        Update: {
+          habit_id?: string
+          skip_date?: string
+          skip_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skips_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["habit_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

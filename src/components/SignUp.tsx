@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,8 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email address" }),
@@ -23,6 +26,8 @@ type FormValues = z.infer<typeof formSchema>;
 const SignUp: React.FC = () => {
   const { totalSavings, weeklySkipSavings, setStep } = useAppContext();
   const [showFullForm, setShowFullForm] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -33,24 +38,63 @@ const SignUp: React.FC = () => {
     },
   });
 
-  const handleSignUp = (values: FormValues) => {
-    console.log('Signup values:', values);
-    console.log('Total savings tracking:', totalSavings);
-    console.log('Weekly skips tracking:', weeklySkipSavings);
-    
-    toast.success('Account created!', {
-      description: `Welcome aboard, ${values.name}! Your savings journey awaits.`,
-    });
+  const handleSignUp = async (values: FormValues) => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signUp({
+        email: values.email,
+        password: values.password,
+        options: {
+          data: {
+            name: values.name,
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Account created!', {
+        description: `Welcome aboard, ${values.name}! Check your email to verify your account.`,
+      });
+      
+      // Note: In a real app, you'd typically redirect to a pending verification page
+      // or to the login page
+    } catch (error: any) {
+      toast.error('Sign up failed', {
+        description: error.message || 'Something went wrong. Please try again.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleOAuthSignUp = (provider: string) => {
-    console.log(`Signing up with ${provider}`);
-    console.log('Total savings tracking:', totalSavings);
-    console.log('Weekly skips tracking:', weeklySkipSavings);
-    
-    toast.success(`${provider} sign-up initiated`, {
-      description: "This would redirect to the provider in a real app.",
-    });
+  const handleOAuthSignUp = async (provider: 'google' | 'apple') => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/app`,
+          queryParams: {
+            prompt: 'consent'
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+      
+      // The user will be redirected to the OAuth provider
+    } catch (error: any) {
+      toast.error(`${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-in failed`, {
+        description: error.message || 'Something went wrong. Please try again.',
+      });
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,7 +116,8 @@ const SignUp: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="w-full border bg-white hover:bg-gray-200 text-gray-700"
-                onClick={() => handleOAuthSignUp('Google')}
+                onClick={() => handleOAuthSignUp('google')}
+                disabled={loading}
               >
                 <span className="mr-2">
                   <svg viewBox="0 0 24 24" width="16" height="16" className="inline">
@@ -85,7 +130,8 @@ const SignUp: React.FC = () => {
               <Button 
                 variant="outline" 
                 className="w-full bg-black hover:bg-[#1a1a1a] text-white hover:text-white"
-                onClick={() => handleOAuthSignUp('Apple')}
+                onClick={() => handleOAuthSignUp('apple')}
+                disabled={loading}
               >
                 <span className="mr-2">
                   <svg viewBox="0 0 24 24" width="16" height="16" className="inline" fill="white">
@@ -111,6 +157,7 @@ const SignUp: React.FC = () => {
                   type="button" 
                   className="w-full bg-royal-blue hover:bg-royal-blue/90 text-white"
                   onClick={() => setShowFullForm(true)}
+                  disabled={loading}
                 >
                   <Mail className="mr-2 h-4 w-4" />
                   SIGN UP WITH EMAIL
@@ -172,8 +219,9 @@ const SignUp: React.FC = () => {
                     <Button 
                       type="submit" 
                       className="w-full bg-bitcoin hover:bg-bitcoin/90 text-white"
+                      disabled={loading}
                     >
-                      SIGN UP
+                      {loading ? 'Signing up...' : 'SIGN UP'}
                     </Button>
                   </form>
                 </Form>
@@ -189,7 +237,16 @@ const SignUp: React.FC = () => {
             <div className="text-center">
               <p className="text-sm text-gray-600">
                 Already have an account? 
-                <Button variant="link" className="pl-1 text-royal-blue">
+                <Button 
+                  variant="link" 
+                  className="pl-1 text-royal-blue"
+                  onClick={() => {
+                    // In a real app, you'd redirect to a login page
+                    toast.info('Login functionality would be here', { 
+                      description: 'This would redirect to a login page in a complete app.'
+                    });
+                  }}
+                >
                   Log in
                 </Button>
               </p>
@@ -202,6 +259,7 @@ const SignUp: React.FC = () => {
             variant="outline"
             className="px-4 py-2"
             onClick={() => setStep(4)}
+            disabled={loading}
           >
             <ArrowLeftIcon className="mr-2" size={16} />
             <span>Back</span>
