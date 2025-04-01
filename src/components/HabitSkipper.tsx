@@ -2,10 +2,11 @@
 import React, { useState } from 'react';
 import { useAppContext, Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
-import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react';
+import { ArrowLeftIcon, ArrowRightIcon, Plus } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { toast } from 'sonner';
 import HabitCard from '@/components/HabitCard';
+import CustomSkipModal from '@/components/CustomSkipModal';
 
 const HabitSkipper: React.FC = () => {
   const { 
@@ -24,6 +25,9 @@ const HabitSkipper: React.FC = () => {
   
   // Track habits being processed to prevent simultaneous skip operations
   const [processingHabits, setProcessingHabits] = useState<Set<string>>(new Set());
+  // State for custom skip modal
+  const [showCustomSkipModal, setShowCustomSkipModal] = useState(false);
+  const [selectedHabitForCustomSkip, setSelectedHabitForCustomSkip] = useState<Habit | null>(null);
   
   const handleSkipHabit = (habitId: string) => {
     // Prevent duplicate skip operations
@@ -97,7 +101,11 @@ const HabitSkipper: React.FC = () => {
     }
   };
 
-  const handleCustomSkip = (habitId: string, name: string, emoji: string, amount: number) => {
+  const handleCustomSkip = (name: string, emoji: string, amount: number) => {
+    if (!selectedHabitForCustomSkip) return;
+    
+    const habitId = selectedHabitForCustomSkip.id;
+    
     // Prevent duplicate skip operations
     if (processingHabits.has(habitId)) return;
     
@@ -125,6 +133,11 @@ const HabitSkipper: React.FC = () => {
         });
       }, 1000);
     }
+  };
+
+  const handleShowCustomSkipModal = (habit: Habit) => {
+    setSelectedHabitForCustomSkip(habit);
+    setShowCustomSkipModal(true);
   };
 
   const handleSuperSkip = () => {
@@ -182,12 +195,28 @@ const HabitSkipper: React.FC = () => {
             <span className="text-xl font-bold">{formatCurrency(weeklySkipSavings)}</span>
           </div>
           
-          <Button 
-            className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
-            onClick={handleSuperSkip}
-          >
-            Super Skip All
-          </Button>
+          <div className="flex gap-3">
+            <Button 
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+              onClick={() => {
+                if (selectedHabits.length > 0) {
+                  handleShowCustomSkipModal(selectedHabits[0]);
+                } else {
+                  toast.error('No habits available for custom skip.');
+                }
+              }}
+            >
+              <Plus size={16} className="mr-1" />
+              Add Custom Skip
+            </Button>
+            
+            <Button 
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
+              onClick={handleSuperSkip}
+            >
+              Super Skip All
+            </Button>
+          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 auto-rows-fr">
@@ -197,7 +226,7 @@ const HabitSkipper: React.FC = () => {
               habit={habit}
               onClick={() => handleSkipHabit(habit.id)}
               onUndo={() => handleUndoSkip(habit.id)}
-              onCustomSkip={(name, emoji, amount) => handleCustomSkip(habit.id, name, emoji, amount)}
+              onCustomSkip={(name, emoji, amount) => handleCustomSkip(name, emoji, amount)}
               progress={getSkipGoalProgress(habit)}
             />
           ))}
@@ -222,6 +251,16 @@ const HabitSkipper: React.FC = () => {
           </Button>
         </div>
       </div>
+      
+      {/* Custom Skip Modal */}
+      {selectedHabitForCustomSkip && (
+        <CustomSkipModal
+          habit={selectedHabitForCustomSkip}
+          isOpen={showCustomSkipModal}
+          onClose={() => setShowCustomSkipModal(false)}
+          onSave={handleCustomSkip}
+        />
+      )}
     </div>
   );
 };
