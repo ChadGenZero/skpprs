@@ -38,9 +38,9 @@ const ProgressBar: React.FC = () => {
 
   return (
     <div className="py-6 px-4 md:px-0 progress-container">
-      <div className="relative mx-auto h-[650px] w-[80px]">
+      <div className="relative mx-auto h-[650px] w-full max-w-[300px]">
         {/* Vertical line */}
-        <div className="absolute left-1/2 top-0 h-full w-[3px] -translate-x-1/2 bg-gray-200 rounded-full">
+        <div className="absolute left-10 top-0 h-full w-[3px] -translate-x-1/2 bg-gray-200 rounded-full">
           {/* Active progress line - animated with CSS */}
           <div 
             className={`absolute top-0 left-0 w-full rounded-full bg-royal-blue transition-all duration-1000 ease-out`} 
@@ -62,9 +62,11 @@ const ProgressBar: React.FC = () => {
           return (
             <div 
               key={s.step}
-              className="absolute left-1/2 -translate-x-1/2"
+              className="absolute flex items-center"
               style={{ 
-                top: `${verticalPosition}%`
+                top: `${verticalPosition}%`,
+                left: "10px",
+                transform: "translateX(-50%)"
               }}
             >
               <button
@@ -91,9 +93,9 @@ const ProgressBar: React.FC = () => {
                 <div className="absolute inset-0 ring-effect"></div>
               </button>
               
-              {/* Step Title */}
+              {/* Step Title - now positioned to the right of the bubble */}
               <div className={cn(
-                "text-sm font-medium mt-2 whitespace-nowrap transition-all absolute left-10",
+                "text-sm font-medium ml-6 whitespace-nowrap transition-all",
                 isStepCurrent ? "text-royal-blue font-semibold scale-105" : "text-gray-500",
                 isStepCompleted && "text-gray-400"
               )}>
