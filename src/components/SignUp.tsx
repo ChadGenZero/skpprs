@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -60,8 +59,7 @@ const SignUp: React.FC = () => {
         description: `Welcome aboard, ${values.name}! Check your email to verify your account.`,
       });
       
-      // Note: In a real app, you'd typically redirect to a pending verification page
-      // or to the login page
+      navigate('/dashboard');
     } catch (error: any) {
       toast.error('Sign up failed', {
         description: error.message || 'Something went wrong. Please try again.',
@@ -77,7 +75,7 @@ const SignUp: React.FC = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/app`,
+          redirectTo: `${window.location.origin}/dashboard`,
           queryParams: {
             prompt: 'consent'
           }
@@ -93,6 +91,38 @@ const SignUp: React.FC = () => {
       toast.error(`${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-in failed`, {
         description: error.message || 'Something went wrong. Please try again.',
       });
+      setLoading(false);
+    }
+  };
+  
+  const handleSignIn = async () => {
+    try {
+      const email = form.getValues().email;
+      const password = form.getValues().password;
+      
+      if (!email || !password) {
+        toast.error('Please enter your email and password to sign in');
+        return;
+      }
+      
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success('Signed in successfully!');
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast.error('Sign in failed', {
+        description: error.message || 'Something went wrong. Please try again.',
+      });
+    } finally {
       setLoading(false);
     }
   };
@@ -240,12 +270,8 @@ const SignUp: React.FC = () => {
                 <Button 
                   variant="link" 
                   className="pl-1 text-royal-blue"
-                  onClick={() => {
-                    // In a real app, you'd redirect to a login page
-                    toast.info('Login functionality would be here', { 
-                      description: 'This would redirect to a login page in a complete app.'
-                    });
-                  }}
+                  onClick={handleSignIn}
+                  disabled={loading}
                 >
                   Log in
                 </Button>
@@ -263,6 +289,15 @@ const SignUp: React.FC = () => {
           >
             <ArrowLeftIcon className="mr-2" size={16} />
             <span>Back</span>
+          </Button>
+          
+          <Button
+            variant="outline"
+            className="px-4 py-2"
+            onClick={() => navigate('/dashboard')}
+            disabled={loading}
+          >
+            <span>Go to Dashboard</span>
           </Button>
         </div>
       </div>

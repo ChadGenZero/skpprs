@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Index from "./pages/Index";
 import Admin from "./pages/Admin";
+import Dashboard from "./components/Dashboard";
 import NotFound from "./pages/NotFound";
 import { supabase } from "./integrations/supabase/client";
 
@@ -46,6 +47,18 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/app" element={<Index />} />
+              <Route
+                path="/dashboard"
+                element={
+                  isLoading ? (
+                    <div className="flex justify-center items-center h-screen">Loading...</div>
+                  ) : session ? (
+                    <Dashboard />
+                  ) : (
+                    <Navigate to="/app" replace />
+                  )
+                }
+              />
               <Route 
                 path="/admin" 
                 element={
