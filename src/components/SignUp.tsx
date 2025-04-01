@@ -65,7 +65,7 @@ const SignUp: React.FC = () => {
     <div className="animate-scale-in relative">
       <div className="max-w-md mx-auto px-4">
         <div className="text-center mb-8">
-          <div className="inline-block px-3 py-1 rounded-full bg-orange-500/10 text-orange-500 text-sm font-medium mb-3">
+          <div className="inline-block px-3 py-1 rounded-full bg-bitcoin/10 text-bitcoin text-sm font-medium mb-3">
             Step 5
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Achieve Your Goals</h1>
@@ -117,7 +117,7 @@ const SignUp: React.FC = () => {
               {!showFullForm ? (
                 <Button 
                   type="button" 
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                  className="w-full bg-bitcoin hover:bg-bitcoin/90 text-white"
                   onClick={() => setShowFullForm(true)}
                 >
                   <Mail className="mr-2 h-4 w-4" />
@@ -179,7 +179,7 @@ const SignUp: React.FC = () => {
                     
                     <Button 
                       type="submit" 
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                      className="w-full bg-bitcoin hover:bg-bitcoin/90 text-white"
                     >
                       SIGN UP
                     </Button>
