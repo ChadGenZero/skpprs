@@ -264,9 +264,9 @@ const HabitSkipper: React.FC = () => {
           <div className="flex gap-3">
             <Button 
               onClick={handleSuperSkip}
-              className="super-skip-button bg-bitcoin text-white"
+              className="super-skip-button bg-bitcoin text-white hover:bg-royal-blue-light hover:shadow-[0_0_15px_rgba(30,174,219,0.6),0_0_30px_rgba(30,174,219,0.2)]"
             >
-              Super Skip All
+              Super Skip
             </Button>
           </div>
         </div>
