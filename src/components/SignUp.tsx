@@ -92,7 +92,7 @@ const SignUp: React.FC = () => {
               
               <Button 
                 variant="outline" 
-                className="w-full bg-black hover:bg-gray-800 text-white"
+                className="w-full bg-black hover:!bg-black text-white"
                 onClick={() => handleOAuthSignUp('Apple')}
               >
                 <span className="mr-2">
@@ -117,7 +117,7 @@ const SignUp: React.FC = () => {
               {!showFullForm ? (
                 <Button 
                   type="button" 
-                  className="w-full bg-bitcoin hover:bg-bitcoin/90 text-white"
+                  className="w-full bg-royal-blue hover:bg-royal-blue/90 text-white"
                   onClick={() => setShowFullForm(true)}
                 >
                   <Mail className="mr-2 h-4 w-4" />
