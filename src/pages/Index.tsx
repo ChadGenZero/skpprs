@@ -16,21 +16,21 @@ const SLogo = () => (
   </div>
 );
 
-// Styled Super Skip button
-const SuperSkipButton = () => {
-  const { superSkip } = useAppContext();
-  
-  return (
-    <div className="flex justify-center my-6">
-      <button
-        onClick={superSkip}
-        className="super-skip-button bg-bitcoin text-white"
-      >
-        Super Skip
-      </button>
-    </div>
-  );
-};
+// This component is removed as requested
+// const SuperSkipButton = () => {
+//   const { superSkip } = useAppContext();
+//   
+//   return (
+//     <div className="flex justify-center my-6">
+//       <button
+//         onClick={superSkip}
+//         className="super-skip-button bg-bitcoin text-white"
+//       >
+//         Super Skip
+//       </button>
+//     </div>
+//   );
+// };
 
 const MainContent: React.FC = () => {
   const { step } = useAppContext();
@@ -44,12 +44,7 @@ const MainContent: React.FC = () => {
       case 3:
         return <GrowthProjector />;
       case 4:
-        return (
-          <>
-            <SuperSkipButton />
-            <HabitSkipper />
-          </>
-        );
+        return <HabitSkipper />; // Removed the SuperSkipButton component
       case 5:
         return <SignUp />;
       default:
