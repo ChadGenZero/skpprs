@@ -18,12 +18,12 @@ const SLogo = () => (
 
 // Styled Super Skip button
 const SuperSkipButton = () => {
-  const { skipAllHabits } = useAppContext();
+  const { superSkip } = useAppContext();
   
   return (
     <div className="flex justify-center my-6">
       <button
-        onClick={skipAllHabits}
+        onClick={superSkip}
         className="super-skip-button bg-bitcoin text-white"
       >
         Super Skip
