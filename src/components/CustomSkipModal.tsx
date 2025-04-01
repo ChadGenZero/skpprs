@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Habit } from '@/context/AppContext';
 import { formatCurrency } from '@/lib/utils';
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { InfoIcon } from "lucide-react";
 
 interface CustomSkipModalProps {
   habit: Habit;
@@ -13,6 +15,22 @@ interface CustomSkipModalProps {
   onClose: () => void;
   onSave: (name: string, emoji: string, amount: number) => void;
 }
+
+// Info tooltip component
+const InfoTooltip: React.FC<{ content: string }> = ({ content }) => {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <InfoIcon size={16} className="text-gray-400 hover:text-bitcoin cursor-help ml-1" />
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+          <p>{content}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 const CustomSkipModal: React.FC<CustomSkipModalProps> = ({ 
   habit, 
@@ -44,24 +62,32 @@ const CustomSkipModal: React.FC<CustomSkipModalProps> = ({
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add Custom Skip for {habit.name}</DialogTitle>
+          <DialogTitle>Add Custom Skip</DialogTitle>
         </DialogHeader>
         
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Custom Skip Name</Label>
-            <Input
-              id="name"
-              placeholder="What did you skip?"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+        <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="space-y-4 py-2">
+          <div className="space-y-2">
+            <Label htmlFor="name" className="flex items-center">
+              Skip Name
+              <InfoTooltip content="What did you skip today? Be specific." />
+            </Label>
+            <Input 
+              id="name" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)} 
+              placeholder="e.g., Coffee Shop Visit" 
+              required 
+              className="text-gray-900 placeholder:text-gray-400"
               autoFocus
             />
           </div>
           
-          <div className="grid gap-2">
-            <Label>Choose an Emoji</Label>
-            <div className="flex flex-wrap gap-2">
+          <div className="space-y-2">
+            <Label htmlFor="emoji" className="flex items-center">
+              Custom Emoji 
+              <InfoTooltip content="Choose an emoji that represents what you skipped" />
+            </Label>
+            <div className="grid grid-cols-5 gap-2 mb-2">
               {commonEmojis.map((e) => (
                 <button
                   key={e}
@@ -73,10 +99,20 @@ const CustomSkipModal: React.FC<CustomSkipModalProps> = ({
                 </button>
               ))}
             </div>
+            <Input 
+              id="emoji" 
+              value={emoji} 
+              onChange={(e) => setEmoji(e.target.value)} 
+              placeholder="or paste your own emoji" 
+              className="text-gray-900 placeholder:text-gray-400 text-2xl"
+            />
           </div>
           
-          <div className="grid gap-2">
-            <Label htmlFor="amount">Amount Saved</Label>
+          <div className="space-y-2">
+            <Label htmlFor="amount" className="flex items-center">
+              Cost ($)
+              <InfoTooltip content="How much did you save by skipping this?" />
+            </Label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <span className="text-gray-500 sm:text-sm">$</span>
@@ -90,22 +126,33 @@ const CustomSkipModal: React.FC<CustomSkipModalProps> = ({
                 className="pl-7"
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
+                required
               />
             </div>
             <p className="text-sm text-gray-500">
               Default is {formatCurrency(habit.expense)}
             </p>
           </div>
-        </div>
+          
+          <div className="p-3 bg-gray-50 rounded-md mt-4">
+            <div className="text-sm text-gray-600 font-medium">You will save:</div>
+            <div className="text-lg font-semibold text-royal-blue">
+              {formatCurrency(amount)}
+            </div>
+            <div className="text-sm text-gray-500 mt-1">
+              This one-time skip will be added to your weekly savings
+            </div>
+          </div>
         
-        <DialogFooter className="sm:justify-between">
-          <Button type="button" variant="outline" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button type="button" onClick={handleSave} className="bg-amber-500 hover:bg-amber-600 text-white">
-            Add Custom Skip
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="pt-4">
+            <Button 
+              type="submit" 
+              className="w-full bg-bitcoin hover:bg-bitcoin/90 text-white"
+            >
+              Add Custom Skip
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

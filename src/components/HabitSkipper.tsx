@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext, Habit } from '@/context/AppContext';
 import { Button } from '@/components/ui/button';
@@ -135,9 +134,13 @@ const HabitSkipper: React.FC = () => {
     }
   };
 
-  const handleShowCustomSkipModal = (habit: Habit) => {
-    setSelectedHabitForCustomSkip(habit);
-    setShowCustomSkipModal(true);
+  const handleShowCustomSkipModal = () => {
+    if (selectedHabits.length > 0) {
+      setSelectedHabitForCustomSkip(selectedHabits[0]);
+      setShowCustomSkipModal(true);
+    } else {
+      toast.error('No habits available for custom skip.');
+    }
   };
 
   const handleSuperSkip = () => {
@@ -197,22 +200,8 @@ const HabitSkipper: React.FC = () => {
           
           <div className="flex gap-3">
             <Button 
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
-              onClick={() => {
-                if (selectedHabits.length > 0) {
-                  handleShowCustomSkipModal(selectedHabits[0]);
-                } else {
-                  toast.error('No habits available for custom skip.');
-                }
-              }}
-            >
-              <Plus size={16} className="mr-1" />
-              Add Custom Skip
-            </Button>
-            
-            <Button 
-              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
               onClick={handleSuperSkip}
+              className="bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white"
             >
               Super Skip All
             </Button>
@@ -226,10 +215,22 @@ const HabitSkipper: React.FC = () => {
               habit={habit}
               onClick={() => handleSkipHabit(habit.id)}
               onUndo={() => handleUndoSkip(habit.id)}
-              onCustomSkip={(name, emoji, amount) => handleCustomSkip(name, emoji, amount)}
               progress={getSkipGoalProgress(habit)}
             />
           ))}
+          
+          <div 
+            onClick={handleShowCustomSkipModal}
+            className="flex flex-col items-center justify-center gap-3 p-6 rounded-3xl border border-dashed border-gray-300 text-gray-500 hover:border-bitcoin hover:text-bitcoin transition-all cursor-pointer shadow-sm hover:shadow-md h-full min-h-[260px]"
+          >
+            <div className="p-3 rounded-full bg-gray-100 hover:bg-amber-100 transition-colors">
+              <Plus size={32} />
+            </div>
+            <span className="font-medium text-center">+ Add Custom Skip</span>
+            <p className="text-xs text-gray-400 text-center max-w-[200px]">
+              Track one-time skips and savings not linked to regular habits
+            </p>
+          </div>
         </div>
         
         <div className="flex justify-between">
