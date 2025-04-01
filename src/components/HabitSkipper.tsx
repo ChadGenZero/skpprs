@@ -192,7 +192,7 @@ const HabitSkipper: React.FC = () => {
             className="bg-royal-blue hover:bg-royal-blue/90 text-white px-8 py-6 rounded-xl shadow-lg hover:shadow-xl transition-all"
             onClick={() => setStep(5)}
           >
-            <span>Setup Auto-Invest</span>
+            <span>Achieve Goals</span>
             <ArrowRightIcon className="ml-2" size={16} />
           </Button>
         </div>

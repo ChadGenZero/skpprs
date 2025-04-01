@@ -7,7 +7,7 @@ import HabitSelector from '@/components/HabitSelector';
 import SavingsCalculator from '@/components/SavingsCalculator';
 import GrowthProjector from '@/components/GrowthProjector';
 import HabitSkipper from '@/components/HabitSkipper';
-import AutoInvest from '@/components/AutoInvest';
+import SignUp from '@/components/SignUp';
 
 // Minimalistic 'S' Logo
 const SLogo = () => (
@@ -30,7 +30,7 @@ const MainContent: React.FC = () => {
       case 4:
         return <HabitSkipper />;
       case 5:
-        return <AutoInvest />;
+        return <SignUp />;
       default:
         return <HabitSelector />;
     }

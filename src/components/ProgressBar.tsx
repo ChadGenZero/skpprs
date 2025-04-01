@@ -10,7 +10,7 @@ const steps = [
   { step: 2, title: 'See Savings' },
   { step: 3, title: 'Grow Savings' },
   { step: 4, title: 'Log Skips' },
-  { step: 5, title: 'Auto-Invest' }
+  { step: 5, title: 'Achieve Goals' }
 ];
 
 const ProgressBar: React.FC = () => {
