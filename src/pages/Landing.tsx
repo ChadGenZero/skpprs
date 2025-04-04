@@ -172,7 +172,7 @@ const Landing: React.FC = () => {
               <span className="text-2xl font-bold tracking-tighter">S</span>
             </div>
             <div className="flex flex-col">
-              <h1 className="text-2xl font-bold text-royal-blue">Skiipper</h1>
+              <h1 className="text-2xl font-bold text-royal-blue">skpprs</h1>
               <p className="text-xs text-gray-500 ml-1">Set Sail</p>
             </div>
           </Link>

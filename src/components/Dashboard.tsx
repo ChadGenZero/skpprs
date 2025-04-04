@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import HabitForm from './HabitForm';
@@ -72,7 +71,7 @@ const Dashboard: React.FC = () => {
       <div className="flex flex-col md:flex-row justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold">Your Habit Dashboard</h1>
-          <p className="text-gray-500">Track, skip, and save money!</p>
+          <p className="text-gray-500">Track, skip, and save money with skpprs!</p>
         </div>
         <div className="flex space-x-4 mt-4 md:mt-0">
           {user && user.email === 'hello.chadcooper@gmail.com' && (

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { AppProvider, useAppContext } from '@/context/AppContext';
@@ -16,22 +15,6 @@ const SLogo = () => (
   </div>
 );
 
-// This component is removed as requested
-// const SuperSkipButton = () => {
-//   const { superSkip } = useAppContext();
-//   
-//   return (
-//     <div className="flex justify-center my-6">
-//       <button
-//         onClick={superSkip}
-//         className="super-skip-button bg-bitcoin text-white"
-//       >
-//         Super Skip
-//       </button>
-//     </div>
-//   );
-// };
-
 const MainContent: React.FC = () => {
   const { step } = useAppContext();
 
@@ -44,7 +27,7 @@ const MainContent: React.FC = () => {
       case 3:
         return <GrowthProjector />;
       case 4:
-        return <HabitSkipper />; // Removed the SuperSkipButton component
+        return <HabitSkipper />;
       case 5:
         return <SignUp />;
       default:
@@ -58,7 +41,7 @@ const MainContent: React.FC = () => {
         <Link to="/" className="flex items-center gap-2">
           <SLogo />
           <div className="flex flex-col">
-            <h1 className="text-2xl font-bold text-royal-blue">Skiipper</h1>
+            <h1 className="text-2xl font-bold text-royal-blue">skpprs</h1>
             <p className="text-xs text-gray-500 ml-1">Set Sail</p>
           </div>
         </Link>
