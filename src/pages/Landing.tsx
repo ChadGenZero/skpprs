@@ -252,7 +252,7 @@ const Landing: React.FC = () => {
         </main>
         
         <footer className="text-center py-8 text-gray-500 text-sm relative z-20">
-          <p>© 2025 Skiipper. All rights reserved.</p>
+          <p>© 2025 skpprs. All rights reserved.</p>
         </footer>
       </div>
     </div>
